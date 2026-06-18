@@ -94,9 +94,29 @@
   // expose for pages that re-render lists (filters/sort) and need a refresh
   window.__animScan = function(){ scan(); sweep(); };
 
-  if (document.readyState !== 'loading') init();
-  else document.addEventListener('DOMContentLoaded', init);
-  window.addEventListener('load', function(){ scan(); sweep(); });
+  // jump to an in-page anchor reliably (e.g. arriving at index.html#fleet from
+  // another page). The native hash jump can race layout + the reveal state, so
+  // we re-scroll instantly and reveal whatever lands in view.
+  function gotoHash(){
+    if (!location.hash || location.hash === '#') return;
+    var el; try { el = document.querySelector(location.hash); } catch(e){ return; }
+    if (!el) return;
+    scan();
+    // landing on a deep-link: reveal EVERYTHING so nothing is left invisible if the
+    // scroll lands late, then jump instantly to the target.
+    document.querySelectorAll(SEL).forEach(reveal);
+    var d = document.documentElement, prev = d.style.scrollBehavior;
+    d.style.scrollBehavior = 'auto';            // force an instant jump (override CSS smooth)
+    el.scrollIntoView({ block:'start' });
+    d.style.scrollBehavior = prev;
+  }
+  // retry a few times so a late layout shift (hero video / images) can't strand us
+  function hashWatch(){ if (location.hash){ gotoHash(); setTimeout(gotoHash, 200); setTimeout(gotoHash, 650); } }
+
+  if (document.readyState !== 'loading') { init(); hashWatch(); }
+  else document.addEventListener('DOMContentLoaded', function(){ init(); hashWatch(); });
+  window.addEventListener('load', function(){ scan(); sweep(); if (location.hash) gotoHash(); });
+  window.addEventListener('hashchange', gotoHash);
   document.addEventListener('visibilitychange', function(){ if (!document.hidden) sweep(); });
   window.addEventListener('scroll', sweep, { passive:true });
 })();
