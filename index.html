@@ -385,7 +385,7 @@
 
     <nav class="main-nav">
       <a href="#home" class="active">الرئيسية<span class="underline"></span></a>
-      <a href="#fleet">الأسطول</a>
+      <a href="fleet.html">الأسطول</a>
       <div class="nav-dd">
         <a href="long-term.html">تأجير طويل الأجل<svg class="dd-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
         <div class="dd-menu">
@@ -718,11 +718,7 @@
   if (fp) fp.addEventListener('click', function(){ nudge(-1); }); // ‹ : forward (reveal next cars)
   if (fn) fn.addEventListener('click', function(){ nudge(1);  }); // › : back
   var fva = document.getElementById('fleetViewAll');
-  if (fva) fva.addEventListener('click', function(){
-    // reveal the whole row (a real build would route to the full catalog page)
-    if (track) animateTo(-(track.scrollWidth - track.clientWidth));
-    console.log('عرض جميع السيارات');
-  });
+  if (fva) fva.addEventListener('click', function(){ window.location.href = 'fleet.html'; });
 
   renderFleet();
   window.renderFleet = renderFleet;   // expose for the future admin
