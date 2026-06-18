@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تأجير طويل الأجل — One Trip Car Rent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="anim.css">
+<script>(function(d){d.documentElement.className+=' js-anim';window.__af=setTimeout(function(){d.documentElement.classList.remove('js-anim');},2000);})(document);</script>
+<style>
+  :root{
+    --blue:#1b2a7a;        /* primary brand blue */
+    --indigo:#2300d9;      /* electric indigo */
+    --orange:#f5901e;      /* brand orange */
+    --orange-soft:#f7a23e;
+    --ink:#1b2440;
+    --muted:#5a6488;
+    --line:#e4e8f5;
+    --cream:#f4f6fd;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Tajawal',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:#fff;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;}
+  ::placeholder{color:#9aa0b4;}
+
+  /* sadu identity strip — pinned to the very top of the hero */
+  .sadu-strip{position:absolute;top:0;left:0;right:0;height:6px;z-index:40;background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#fff 24px,#fff 30px);opacity:.95;}
+
+  /* ---------- header (transparent, overlaid on the hero photo) ---------- */
+  .site-header{
+    position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:28px;
+    padding:18px 48px 0;background:transparent;border:none;
+  }
+  .logo-badge img{height:80px;width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));}
+  .main-nav{display:flex;align-items:center;gap:4px;flex:1;justify-content:center;}
+  .main-nav a{color:rgba(255,255,255,.85);font-weight:600;font-size:15.5px;padding:10px 14px;border-radius:10px;transition:.15s;}
+  .main-nav a:hover{color:#fff;background:rgba(255,255,255,.1);}
+  .main-nav a.active{color:#fff;font-weight:800;background:rgba(255,255,255,.12);}
+  /* nav dropdown */
+  .nav-dd{position:relative;display:inline-flex;}
+  .dd-caret{margin-right:3px;transition:transform .15s;}
+  .nav-dd:hover .dd-caret{transform:rotate(180deg);}
+  .dd-menu{position:absolute;top:calc(100% + 4px);right:0;min-width:190px;background:#fff;border-radius:13px;box-shadow:0 20px 44px rgba(15,22,72,.24);padding:8px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.16s;z-index:60;}
+  .nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu{opacity:1;visibility:visible;transform:translateY(0);}
+  .dd-menu a{display:flex;align-items:center;gap:9px;color:#1b2440;font-weight:700;font-size:14.5px;padding:11px 14px;border-radius:9px;background:transparent;}
+  .dd-menu a:hover{background:#f4f6fd;color:#1b2a7a;}
+  .header-actions{display:flex;align-items:center;gap:16px;}
+  .login-link{color:#fff;font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .login-link:hover{color:var(--orange);}
+  .btn-orange{
+    background:var(--orange);color:#1a0a00;font-weight:800;font-size:15px;padding:12px 24px;border-radius:12px;
+    box-shadow:0 12px 24px rgba(245,144,30,.34);white-space:nowrap;display:inline-flex;align-items:center;gap:8px;
+    border:none;cursor:pointer;transition:.15s;
+  }
+  .btn-orange:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .btn-blue{
+    background:var(--blue);color:#eef1ff;font-weight:800;font-size:15px;padding:12px 24px;border-radius:12px;
+    border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s;box-shadow:0 12px 24px rgba(27,42,122,.3);
+  }
+  .btn-blue:hover{filter:brightness(1.12);transform:translateY(-1px);}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;color:#fff;background:#0d123a;}
+  .hero-photo{display:block;width:100%;height:auto;}                /* full image, never cropped */
+  .hero-overlay{
+    position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding-bottom:120px;
+    background:
+      linear-gradient(270deg, rgba(13,18,58,.90) 0%, rgba(15,22,72,.66) 42%, rgba(15,22,72,.28) 76%, rgba(15,22,72,.12) 100%),
+      linear-gradient(0deg, rgba(13,18,58,.72) 0%, rgba(13,18,58,0) 42%);
+  }
+  .hero-deco{display:none;}
+  .hero-inner{position:relative;z-index:2;max-width:1240px;width:100%;margin:auto;padding:0 48px;}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);margin-bottom:20px;}
+  .eyebrow .dot{width:8px;height:8px;background:var(--orange);border-radius:2px;transform:rotate(45deg);}
+  .eyebrow span{font-weight:700;font-size:14px;}
+  .hero h1{margin:0 0 16px;font-weight:900;font-size:clamp(34px,5vw,62px);line-height:1.08;max-width:780px;}
+  .hero h1 em{font-style:normal;color:var(--orange);}
+  .hero p{margin:0;font-size:clamp(16px,1.6vw,21px);line-height:1.7;color:rgba(255,255,255,.86);max-width:640px;}
+  .hero .hero-sub2{margin-top:16px;font-size:clamp(14.5px,1.3vw,17px);color:rgba(255,255,255,.7);max-width:720px;}
+
+  /* ---------- search / duration bar ---------- */
+  .search-card{
+    position:relative;z-index:5;max-width:1180px;margin:-92px auto 0;background:#fff;border-radius:22px;
+    box-shadow:0 40px 80px rgba(20,28,80,.28);padding:26px;border:1px solid var(--line);
+  }
+  .duration-tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .dur-tab{
+    flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+    padding:14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-family:inherit;transition:.15s;
+  }
+  .dur-tab b{font-size:20px;font-weight:900;color:var(--ink);}
+  .dur-tab small{font-size:13px;color:var(--muted);font-weight:600;}
+  .dur-tab:hover{border-color:#c9d0ef;}
+  .dur-tab.active{border-color:var(--blue);background:var(--blue);}
+  .dur-tab.active b,.dur-tab.active small{color:#fff;}
+  .search-row{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end;}
+  .field label{display:block;font-weight:800;font-size:14px;margin-bottom:8px;color:var(--ink);}
+  .field .control{
+    display:flex;align-items:center;gap:10px;height:56px;border:1.5px solid var(--line);border-radius:13px;padding:0 14px;background:#fff;
+  }
+  .field select,.field input{border:none;outline:none;background:transparent;width:100%;font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);}
+  .field .control:focus-within{border-color:var(--blue);}
+  .search-card .btn-blue{height:56px;justify-content:center;padding:0 40px;font-size:16px;}
+
+  /* ---------- section shells ---------- */
+  .section{max-width:1240px;margin:0 auto;padding:76px 48px;}
+  .section-head{text-align:center;margin-bottom:46px;}
+  .section-head .eyebrow{background:#fff5ea;border-color:#ffe0bd;color:var(--orange);margin-bottom:14px;}
+  .section-head .eyebrow span{color:var(--orange);}
+  .section-head h2{margin:0 0 12px;font-weight:900;font-size:clamp(26px,3vw,42px);color:var(--blue);}
+  .section-head p{margin:0 auto;max-width:620px;color:var(--muted);font-size:17px;line-height:1.7;}
+
+  /* ---------- benefits ---------- */
+  .benefits-wrap{background:var(--cream);}
+  .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .benefit{
+    background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px 24px;transition:.18s;
+  }
+  .benefit:hover{transform:translateY(-4px);box-shadow:0 26px 50px rgba(27,42,122,.12);border-color:#d6ddf6;}
+  .benefit .ic{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eaf0ff,#fff2e3);margin-bottom:16px;}
+  .benefit h3{margin:0 0 8px;font-size:18.5px;font-weight:800;color:var(--ink);}
+  .benefit p{margin:0;color:var(--muted);font-size:15px;line-height:1.7;}
+
+  /* ---------- how it works ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .step{position:relative;text-align:center;padding:36px 26px;border-radius:22px;background:#fff;border:1px solid var(--line);}
+  .step .num{
+    width:58px;height:58px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:24px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--indigo));box-shadow:0 14px 26px rgba(35,0,217,.28);
+  }
+  .step h3{margin:0 0 8px;font-size:20px;font-weight:800;color:var(--blue);}
+  .step p{margin:0;color:var(--muted);font-size:15px;line-height:1.7;}
+  .step .ribbon{position:absolute;top:20px;left:22px;color:var(--orange);font-weight:900;font-size:30px;opacity:.18;}
+
+  /* ---------- cars grid ---------- */
+  .cars-wrap{background:var(--cream);}
+  .cars{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .car{
+    background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;transition:.18s;
+  }
+  .car:hover{transform:translateY(-5px);box-shadow:0 30px 60px rgba(27,42,122,.14);border-color:#d6ddf6;}
+  .car-top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;}
+  .car-cat{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--orange);background:#fff5ea;padding:6px 12px;border-radius:999px;}
+  .car-fav{color:#c2c8dd;}
+  .car-photo{height:150px;display:flex;align-items:center;justify-content:center;padding:6px 18px;}
+  .car-photo img{max-height:150px;width:auto;max-width:100%;}
+  .car-name{margin:0 20px;font-size:20px;font-weight:900;color:var(--ink);}
+  .car-specs{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 20px 0;padding-top:14px;border-top:1px solid var(--line);}
+  .spec{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:600;}
+  .spec svg{color:var(--blue);}
+  .car-price{margin:18px 20px 0;display:flex;align-items:baseline;gap:8px;}
+  .car-price b{font-size:26px;font-weight:900;color:var(--blue);}
+  .car-price .cur{font-size:15px;font-weight:800;color:var(--orange);}
+  .car-price .per{font-size:13px;color:var(--muted);font-weight:600;}
+  .car-tax{margin:4px 20px 0;font-size:12px;color:#98a0bd;}
+  .car .btn-blue{margin:18px 20px 20px;justify-content:center;}
+
+  /* ---------- corporate CTA ---------- */
+  .corp{
+    position:relative;overflow:hidden;border-radius:26px;color:#fff;padding:54px 48px;
+    background:radial-gradient(120% 160% at 90% 10%,#2a0fb0,#1b2a7a 60%,#121a52);
+    display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap;
+  }
+  .corp h2{margin:0 0 8px;font-size:clamp(24px,2.6vw,34px);font-weight:900;}
+  .corp h2 em{font-style:normal;color:var(--orange);}
+  .corp p{margin:0;color:rgba(255,255,255,.85);font-size:17px;max-width:560px;line-height:1.7;}
+
+  /* ---------- footer ---------- */
+  .site-footer{background:#0e1640;color:#cdd3ee;padding:56px 48px 26px;}
+  .footer-inner{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:36px;}
+  .footer-brand img{height:60px;margin-bottom:16px;background:#fff;border-radius:12px;padding:8px 12px;}
+  .footer-brand p{margin:0;color:#9aa3cf;font-size:14.5px;line-height:1.8;max-width:300px;}
+  .fcol h4{margin:0 0 16px;font-size:16px;font-weight:800;color:#fff;}
+  .fcol a{display:block;color:#aab2da;font-size:14.5px;padding:6px 0;transition:.15s;}
+  .fcol a:hover{color:var(--orange);}
+  .cities{display:flex;flex-wrap:wrap;gap:8px;}
+  .cities span{font-size:13px;color:#aab2da;background:rgba(255,255,255,.06);padding:5px 11px;border-radius:999px;}
+  .footer-bottom{max-width:1240px;margin:36px auto 0;padding-top:22px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#8b93bf;font-size:13.5px;}
+  .socials{display:flex;gap:10px;}
+  .socials a{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:#cdd3ee;transition:.15s;}
+  .socials a:hover{background:var(--orange);color:#1a0a00;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:980px){
+    .benefits,.steps,.cars{grid-template-columns:repeat(2,1fr);}
+    .footer-inner{grid-template-columns:1fr 1fr;}
+    .search-row{grid-template-columns:1fr;}
+    .main-nav{display:none;}
+  }
+  @media (max-width:600px){
+    .site-header,.hero-inner,.section,.site-footer{padding-left:20px;padding-right:20px;}
+    .benefits,.steps,.cars,.footer-inner{grid-template-columns:1fr;}
+    .corp{padding:34px 24px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO (full-bleed photo, header overlaid like the homepage) ===== -->
+<section class="hero">
+  <!-- full image — shown complete (no crop) -->
+  <img class="hero-photo" src="assets/hero-handover.png" alt="">
+  <div class="hero-overlay">
+    <div class="sadu-strip"></div>
+
+    <header class="site-header">
+      <a class="logo-badge" href="index.html"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></a>
+      <nav class="main-nav">
+        <a href="index.html">الرئيسية</a>
+        <a href="index.html#fleet">الأسطول</a>
+        <div class="nav-dd">
+          <a href="long-term.html" class="active">تأجير طويل الأجل<svg class="dd-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+          <div class="dd-menu">
+            <a href="long-term.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg>أفراد</a>
+            <a href="corporate.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l7-4 7 4v14M3 21h18M7 10h.01M7 14h.01M13 10h.01M13 14h.01"/></svg>شركات</a>
+          </div>
+        </div>
+        <a href="contact.html">تواصل معنا</a>
+      </nav>
+      <div class="header-actions">
+        <a href="#" class="login-link">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          تسجيل الدخول
+        </a>
+        <a href="#cars" class="btn-orange">احجز الآن
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a0a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+      </div>
+    </header>
+
+    <div class="hero-inner">
+      <div class="eyebrow"><span class="dot"></span><span>تأجير طويل الأجل — للأفراد</span></div>
+      <h1>خيارات تأجير طويلة الأجل <em>تريّح بالك</em></h1>
+      <p>وفّر وقتك، وانطلق بثقة مع السيارة التي تناسب احتياجاتك.</p>
+      <p class="hero-sub2">مع One Trip Car Rent، نوفّر لك حلول تأجير طويلة الأجل تجمع بين الراحة والمرونة والقيمة، لتستمتع بسيارة حديثة وخدمات متكاملة بأسعار تنافسية. اختر سيارتك اليوم ودعنا نهتم بالباقي.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SEARCH / DURATION ===== -->
+<div class="search-card" id="search">
+  <div class="duration-tabs" id="durTabs">
+    <button class="dur-tab active" data-months="12" type="button"><b>١٢ شهر</b><small>القسط الأعلى مرونة</small></button>
+    <button class="dur-tab" data-months="24" type="button"><b>٢٤ شهر</b><small>توفير متوسط</small></button>
+    <button class="dur-tab" data-months="36" type="button"><b>٣٦ شهر</b><small>أوفر قسط شهري</small></button>
+  </div>
+  <div class="search-row">
+    <div class="field">
+      <label>المدينة</label>
+      <div class="control">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        <select><option>الرياض</option><option>جدة</option><option>مكة المكرمة</option><option>الدمام</option><option>المدينة المنورة</option><option>أبها</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>فئة السيارة</label>
+      <div class="control">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.5l1.2-4.6A2.2 2.2 0 0 1 8.3 10.3h7.4a2.2 2.2 0 0 1 2.1 1.6l1.2 4.6"/><path d="M4 16.5h16v2.2a1 1 0 0 1-1 1h-1.6a1 1 0 0 1-1-1v-1.2H7.6v1.2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
+        <select><option>كل الفئات</option><option>سيدان اقتصادية</option><option>سيدان متوسطة</option><option>دفع رباعي</option><option>فاخرة</option></select>
+      </div>
+    </div>
+    <button class="btn-blue" onclick="document.getElementById('cars').scrollIntoView({behavior:'smooth'})">عرض السيارات
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===== BENEFITS ===== -->
+<div class="benefits-wrap">
+  <section class="section">
+    <div class="section-head">
+      <div class="eyebrow" style="background:#fff5ea;border:1px solid #ffe0bd;"><span>ليه One Trip</span></div>
+      <h2>حلول تأجير طويلة الأجل تغنيك وتريّح بالك</h2>
+      <p>باقة متكاملة تخلّيك تركب وتمشي — والباقي علينا.</p>
+    </div>
+    <div class="benefits" id="benefits"></div>
+  </section>
+</div>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section">
+  <div class="section-head">
+    <div class="eyebrow"><span>بثلاث خطوات</span></div>
+    <h2>كيف نعمل</h2>
+    <p>من الاختيار للطريق في دقائق.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="ribbon">٠١</div><div class="num">١</div><h3>اختر</h3><p>اختر السيارة، القسط الشهري المناسب، ومدة التأجير اللي تريّحك.</p></div>
+    <div class="step"><div class="ribbon">٠٢</div><div class="num">٢</div><h3>استلم</h3><p>نسلّمك سيارتك جاهزة ومؤمّنة، واستمتع برحلتك من أول يوم.</p></div>
+    <div class="step"><div class="ribbon">٠٣</div><div class="num">٣</div><h3>استفد</h3><p>حلول تأجير مرنة وقابلة للتخصيص — صيانة وتأمين ودعم على مدار الساعة.</p></div>
+  </div>
+</section>
+
+<!-- ===== CARS ===== -->
+<div class="cars-wrap" id="cars">
+  <section class="section">
+    <div class="section-head">
+      <div class="eyebrow" style="background:#fff5ea;border:1px solid #ffe0bd;"><span>أسطولنا</span></div>
+      <h2>اختر سيارتك باشتراك شهري</h2>
+      <p>الأسعار تتغيّر حسب مدة التأجير — جرّب ١٢ / ٢٤ / ٣٦ شهر من الأعلى.</p>
+    </div>
+    <div class="cars" id="carsGrid"></div>
+  </section>
+</div>
+
+<!-- ===== CORPORATE CTA ===== -->
+<section class="section">
+  <div class="corp">
+    <svg class="hero-deco" viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="#fff" opacity=".1"><rect x="1150" y="120" width="34" height="180"/><rect x="1196" y="160" width="26" height="140"/><rect x="1236" y="90" width="40" height="210" rx="4"/></g></svg>
+    <div style="position:relative;z-index:2;">
+      <h2>تمتلك شركة؟ <em>حلول الأساطيل للشركات</em></h2>
+      <p>باقات مخصّصة لأسطول شركتك بأسعار تفضيلية، إدارة مركزية، وتقارير شهرية — مع نفس راحة البال.</p>
+    </div>
+    <a href="corporate.html" class="btn-orange" style="position:relative;z-index:2;">تواصل لحلول الشركات
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a0a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/onetrip-logo.png" alt="One Trip Car Rent">
+      <p>منصّة تنقّل سعودية حديثة للتأجير اليومي والشهري وطويل الأجل — بهوية سعودية في كل تفصيلة.</p>
+    </div>
+    <div class="fcol">
+      <h4>الشركة</h4>
+      <a href="#">من نحن</a><a href="#">الوظائف</a><a href="#">الامتياز التجاري</a><a href="#">الأسطول</a>
+    </div>
+    <div class="fcol">
+      <h4>خدماتنا</h4>
+      <a href="index.html#bookingWidget">التأجير اليومي</a><a href="long-term.html">تأجير طويل الأجل</a><a href="#">الاشتراك الشهري</a><a href="#">ليموزين</a>
+    </div>
+    <div class="fcol">
+      <h4>مدن نخدمها</h4>
+      <div class="cities"><span>الرياض</span><span>جدة</span><span>مكة</span><span>المدينة</span><span>الدمام</span><span>أبها</span><span>العُلا</span><span>حائل</span><span>جازان</span><span>ينبع</span></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>One Trip Car Rent © جميع الحقوق محفوظة ٢٠٢٦</span>
+    <div class="socials">
+      <a href="#" aria-label="x"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L6 22H2.9l7.5-8.6L2 2h6.5l4.5 6.7L18.9 2z"/></svg></a>
+      <a href="#" aria-label="instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+      <a href="#" aria-label="youtube"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.5-.4-5.1a2.6 2.6 0 0 0-1.8-1.8C19 4.7 12 4.7 12 4.7s-7 0-8.8.4A2.6 2.6 0 0 0 1.4 6.9C1 8.5 1 12 1 12s0 3.5.4 5.1a2.6 2.6 0 0 0 1.8 1.8c1.8.4 8.8.4 8.8.4s7 0 8.8-.4a2.6 2.6 0 0 0 1.8-1.8C23 15.5 23 12 23 12zM10 15.5v-7l6 3.5-6 3.5z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---- benefits data ---- */
+  var ICON = {
+    wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3 18v3h3l6.5-6.5a4 4 0 0 0 5.2-5.2l-2.6 2.6-2-2 2.6-2.6z"/>',
+    shield:'<path d="M12 3l8 3v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3z"/>',
+    road:'<path d="M5 21l3-18M19 21L16 3M12 5v2M12 11v2M12 17v2"/>',
+    gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8s-1-5-4-5-2 5 4 5zM12 8s1-5 4-5 2 5-4 5z"/>',
+    wallet:'<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M17 14h.01"/>',
+    save:'<path d="M3 17l5-5 4 4 8-9M21 7v5h-5"/>'
+  };
+  var benefits=[
+    {ic:'wrench', t:'صيانة توصلك لأي مكان', d:'فريق صيانة يجيلك في موقعك من غير ما توقّف يومك.'},
+    {ic:'shield', t:'ضمان كامل من الوكيل', d:'سيارتك مغطّاة بضمان المصنّع طوال فترة التأجير.'},
+    {ic:'road',   t:'مساعدة على الطريق ٢٤/٧', d:'دعم على مدار الساعة في أي مكان داخل المملكة.'},
+    {ic:'gift',   t:'مكافآت عضوية One Trip', d:'اجمع نقاط واستبدلها بأيام تأجير وترقيات.'},
+    {ic:'wallet', t:'أقساط شهرية ثابتة ومرنة', d:'قسط واضح بدون مفاجآت — يشمل التأمين والصيانة.'},
+    {ic:'save',   t:'توفير أكبر بدون قلق الإهلاك', d:'تركب أحدث الموديلات بدون ما تشيل هم قيمة إعادة البيع.'}
+  ];
+  document.getElementById('benefits').innerHTML = benefits.map(function(b){
+    return '<div class="benefit"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ICON[b.ic]+'</svg></div><h3>'+b.t+'</h3><p>'+b.d+'</p></div>';
+  }).join('');
+
+  /* ===========================================================
+     CARS DATA — single source of truth (admin-ready).
+     priceByMonths: monthly SAR for each rental duration.
+     =========================================================== */
+  window.ltCars = [
+    {id:'camry23',  name:'تويوتا كامري 2023', category:'سيدان متوسطة',  image:'assets/cars/camry.png',   seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:2968,24:2822,36:2408}},
+    {id:'accent25', name:'هيونداي أكسنت 2025', category:'سيدان صغيرة',  image:'assets/cars/accent.png', seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1736,24:1652,36:1406}},
+    {id:'sunny26',  name:'نيسان صني 2026',    category:'سيدان اقتصادية', image:'assets/cars/sunny26.png', seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1641,24:1562,36:1327}},
+    {id:'sunny25',  name:'نيسان صني 2025',    category:'سيدان اقتصادية', image:'assets/cars/sunny25.png', seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1590,24:1510,36:1290}},
+    {id:'camry23b', name:'تويوتا كامري 2023 — فل', category:'سيدان متوسطة', image:'assets/cars/camry.png', seats:5, bags:3, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:3080,24:2929,36:2468}},
+    {id:'accent25b',name:'هيونداي أكسنت 2025 — ستاندر', category:'سيدان صغيرة', image:'assets/cars/accent.png', seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1680,24:1600,36:1360}}
+  ];
+
+  var months = 12;
+  function fmt(n){ return n.toLocaleString('en-US'); }
+  function specSvg(p){ return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
+  var S={
+    seat:'<path d="M5 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5M4 11h13a2 2 0 0 1 2 2v5h-2M4 11v7M7 18h8"/>',
+    bag:'<rect x="6" y="8" width="12" height="12" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+    door:'<path d="M14 3H7a2 2 0 0 0-2 2v16h11V3zM14 3l5 4v14M9 13h.01"/>',
+    ac:'<path d="M12 3v18M5 7l14 10M19 7L5 17"/>'
+  };
+  function renderCars(){
+    var grid=document.getElementById('carsGrid');
+    grid.innerHTML = window.ltCars.map(function(c){
+      var price = c.priceByMonths[months];
+      return '<article class="car" data-id="'+c.id+'">'+
+        '<div class="car-top"><span class="car-cat">'+specSvg(S.gear)+c.category+'</span>'+
+          '<span class="car-fav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.3-9.5-8.5C.9 9.6 2.5 6 6 6c2 0 3.2 1.2 4 2 0.8-.8 2-2 4-2 3.5 0 5.1 3.6 3.5 6.5C19 16.7 12 21 12 21z"/></svg></span></div>'+
+        '<div class="car-photo"><img src="'+c.image+'" alt="'+c.name+'"></div>'+
+        '<h3 class="car-name">'+c.name+'</h3>'+
+        '<div class="car-specs">'+
+          '<span class="spec">'+specSvg(S.seat)+c.seats+' مقاعد</span>'+
+          '<span class="spec">'+specSvg(S.bag)+c.bags+' حقيبة</span>'+
+          '<span class="spec">'+specSvg(S.gear)+c.gear+'</span>'+
+          '<span class="spec">'+specSvg(S.door)+c.doors+' أبواب</span>'+
+          '<span class="spec">'+specSvg(S.ac)+(c.ac?'مكيّف':'بدون')+'</span>'+
+        '</div>'+
+        '<div class="car-price"><b>'+fmt(price)+'</b><span class="cur">ريال</span><span class="per">/ شهريًا</span></div>'+
+        '<div class="car-tax">السعر لا يشمل الضريبة — لمدة '+months+' شهر</div>'+
+        '<button class="btn-blue" type="button" onclick="console.log(\'احجز\','+JSON.stringify(c.id)+','+months+')">احجز الآن'+
+          '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'+
+        '</button>'+
+      '</article>';
+    }).join('');
+  }
+  window.renderLtCars = renderCars;
+
+  /* duration tabs -> update prices */
+  var durTabs=document.getElementById('durTabs');
+  durTabs.addEventListener('click', function(e){
+    var btn=e.target.closest('.dur-tab'); if(!btn) return;
+    durTabs.querySelectorAll('.dur-tab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    months = parseInt(btn.getAttribute('data-months'),10);
+    renderCars();
+  });
+
+  renderCars();
+})();
+</script>
+<script src="anim.js"></script>
+</body>
+</html>

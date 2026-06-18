@@ -1,0 +1,77 @@
+/* ============================================================
+   One Trip — professional scroll & entrance animations
+   Gated behind .js-anim (added by inline head script) and
+   prefers-reduced-motion so non-JS / reduced-motion users
+   always see the full content immediately (no hidden state).
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference){
+
+  /* base hidden state for revealable elements */
+  .js-anim .hero-inner > *,
+  .js-anim .hero-copy > *,
+  .js-anim .section-head,
+  .js-anim .bz-head,
+  .js-anim .bz-cta,
+  .js-anim .benefit,
+  .js-anim .step,
+  .js-anim .car,
+  .js-anim .car-card,
+  .js-anim .why-card,
+  .js-anim .portal-visual,
+  .js-anim .portal-feats li,
+  .js-anim .quote-card,
+  .js-anim .fleet-intro-text,
+  .js-anim .corp{
+    opacity:0;
+    transform:translateY(30px);
+    transition:opacity .75s cubic-bezier(.22,.61,.36,1),
+               transform .75s cubic-bezier(.22,.61,.36,1);
+    will-change:opacity, transform;
+  }
+
+  /* revealed */
+  .js-anim .hero-inner > *.in,
+  .js-anim .hero-copy > *.in,
+  .js-anim .section-head.in,
+  .js-anim .bz-head.in,
+  .js-anim .bz-cta.in,
+  .js-anim .benefit.in,
+  .js-anim .step.in,
+  .js-anim .car.in,
+  .js-anim .car-card.in,
+  .js-anim .why-card.in,
+  .js-anim .portal-visual.in,
+  .js-anim .portal-feats li.in,
+  .js-anim .quote-card.in,
+  .js-anim .fleet-intro-text.in,
+  .js-anim .corp.in{
+    opacity:1;
+    transform:none;
+  }
+
+  /* the featured fleet card keeps its raised offset after reveal */
+  .js-anim .car-card.featured.in{transform:translateY(-18px);}
+
+  /* directional variants (optional, via data-reveal) */
+  .js-anim [data-reveal="right"]{transform:translateX(34px);}
+  .js-anim [data-reveal="left"]{transform:translateX(-34px);}
+  .js-anim [data-reveal="zoom"]{transform:scale(.93);}
+  .js-anim [data-reveal].in{transform:none;}
+
+  /* soft continuous float for hero decorations */
+  @keyframes ot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .js-anim .fleet-deco{animation:ot-float 7s ease-in-out infinite;}
+
+  /* primary CTA shine sweep on hover */
+  .btn-orange{position:relative;overflow:hidden;}
+  .btn-orange::after{
+    content:"";position:absolute;top:0;left:-130%;width:60%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
+    transform:skewX(-18deg);transition:left .6s ease;pointer-events:none;
+  }
+  .btn-orange:hover::after{left:140%;}
+
+  /* gentle pulse on the duration/active chips when selected */
+  @keyframes ot-pop{0%{transform:scale(.9)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+  .dur-tab.active, .chip.active{animation:ot-pop .28s ease;}
+}

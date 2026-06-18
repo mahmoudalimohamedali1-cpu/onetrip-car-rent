@@ -1,0 +1,13 @@
+# original design handoff bundle (large — not part of the site)
+design_bundle/
+
+# crop sources & image backups (not used by the live site)
+*-source.png
+*-original.png
+*-green-backup.png
+assets/cars/*-backup.png
+
+# local dev / tooling
+.claude/
+.DS_Store
+Thumbs.db

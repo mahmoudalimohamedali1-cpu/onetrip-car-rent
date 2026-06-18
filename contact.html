@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تواصل معنا — One Trip Car Rent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="anim.css">
+<script>(function(d){d.documentElement.className+=' js-anim';window.__af=setTimeout(function(){d.documentElement.classList.remove('js-anim');},2000);})(document);</script>
+<style>
+  :root{
+    --blue:#1b2a7a;--indigo:#2300d9;--orange:#f5901e;--orange-soft:#f7a23e;
+    --ink:#1b2440;--muted:#5a6488;--line:#e4e8f5;--cream:#f4f6fd;--field:#dfe4f3;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Tajawal',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:#fff;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;}
+  input,select,textarea,button{font-family:inherit;}
+  ::placeholder{color:#9aa0b4;}
+
+  .sadu-strip{height:6px;background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#fff 24px,#fff 30px);opacity:.95;}
+
+  /* ---- light header ---- */
+  .site-header{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:14px 48px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;}
+  .logo-badge img{height:66px;width:auto;}
+  .main-nav{display:flex;align-items:center;gap:4px;flex:1;justify-content:center;}
+  .main-nav a{color:var(--muted);font-weight:600;font-size:15.5px;padding:10px 14px;border-radius:10px;transition:.15s;}
+  .main-nav a:hover{color:var(--blue);background:var(--cream);}
+  .main-nav a.active{color:var(--blue);font-weight:800;}
+  .nav-dd{position:relative;display:inline-flex;}
+  .dd-caret{margin-right:3px;transition:transform .15s;}
+  .nav-dd:hover .dd-caret{transform:rotate(180deg);}
+  .dd-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:190px;background:#fff;border-radius:13px;box-shadow:0 20px 44px rgba(15,22,72,.18);padding:8px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.16s;z-index:60;}
+  .nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu{opacity:1;visibility:visible;transform:translateY(0);}
+  .dd-menu a{display:flex;align-items:center;gap:9px;color:#1b2440;font-weight:700;font-size:14.5px;padding:11px 14px;border-radius:9px;}
+  .dd-menu a:hover{background:#f4f6fd;color:#1b2a7a;}
+  .header-actions{display:flex;align-items:center;gap:16px;}
+  .login-link{color:var(--ink);font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .login-link:hover{color:var(--blue);}
+  .btn-orange{background:var(--orange);color:#1a0a00;font-weight:800;font-size:15px;padding:11px 22px;border-radius:12px;box-shadow:0 12px 24px rgba(245,144,30,.32);white-space:nowrap;display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;transition:.15s;}
+  .btn-orange:hover{filter:brightness(1.06);transform:translateY(-1px);}
+
+  /* ---- contact hero ---- */
+  .c-hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,#f4f7ff 100%);}
+  .c-hero-inner{position:relative;z-index:3;max-width:1320px;margin:0 auto;padding:54px 48px 40px;min-height:230px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .c-pin{position:absolute;top:30px;left:24px;width:180px;height:auto;opacity:.5;z-index:0;pointer-events:none;}
+  .c-herodeco{position:absolute;top:14px;right:0;width:min(560px,42%);height:auto;z-index:0;pointer-events:none;
+    -webkit-mask-image:linear-gradient(270deg,#000 0,#000 64%,transparent 100%);mask-image:linear-gradient(270deg,#000 0,#000 64%,transparent 100%);}
+  .c-eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff5ea;border:1.5px solid #ffe0bd;color:var(--orange);padding:8px 18px;border-radius:999px;font-weight:800;font-size:14px;margin-bottom:16px;}
+  .c-hero h1{margin:0 0 12px;font-weight:900;font-size:clamp(30px,4vw,52px);color:var(--blue);}
+  .c-hero h1 em{font-style:normal;color:var(--orange);}
+  .c-hero p{margin:0 auto;color:var(--muted);font-size:18px;line-height:1.7;max-width:520px;}
+
+  /* ---- main two columns ---- */
+  .c-main{max-width:1320px;margin:0 auto;padding:8px 48px 70px;display:grid;grid-template-columns:1fr 1.15fr;gap:26px;align-items:start;}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 24px 54px rgba(27,42,122,.08);padding:30px 32px 34px;}
+  .panel-title{margin:0 0 24px;font-size:22px;font-weight:900;color:var(--blue);position:relative;display:inline-block;}
+  .panel-title::after{content:"";position:absolute;right:0;bottom:-9px;width:46px;height:3px;border-radius:3px;background:var(--orange);}
+
+  /* form */
+  .frm-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .fld{position:relative;margin-bottom:14px;}
+  .fld .ic{position:absolute;top:50%;left:14px;transform:translateY(-50%);color:#aab2cf;pointer-events:none;}
+  .fld textarea + .ic{top:18px;transform:none;}
+  .fld input,.fld select,.fld textarea{width:100%;border:1.5px solid var(--field);border-radius:13px;background:#fcfdff;padding:0 40px 0 14px;height:54px;font-size:15px;font-weight:600;color:var(--ink);outline:none;transition:border-color .15s;text-align:right;direction:rtl;}
+  .fld textarea{height:120px;padding:14px 40px 14px 14px;resize:vertical;line-height:1.6;}
+  .fld select{appearance:none;cursor:pointer;}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--blue);background:#fff;}
+  .fld .caret{position:absolute;top:50%;left:14px;transform:translateY(-50%);color:#aab2cf;pointer-events:none;}
+  .send-btn{width:100%;height:58px;border:none;border-radius:14px;background:var(--blue);color:#eef1ff;font-weight:800;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 18px 36px rgba(27,42,122,.32);transition:.15s;margin-top:6px;}
+  .send-btn:hover{filter:brightness(1.12);transform:translateY(-1px);}
+  .privacy{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0 0;color:var(--muted);font-size:13.5px;font-weight:600;}
+
+  /* contact methods grid */
+  .methods{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:18px;}
+  .method{grid-column:span 2;text-align:center;border:1px solid var(--line);border-radius:18px;padding:22px 16px;background:#fff;transition:.18s;}
+  .method.wide{grid-column:span 3;}
+  .method:hover{transform:translateY(-3px);box-shadow:0 22px 44px rgba(27,42,122,.12);border-color:#e7ccae;}
+  .method .mic{width:54px;height:54px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:#fff5ea;color:var(--orange);border:1.5px solid #ffe0bd;}
+  .method h4{margin:0 0 6px;font-size:16px;font-weight:800;color:var(--blue);}
+  .method .val{margin:0;font-size:15px;font-weight:800;color:var(--ink);direction:ltr;unicode-bidi:plaintext;}
+  .method .sub{margin:5px 0 0;font-size:13px;color:var(--muted);font-weight:600;}
+
+  /* map */
+  .map{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);height:230px;
+    background:
+      repeating-linear-gradient(90deg,rgba(27,42,122,.05) 0 1px,transparent 1px 46px),
+      repeating-linear-gradient(0deg,rgba(27,42,122,.05) 0 1px,transparent 1px 46px),
+      linear-gradient(135deg,#eef3ea,#e7eef6);}
+  .map::before{content:"";position:absolute;top:30%;left:-10%;width:120%;height:14px;background:#dfe6ee;transform:rotate(-8deg);}
+  .map::after{content:"";position:absolute;top:62%;left:-10%;width:120%;height:20px;background:#e3ebf3;transform:rotate(6deg);}
+  .map-pin{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);color:var(--blue);z-index:2;filter:drop-shadow(0 8px 12px rgba(27,42,122,.4));}
+  .map-btn{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:9px;background:#fff;color:var(--blue);font-weight:800;font-size:14.5px;padding:11px 20px;border-radius:12px;box-shadow:0 12px 26px rgba(27,42,122,.22);border:none;cursor:pointer;transition:.15s;}
+  .map-btn:hover{background:var(--blue);color:#fff;}
+  .map-btn svg{color:var(--orange);}
+  .map-btn:hover svg{color:#fff;}
+
+  /* ---- bottom CTA band ---- */
+  .c-band{position:relative;overflow:hidden;max-width:1320px;margin:0 auto 60px;border-radius:24px;color:#fff;
+    background:radial-gradient(120% 160% at 80% 0%,#2a0fb0,#1b2a7a 60%,#121a52);}
+  .c-band-inner{position:relative;z-index:3;display:flex;align-items:center;gap:30px;padding:30px 40px;flex-wrap:wrap;}
+  .c-band-logo{height:78px;width:auto;background:#fff;border-radius:14px;padding:10px 16px;}
+  .c-band-txt h3{margin:0 0 6px;font-size:clamp(22px,2.4vw,30px);font-weight:900;}
+  .c-band-txt p{margin:0;color:rgba(255,255,255,.82);font-size:16px;line-height:1.7;max-width:420px;}
+  .c-band-cars{position:absolute;bottom:0;left:0;width:min(640px,52%);height:auto;z-index:1;pointer-events:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%);mask-image:linear-gradient(90deg,transparent 0,#000 22%);}
+
+  /* ---- footer ---- */
+  .site-footer{background:#0e1640;color:#cdd3ee;padding:54px 48px 24px;}
+  .footer-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:36px;}
+  .footer-brand img{height:58px;margin-bottom:16px;background:#fff;border-radius:12px;padding:8px 12px;}
+  .footer-brand p{margin:0;color:#9aa3cf;font-size:14.5px;line-height:1.8;max-width:300px;}
+  .fcol h4{margin:0 0 16px;font-size:16px;font-weight:800;color:#fff;}
+  .fcol a{display:block;color:#aab2da;font-size:14.5px;padding:6px 0;transition:.15s;}
+  .fcol a:hover{color:var(--orange);}
+  .cities{display:flex;flex-wrap:wrap;gap:8px;}
+  .cities span{font-size:13px;color:#aab2da;background:rgba(255,255,255,.06);padding:5px 11px;border-radius:999px;}
+  .footer-bottom{max-width:1320px;margin:34px auto 0;padding-top:22px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#8b93bf;font-size:13.5px;}
+  .socials{display:flex;gap:10px;}
+  .socials a{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:#cdd3ee;transition:.15s;}
+  .socials a:hover{background:var(--orange);color:#1a0a00;}
+
+  @media (max-width:980px){
+    .c-main{grid-template-columns:1fr;}
+    .methods{grid-template-columns:1fr 1fr;}
+    .method,.method.wide{grid-column:span 1;}
+    .footer-inner{grid-template-columns:1fr 1fr;}
+    .main-nav{display:none;}
+    .c-pin,.c-herodeco{display:none;}
+  }
+  @media (max-width:600px){
+    .site-header,.c-hero-inner,.c-main,.site-footer{padding-left:18px;padding-right:18px;}
+    .frm-row{grid-template-columns:1fr;}
+    .methods{grid-template-columns:1fr;}
+    .footer-inner{grid-template-columns:1fr;}
+    .c-band-cars{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sadu-strip"></div>
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+  <a class="logo-badge" href="index.html"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></a>
+  <nav class="main-nav">
+    <a href="index.html">الرئيسية</a>
+    <a href="index.html#fleet">الأسطول</a>
+    <div class="nav-dd">
+      <a href="long-term.html">تأجير طويل الأجل<svg class="dd-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+      <div class="dd-menu">
+        <a href="long-term.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg>أفراد</a>
+        <a href="corporate.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l7-4 7 4v14M3 21h18M7 10h.01M7 14h.01M13 10h.01M13 14h.01"/></svg>شركات</a>
+      </div>
+    </div>
+    <a href="index.html#bookingWidget">الاشتراك الشهري</a>
+    <a href="contact.html" class="active">تواصل معنا</a>
+  </nav>
+  <div class="header-actions">
+    <a href="#" class="login-link">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      تسجيل الدخول
+    </a>
+    <a href="create-booking.html" class="btn-orange">احجز الآن</a>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="c-hero">
+  <svg class="c-pin" viewBox="0 0 220 150" aria-hidden="true">
+    <circle cx="55" cy="42" r="34" fill="none" stroke="#f5901e" stroke-width="11"/><circle cx="55" cy="42" r="11" fill="#1b2a7a"/>
+    <path d="M55 76 C 55 120 120 96 150 120" fill="none" stroke="#f5901e" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 16"/><circle cx="152" cy="121" r="6" fill="#f5901e"/>
+  </svg>
+  <img class="c-herodeco" src="assets/contact-hero.png" alt="" aria-hidden="true">
+  <div class="c-hero-inner">
+    <div class="c-eyebrow">💬 تواصل معنا</div>
+    <h1>نحن هنا <em>لخدمتك</em></h1>
+    <p>لديك سؤال أو تحتاج مساعدة؟ فريق One Trip على أتمّ الاستعداد للرد عليك.</p>
+  </div>
+</section>
+
+<!-- ===== MAIN ===== -->
+<div class="c-main">
+  <!-- form -->
+  <div class="panel">
+    <h2 class="panel-title">أرسل لنا رسالة</h2>
+    <form id="contactForm" novalidate>
+      <div class="frm-row">
+        <div class="fld"><input type="text" placeholder="الاسم الكامل" required><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1"/></svg></span></div>
+        <div class="fld"><input type="email" placeholder="البريد الإلكتروني" required><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span></div>
+      </div>
+      <div class="fld"><input type="tel" placeholder="رقم الجوال"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.2-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2Z"/></svg></span></div>
+      <div class="fld">
+        <select required>
+          <option value="" disabled selected>اختر موضوع الرسالة</option>
+          <option>استفسار عام</option><option>حجز سيارة</option><option>تأجير طويل الأجل</option><option>حلول الشركات</option><option>شكوى أو ملاحظة</option><option>اقتراح</option>
+        </select>
+        <span class="caret"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="fld"><textarea placeholder="رسالتك"></textarea><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span></div>
+      <button class="send-btn" type="submit" id="sendBtn">إرسال الرسالة
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- contact methods -->
+  <div class="panel">
+    <h2 class="panel-title">تواصل معنا عبر</h2>
+    <div class="methods">
+      <div class="method">
+        <div class="mic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.2-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2Z"/></svg></div>
+        <h4>الهاتف</h4><p class="val">9200 32104</p><p class="sub">من 9 صباحًا إلى 11 مساءً</p>
+      </div>
+      <div class="method">
+        <div class="mic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 18.3L3 21z"/><path d="M8.5 9.5c.3 2 2 3.7 4 4 .6.1 1.2-.2 1.4-.8l.2-.6-2-1-.8.7a5 5 0 0 1-1.5-1.5l.7-.8-1-2-.6.2c-.5.2-.8.8-.7 1.4z" fill="currentColor" stroke="none"/></svg></div>
+        <h4>واتساب</h4><p class="val">+966 50 123 4567</p><p class="sub">متاح على مدار 24 ساعة</p>
+      </div>
+      <div class="method">
+        <div class="mic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+        <h4>البريد الإلكتروني</h4><p class="val">carrent@onetrip.sa</p><p class="sub">نرد عليك خلال 24 ساعة</p>
+      </div>
+      <div class="method wide">
+        <div class="mic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg></div>
+        <h4>العنوان</h4><p class="val" style="direction:rtl">الرياض - المملكة العربية السعودية</p><p class="sub">شارع العليا - بجوار برج المملكة</p>
+      </div>
+      <div class="method wide">
+        <div class="mic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14a2 2 0 0 0-2 2v0a2 2 0 0 0 2 2h1v-4H4zM20 14h-1v4h1a2 2 0 0 0 2-2v0a2 2 0 0 0-2-2z"/><path d="M19 18a4 4 0 0 1-4 3h-2"/></svg></div>
+        <h4>خدمة العملاء</h4><p class="val" style="direction:rtl;font-weight:700">فريقنا جاهز لمساعدتك</p><p class="sub">في أي وقت</p>
+      </div>
+    </div>
+    <!-- map -->
+    <div class="map">
+      <span class="map-pin"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></span>
+      <button class="map-btn" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        اعرض الموقع على الخريطة
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BOTTOM CTA BAND ===== -->
+<section class="c-band">
+  <img class="c-band-cars" src="assets/contact-cars.png" alt="" aria-hidden="true">
+  <div class="c-band-inner">
+    <img class="c-band-logo" src="assets/onetrip-logo.png" alt="One Trip Car Rent">
+    <div class="c-band-txt">
+      <h3>رحلتك تبدأ من هنا</h3>
+      <p>مع One Trip — كل طريق يوصّلك لأفضل تجربة.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/onetrip-logo.png" alt="One Trip Car Rent">
+      <p>منصّة تنقّل سعودية حديثة للتأجير اليومي والشهري وطويل الأجل — بهوية سعودية في كل تفصيلة.</p>
+    </div>
+    <div class="fcol"><h4>الشركة</h4><a href="#">من نحن</a><a href="#">الوظائف</a><a href="#">الامتياز التجاري</a><a href="index.html#fleet">الأسطول</a></div>
+    <div class="fcol"><h4>خدماتنا</h4><a href="create-booking.html">التأجير اليومي</a><a href="long-term.html">تأجير طويل الأجل</a><a href="corporate.html">حلول الشركات</a><a href="contact.html">تواصل معنا</a></div>
+    <div class="fcol"><h4>مدن نخدمها</h4><div class="cities"><span>الرياض</span><span>جدة</span><span>مكة</span><span>المدينة</span><span>الدمام</span><span>أبها</span><span>العُلا</span><span>حائل</span><span>جازان</span><span>ينبع</span></div></div>
+  </div>
+  <div class="footer-bottom">
+    <span>One Trip Car Rent © جميع الحقوق محفوظة ٢٠٢٦</span>
+    <div class="socials">
+      <a href="#" aria-label="x"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L6 22H2.9l7.5-8.6L2 2h6.5l4.5 6.7L18.9 2z"/></svg></a>
+      <a href="#" aria-label="instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+      <a href="#" aria-label="youtube"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.5-.4-5.1a2.6 2.6 0 0 0-1.8-1.8C19 4.7 12 4.7 12 4.7s-7 0-8.8.4A2.6 2.6 0 0 0 1.4 6.9C1 8.5 1 12 1 12s0 3.5.4 5.1a2.6 2.6 0 0 0 1.8 1.8c1.8.4 8.8.4 8.8.4s7 0 8.8-.4a2.6 2.6 0 0 0 1.8-1.8C23 15.5 23 12 23 12zM10 15.5v-7l6 3.5-6 3.5z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var f=document.getElementById('contactForm'), btn=document.getElementById('sendBtn');
+  if(f) f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=f.querySelector('input[type=text]').value.trim();
+    var email=f.querySelector('input[type=email]').value.trim();
+    if(!name || !email){ btn.textContent='من فضلك اكمل الاسم والبريد'; btn.style.background='#c0392b'; return; }
+    console.log('رسالة تواصل:', {name:name, email:email, phone:f.querySelector('input[type=tel]').value, subject:f.querySelector('select').value, message:f.querySelector('textarea').value});
+    btn.innerHTML='تم إرسال رسالتك ✓'; btn.style.background='#138a52'; f.reset();
+  });
+  var mapBtn=document.querySelector('.map-btn');
+  if(mapBtn) mapBtn.addEventListener('click',function(){ window.open('https://maps.google.com/?q=Kingdom+Centre+Riyadh','_blank','noopener'); });
+})();
+</script>
+<script src="anim.js"></script>
+</body>
+</html>

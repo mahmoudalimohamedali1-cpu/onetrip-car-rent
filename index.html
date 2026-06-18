@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Trip Car Rent — تجربة لا تُقاس بالتوقّعات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="anim.css">
+<script>(function(d){d.documentElement.className+=' js-anim';window.__af=setTimeout(function(){d.documentElement.classList.remove('js-anim');},2000);})(document);</script>
+<style>
+  :root{
+    --accent:#f5901e;       /* orange brand accent */
+    --indigo:#2300d9;       /* electric indigo brand */
+    --green:#1b2a7a;        /* Saudi forest green */
+    --gold:#f5901e;         /* luxury gold */
+    --gold-soft:#f7a23e;    /* inactive tab text */
+    --field-border:#d8def0;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Tajawal',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    background:#0c0140;
+  }
+  input{font-family:inherit;}
+  ::placeholder{color:#9aa0b4;}
+
+  @keyframes otPan{
+    0%  {transform:scale(1.12) translate3d(0,0,0);}
+    50% {transform:scale(1.16) translate3d(-1.5%,-1.2%,0);}
+    100%{transform:scale(1.12) translate3d(0,0,0);}
+  }
+
+  /* ---------- layout shell ---------- */
+  .hero{
+    position:relative;min-height:100vh;width:100%;overflow:hidden;
+    background:radial-gradient(120% 130% at 80% 0%, #2a0fb0 0%, #16006e 45%, #0c0140 100%);
+  }
+  .sadu-strip{
+    position:absolute;top:0;left:0;right:0;height:6px;z-index:40;opacity:.92;
+    background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#ffffff 24px,#ffffff 30px);
+  }
+  .hero-video{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    animation:otPan 32s cubic-bezier(.45,0,.55,1) infinite;
+    will-change:transform;transform:translateZ(0);backface-visibility:hidden;
+  }
+  .overlay-1{position:absolute;inset:0;z-index:1;}
+  .overlay-2{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(12,1,64,.55) 0%,rgba(12,1,64,0) 22%);}
+
+  /* ---------- header ---------- */
+  .site-header{
+    position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    gap:28px;padding:22px 48px 0;
+  }
+  .logo-badge{
+    display:flex;align-items:center;
+  }
+  .logo-badge img{
+    height:74px;width:auto;display:block;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,.45));
+  }
+
+  .main-nav{display:flex;align-items:center;gap:6px;flex:1;justify-content:center;}
+  .main-nav a{
+    color:rgba(255,255,255,.82);font-weight:500;font-size:16px;text-decoration:none;
+    padding:10px 16px;border-radius:10px;position:relative;transition:color .15s,background .15s;
+  }
+  .main-nav a:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .main-nav a.active{color:#fff;font-weight:700;}
+  .main-nav a.active .underline{
+    position:absolute;bottom:2px;right:16px;left:16px;height:3px;border-radius:3px;background:var(--accent);
+  }
+  /* nav dropdown */
+  .nav-dd{position:relative;display:inline-flex;}
+  .dd-caret{margin-right:3px;transition:transform .15s;}
+  .nav-dd:hover .dd-caret{transform:rotate(180deg);}
+  .dd-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:190px;background:#fff;border-radius:13px;box-shadow:0 20px 44px rgba(8,1,64,.3);padding:8px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.16s;z-index:60;}
+  .nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu{opacity:1;visibility:visible;transform:translateY(0);}
+  .dd-menu a{display:flex;align-items:center;gap:9px;color:#1b2440;font-weight:700;font-size:14.5px;padding:11px 14px;border-radius:9px;background:transparent;}
+  .dd-menu a:hover{background:#f4f6fd;color:#1b2a7a;}
+
+  .header-actions{display:flex;align-items:center;gap:18px;}
+  .login-link{
+    color:#fff;font-weight:600;font-size:15px;text-decoration:none;display:flex;align-items:center;
+    gap:8px;white-space:nowrap;transition:opacity .15s;
+  }
+  .login-link:hover{opacity:.85;}
+  .book-btn{
+    background:var(--accent);color:#1a0a00;font-weight:800;font-size:16px;text-decoration:none;
+    padding:13px 26px;border-radius:12px;box-shadow:0 12px 26px rgba(245,144,30,.38);
+    white-space:nowrap;display:flex;align-items:center;gap:9px;transition:filter .15s,transform .15s;
+  }
+  .book-btn:hover{filter:brightness(1.06);transform:translateY(-1px);}
+
+  /* ---------- hero copy ---------- */
+  .hero-copy{
+    position:relative;z-index:20;max-width:1180px;margin:0 auto;padding:84px 48px 0;text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;padding:9px 18px;border-radius:999px;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
+    backdrop-filter:blur(6px);margin-bottom:26px;
+  }
+  .eyebrow .diamond{width:9px;height:9px;border-radius:2px;background:var(--accent);transform:rotate(45deg);}
+  .eyebrow span:last-child{color:#fff;font-weight:700;font-size:14.5px;letter-spacing:.2px;}
+  .hero-title{
+    color:#fff;font-weight:900;font-size:clamp(44px,6.4vw,92px);line-height:1.04;margin:0 0 22px;
+    text-wrap:balance;text-shadow:0 8px 40px rgba(0,0,0,.35);
+  }
+  .hero-title em{color:var(--accent);font-style:normal;}
+  .hero-sub{
+    color:rgba(255,255,255,.86);font-weight:500;font-size:clamp(17px,1.7vw,22px);line-height:1.7;
+    max-width:720px;margin:0 auto;text-wrap:pretty;
+  }
+
+  /* ---------- booking widget ---------- */
+  .booking{
+    position:relative;z-index:20;max-width:1240px;margin:540px auto 0;padding:0 48px 84px;
+  }
+  .tab-bar{
+    display:flex;align-items:stretch;background:var(--green);border-radius:26px 26px 0 0;
+    overflow:hidden;min-height:70px;
+  }
+  .tab{
+    display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;
+    font-weight:700;font-size:15.5px;padding:0 22px;border:none;cursor:pointer;white-space:nowrap;
+    transition:background .15s ease, color .15s ease;background:transparent;color:var(--gold-soft);
+  }
+  .tab.active{background:var(--gold);color:var(--green);font-weight:800;}
+  .tab-divider{width:1px;background:rgba(201,168,104,.4);margin:20px 0;}
+
+  .form-card{
+    position:relative;overflow:hidden;background:#fff;border-radius:0 0 30px 30px;
+    padding:40px 42px 50px;box-shadow:0 44px 90px rgba(20,28,80,.4);
+  }
+  .deco{position:absolute;pointer-events:none;}
+  .deco-geo{inset:0;width:100%;height:100%;opacity:.04;}
+  .deco-palm{top:-12px;left:-26px;width:235px;height:195px;opacity:.5;}
+  .deco-skyline{left:0;right:0;bottom:0;width:100%;height:auto;opacity:.85;}
+
+  .form-content{position:relative;z-index:2;}
+  .field-grid{display:grid;grid-template-columns:1.7fr 1.25fr 1.25fr;gap:20px;align-items:end;}
+
+  .field-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px;}
+  .field-label{color:var(--green);font-weight:800;font-size:16px;display:block;margin-bottom:11px;}
+  .field-label.inline{margin-bottom:0;}
+
+  .return-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;color:#6b7088;font-weight:600;font-size:13px;}
+  .checkbox{
+    width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+    border:2px solid #f3c69a;background:#fff;transition:all .15s ease;
+  }
+  .checkbox.checked{border-color:var(--gold);background:var(--gold);}
+  .checkbox svg{display:none;}
+  .checkbox.checked svg{display:block;}
+
+  .field-box{
+    display:flex;align-items:center;gap:11px;background:#fff;border:1.5px solid var(--field-border);
+    border-radius:14px;padding:0 16px;height:60px;transition:border-color .15s;
+  }
+  .field-box:focus-within{border-color:var(--green);}
+  .field-box input{
+    border:none;background:transparent;outline:none;width:100%;font-size:16px;font-weight:600;color:var(--green);
+  }
+  .dt-row{display:flex;gap:11px;}
+  .dt-row .field-box{padding:0 14px;gap:8px;}
+  .dt-row .field-box.date{flex:1.25;}
+  .dt-row .field-box.time{flex:1;}
+  .dt-row .field-box input{font-size:15px;}
+
+  .search-row{margin-top:30px;display:flex;justify-content:flex-end;}
+  .search-btn{
+    display:inline-flex;align-items:center;gap:13px;background:var(--green);color:#f3ecdb;border:none;
+    font-family:inherit;font-weight:800;font-size:18px;padding:17px 62px;border-radius:14px;cursor:pointer;
+    box-shadow:0 14px 28px rgba(27,42,122,.42);transition:filter .15s,transform .15s;
+  }
+  .search-btn:hover{filter:brightness(1.13);transform:translateY(-1px);}
+
+  /* ---------- image-based booking widget ----------
+     The PNG is the design; transparent hotspots sit on top.
+     Tweak the % numbers below to nudge any field/button. */
+  .booking .bwrap{
+    position:relative;width:100%;margin:0 auto;
+    container-type:inline-size;
+    filter:drop-shadow(0 40px 80px rgba(20,28,80,.45));
+  }
+  .bg-img{width:100%;display:block;border-radius:22px;}
+  .hotspot{
+    position:absolute;border:0;background:transparent;outline:none;
+    font-family:inherit;padding:0;margin:0;-webkit-tap-highlight-color:transparent;
+  }
+  button.hotspot{cursor:pointer;color:transparent;border-radius:12px;transition:transform .08s ease, background .12s ease;}
+  button.hotspot:hover{background:rgba(255,255,255,.06);}
+  button.hotspot:active{transform:scale(.96);background:rgba(27,42,122,.12);}
+  input.hotspot{
+    cursor:text;color:#1b2a7a;font-weight:700;text-align:right;
+    font-size:clamp(11px,1.45cqw,18px);padding:0 1.4cqw;border-radius:12px;
+  }
+  input.hotspot::placeholder{color:transparent;}
+  input.hotspot:focus{box-shadow:0 0 0 2px rgba(27,42,122,.4) inset;}
+  button.hotspot:focus-visible{box-shadow:0 0 0 2px rgba(27,42,122,.4) inset;}
+
+  /* positions (% of the widget image — recomputed after extra top/bottom/right crop) */
+  .location{top:45.06%;right:-1%;width:43.13%;height:18.28%;padding-right:4.5cqw;}
+  .date1{top:45.06%;right:44.23%;width:11.58%;height:18.28%;}
+  .time1{top:45.06%;right:56.87%;width:11.58%;height:18.28%;}
+  .date2{top:45.06%;right:69.49%;width:11.58%;height:18.28%;}
+  .time2{top:45.06%;right:82.12%;width:11.58%;height:18.28%;}
+  .search{top:69.92%;left:6.84%;width:13.68%;height:16.97%;}
+  .returnchk{top:28.1%;right:27.4%;width:13.68%;height:9.53%;}
+  .tab0{top:-1.35%;right:-2.06%;width:19.99%;height:18.94%;}
+  .tab1{top:-1.35%;right:18.98%;width:17.88%;height:18.94%;}
+  .tab2{top:-1.35%;right:37.93%;width:15.78%;height:18.94%;}
+  .tab3{top:-1.35%;right:54.75%;width:16.84%;height:18.94%;}
+  .tab4{top:-1.35%;right:74.75%;width:16.84%;height:18.94%;}
+
+  /* ---------- fleet section (real, data-driven) ---------- */
+  .fleet{
+    position:relative;z-index:5;overflow:hidden;
+    background:radial-gradient(120% 100% at 90% 10%, #faf7f1 0%, #efe9df 60%, #e9e2d6 100%);
+    padding:60px 0 52px;
+  }
+  /* palm + skyline pinned to the far-right edge of the page, full section height */
+  .fleet-deco{
+    position:absolute;top:0;right:0;height:100%;width:auto;max-width:none;z-index:1;pointer-events:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%);
+            mask-image:linear-gradient(90deg,transparent 0,#000 22%);
+  }
+  /* full page width — no centered max-width, no side gutters left over */
+  .fleet-inner{
+    position:relative;z-index:3;width:100%;margin:0;
+    padding:0 250px 0 56px;            /* right padding clears the pinned decoration */
+    display:flex;gap:40px;align-items:stretch;
+  }
+
+  /* right intro panel: REAL editable text only (decoration is separate, to its right) */
+  .fleet-intro{
+    position:relative;flex:0 0 320px;max-width:320px;display:flex;align-items:center;
+  }
+  .fleet-intro-text{position:relative;z-index:2;width:100%;text-align:right;}
+  .fleet-eyebrow{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-bottom:16px;}
+  .fleet-eyebrow span{color:#f5901e;font-weight:800;font-size:15.5px;letter-spacing:.3px;}
+  .fleet-title{margin:0 0 16px;font-weight:900;font-size:clamp(30px,3vw,46px);line-height:1.12;color:#1b2a7a;}
+  .fleet-title em{display:block;font-style:normal;color:#f5901e;}
+  .fleet-sub{margin:0 0 26px;color:#5a6488;font-weight:500;font-size:16px;line-height:1.8;}
+  .fleet-viewall{
+    display:inline-flex;align-items:center;gap:11px;background:#1b2a7a;color:#f3ecdb;border:none;
+    font-family:inherit;font-weight:800;font-size:16px;padding:14px 28px;border-radius:13px;cursor:pointer;
+    box-shadow:0 14px 28px rgba(27,42,122,.32);transition:filter .15s,transform .12s;
+  }
+  .fleet-viewall:hover{filter:brightness(1.12);transform:translateY(-1px);}
+  .fleet-viewall:active{transform:scale(.98);}
+  .fleet-arrows{display:flex;gap:12px;margin-top:26px;justify-content:flex-end;}
+  .fleet-arrow{
+    width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:filter .15s,transform .12s,background .15s;
+  }
+  .fleet-arrow.prev{background:#1b2a7a;color:#f3ecdb;}
+  .fleet-arrow.next{background:#fff;color:#1b2a7a;box-shadow:0 8px 20px rgba(27,42,122,.18);}
+  .fleet-arrow:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .fleet-arrow:active{transform:scale(.94);}
+
+  /* cars track */
+  .fleet-track{
+    flex:1;display:flex;gap:18px;align-items:stretch;
+    overflow-x:auto;padding:30px 4px 12px;scrollbar-width:none;
+  }
+  .fleet-track::-webkit-scrollbar{display:none;}
+
+  .car-card{
+    position:relative;flex:1 0 258px;min-width:258px;max-width:312px;display:flex;flex-direction:column;align-items:center;
+    background:#faf7f1;border:1px solid #d8def0;border-radius:26px 26px 18px 18px;
+    padding:24px 14px 22px;box-shadow:0 18px 40px rgba(27,42,122,.1);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .car-card:hover{transform:translateY(-4px);box-shadow:0 26px 54px rgba(27,42,122,.16);}
+  .car-card.featured{
+    background:#1b2a7a;border-color:#33409e;transform:translateY(-18px);
+    box-shadow:0 34px 64px rgba(27,42,122,.34);
+  }
+  .car-card.featured:hover{transform:translateY(-22px);}
+
+  .car-badge{
+    position:absolute;top:-13px;left:50%;transform:translateX(-50%);white-space:nowrap;
+    background:linear-gradient(180deg,#ffb04a,#f5901e);color:#1b2a7a;font-weight:900;font-size:13px;
+    padding:7px 18px;border-radius:9px;box-shadow:0 8px 18px rgba(194,163,95,.5);
+  }
+  .car-ornament{margin-bottom:12px;opacity:.85;}
+  .car-cat{font-weight:700;font-size:13.5px;color:#9488b6;margin-bottom:4px;}
+  .car-card.featured .car-cat{color:#f7a23e;}
+  .car-name{margin:0 0 6px;font-weight:900;font-size:19px;color:#1b2a7a;text-align:center;}
+  .car-card.featured .car-name{color:#fff;}
+  .car-photo{width:100%;height:160px;display:flex;align-items:center;justify-content:center;margin:10px 0 16px;}
+  .car-photo img{height:100%;width:auto;max-width:106%;object-fit:contain;}
+
+  .car-price-band{
+    width:calc(100% + 36px);margin:0 -18px 0;background:#18256b;color:#f3ecdb;
+    padding:14px 10px;text-align:center;
+  }
+  .car-card.featured .car-price-band{background:#141d5c;}
+  .car-old-price{display:block;color:#c98f8f;text-decoration:line-through;font-weight:700;font-size:14px;margin-bottom:2px;}
+  .car-price{font-weight:900;font-size:20px;}
+  .car-price small{font-weight:700;font-size:14px;color:#f7a23e;}
+  .car-tax{font-size:12px;color:rgba(243,236,219,.7);margin-top:4px;}
+  .car-discount-tag{
+    position:absolute;top:14px;right:14px;background:#c0392b;color:#fff;font-weight:800;font-size:12px;
+    padding:5px 9px;border-radius:8px;
+  }
+
+  .car-book{
+    margin-top:16px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    background:#fff;color:#1b2a7a;border:1.5px solid #d8def0;font-family:inherit;font-weight:800;font-size:15px;
+    padding:12px;border-radius:12px;cursor:pointer;transition:filter .15s,transform .12s,background .15s;
+  }
+  .car-book:hover{background:#1b2a7a;color:#f3ecdb;border-color:#1b2a7a;}
+  .car-book:active{transform:scale(.97);}
+  .car-card.featured .car-book{background:linear-gradient(180deg,#ffb04a,#f5901e);border-color:#f5901e;color:#1b2a7a;}
+  .car-card.featured .car-book:hover{filter:brightness(1.08);}
+
+  .fleet-wave{position:absolute;left:0;right:0;bottom:0;width:100%;height:120px;z-index:2;pointer-events:none;}
+
+  /* ---------- contact / footer ---------- */
+  .site-footer{background:#141d5c;color:#e8e1cf;}
+  .footer-inner{
+    max-width:1240px;margin:0 auto;padding:54px 48px 34px;
+    display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start;
+  }
+  .footer-brand{max-width:420px;}
+  .footer-brand img{height:56px;width:auto;display:block;margin-bottom:16px;
+    filter:drop-shadow(0 6px 16px rgba(0,0,0,.4));}
+  .footer-brand p{margin:0;color:rgba(232,225,207,.78);font-weight:500;font-size:16px;line-height:1.7;}
+  .footer-contact{display:flex;flex-direction:column;gap:12px;}
+  .footer-contact a{color:#e8e1cf;text-decoration:none;font-weight:700;font-size:17px;}
+  .footer-contact a:hover{color:var(--gold);}
+  .footer-contact span{color:rgba(232,225,207,.6);font-weight:500;font-size:14px;}
+  .footer-bar{
+    border-top:1px solid rgba(201,168,104,.25);text-align:center;
+    padding:18px;color:rgba(232,225,207,.6);font-size:13.5px;font-weight:500;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1024px){
+    .site-header{flex-wrap:wrap;gap:16px;padding:18px 24px 0;}
+    .main-nav{order:3;width:100%;justify-content:center;flex-wrap:wrap;}
+    .hero-copy{padding:56px 24px 0;}
+    .booking{margin-top:160px;padding:0 24px 64px;}
+    .field-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:640px){
+    .tab-bar{overflow-x:auto;}
+    .tab{padding:0 16px;font-size:14px;}
+    .form-card{padding:28px 22px 38px;}
+    .search-row{justify-content:stretch;}
+    .search-btn{width:100%;justify-content:center;padding:17px 0;}
+    .login-link span{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="hero" id="home">
+
+  <!-- Sadu-inspired Saudi identity strip -->
+  <div class="sadu-strip"></div>
+
+  <!-- Background video + fallback gradient -->
+  <video id="heroVideo" class="hero-video" src="assets/hero.mp4"
+         autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
+
+  <!-- Dark transparent overlay (overlayStrength = 0.62) -->
+  <div id="overlay" class="overlay-1"></div>
+  <div class="overlay-2"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="logo-badge">
+      <img src="assets/onetrip-logo.png" alt="One Trip Car Rent">
+    </div>
+
+    <nav class="main-nav">
+      <a href="#home" class="active">الرئيسية<span class="underline"></span></a>
+      <a href="#fleet">الأسطول</a>
+      <div class="nav-dd">
+        <a href="long-term.html">تأجير طويل الأجل<svg class="dd-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="dd-menu">
+          <a href="long-term.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg>أفراد</a>
+          <a href="corporate.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l7-4 7 4v14M3 21h18M7 10h.01M7 14h.01M13 10h.01M13 14h.01"/></svg>شركات</a>
+        </div>
+      </div>
+      <a href="#bookingWidget">الاشتراك الشهري</a>
+      <a href="contact.html">تواصل معنا</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="#" class="login-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>تسجيل الدخول / حساب جديد</span>
+      </a>
+      <a href="create-booking.html" class="book-btn">
+        احجز الآن
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a0a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ===== HERO CONTENT ===== -->
+  <section class="hero-copy">
+    <div class="eyebrow">
+      <span class="diamond"></span>
+      <span>مصمّمة بهوية سعودية في كل تفصيلة</span>
+    </div>
+
+    <h1 class="hero-title">تجربة لا تُقاس <em>بالتوقّعات</em></h1>
+
+    <p class="hero-sub">
+      مرحبًا بك في One Trip Car Rent — منصّة تنقّل حديثة صُمّمت لتجعل وصولك أسهل وأسرع وأكثر راحة.
+    </p>
+  </section>
+
+  <!-- ===== BOOKING WIDGET (real HTML — top rebuilt, palm + skyline kept) ===== -->
+  <section class="booking" id="bookingWidget">
+    <!-- Tabs -->
+    <div class="tab-bar" id="tabBar">
+      <button class="tab active" data-tab="0">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.5l1.2-4.6A2.2 2.2 0 0 1 8.3 10.3h7.4a2.2 2.2 0 0 1 2.1 1.6l1.2 4.6"/><path d="M4 16.5h16v2.2a1 1 0 0 1-1 1h-1.6a1 1 0 0 1-1-1v-1.2H7.6v1.2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
+        ابحث الآن
+      </button>
+      <button class="tab" data-tab="1">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M5.5 18 4 8l4.5 3.4L12 5l3.5 6.4L20 8l-1.5 10"/></svg>
+        الاشتراك الشهري
+      </button>
+      <span class="tab-divider"></span>
+      <button class="tab" data-tab="2">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
+        إدارة الحجز
+      </button>
+      <span class="tab-divider"></span>
+      <button class="tab" data-tab="3">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16.5" x2="13" y2="16.5"/></svg>
+        تأجير طويل الأجل
+      </button>
+      <span class="tab-divider"></span>
+      <button class="tab" data-tab="4">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="18" y2="10.5"/><line x1="18" y1="20" x2="6" y2="10.5"/><path d="M12 10c-1.7-1.1-2.3-2.9-1.7-4.7.9.7 1.4 1.6 1.7 2.7.3-1.1.8-2 1.7-2.7.6 1.8 0 3.6-1.7 4.7Z" fill="currentColor" stroke="none"/><circle cx="12" cy="20.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+        بلو ليموزين
+      </button>
+    </div>
+
+    <!-- Form card -->
+    <div class="form-card">
+      <!-- original Saudi skyline (towers + palms + flag), cropped from the design as an image -->
+      <img class="deco deco-skyline" src="booking-skyline.png" alt="" aria-hidden="true">
+
+      <div class="form-content">
+        <div class="field-grid">
+          <!-- Location -->
+          <div>
+            <div class="field-head">
+              <label class="field-label inline">موقع الاستلام و التسليم</label>
+              <label class="return-toggle" id="returnToggle">
+                <span class="checkbox" id="returnCheckbox">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                الرجوع لموقع مختلف
+              </label>
+            </div>
+            <div class="field-box">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+              <input type="text" placeholder="مكان البحث">
+            </div>
+          </div>
+
+          <!-- Pickup date + time -->
+          <div>
+            <label class="field-label">تاريخ و وقت التسليم</label>
+            <div class="dt-row">
+              <div class="field-box date">
+                <input type="text" placeholder="التاريخ">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
+              </div>
+              <div class="field-box time">
+                <input type="text" placeholder="الوقت">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Return date + time -->
+          <div>
+            <label class="field-label">تاريخ و وقت العودة</label>
+            <div class="dt-row">
+              <div class="field-box date">
+                <input type="text" placeholder="التاريخ">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
+              </div>
+              <div class="field-box time">
+                <input type="text" placeholder="الوقت">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search button -->
+        <div class="search-row">
+          <button class="search-btn" id="searchBtn" type="button">
+            بحث
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#f3ecdb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== FLEET SECTION (real text + decorative image + data-driven cards) ===== -->
+<section class="fleet" id="fleet">
+  <!-- palm + Riyadh skyline: pinned to the far-right edge, full height -->
+  <img class="fleet-deco" src="fleet-deco.png" alt="" aria-hidden="true">
+
+  <div class="fleet-inner">
+    <!-- right intro panel: REAL editable text (separate from the decoration) -->
+    <aside class="fleet-intro">
+      <div class="fleet-intro-text">
+        <div class="fleet-eyebrow">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#f5901e"><path d="M12 2l2.4 6.8L21 11l-6.6 2.2L12 20l-2.4-6.8L3 11l6.6-2.2z"/></svg>
+          <span data-bind="eyebrow">خيارات تناسبك</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#f5901e"><path d="M12 2l2.4 6.8L21 11l-6.6 2.2L12 20l-2.4-6.8L3 11l6.6-2.2z"/></svg>
+        </div>
+        <h2 class="fleet-title"><span data-bind="heading1">سيارات مميّزة</span> <em data-bind="heading2">في أسطولنا</em></h2>
+        <p class="fleet-sub" data-bind="subtext">مجموعة واسعة من السيارات الحديثة بأفضل الأسعار وخدمة عملاء استثنائية.</p>
+        <button class="fleet-viewall" id="fleetViewAll" type="button">
+          عرض جميع السيارات
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f3ecdb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <div class="fleet-arrows">
+          <button class="fleet-arrow prev" id="fleetPrev" type="button" aria-label="السابق">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg>
+          </button>
+          <button class="fleet-arrow next" id="fleetNext" type="button" aria-label="التالي">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- car cards (rendered from data — fully editable by the admin) -->
+    <div class="fleet-track" id="fleetTrack"><!-- cards injected by JS --></div>
+  </div>
+</section>
+
+<!-- ===== CONTACT / FOOTER ===== -->
+<footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/onetrip-logo.png" alt="One Trip Car Rent">
+      <p>منصّة تنقّل حديثة بهوية سعودية — تجربة لا تُقاس بالتوقّعات.</p>
+    </div>
+    <div class="footer-contact">
+      <a href="tel:+966500000000" dir="ltr">+966 50 000 0000</a>
+      <a href="mailto:info@onetrip.sa">info@onetrip.sa</a>
+      <span>متوفّر في جميع مناطق المملكة · خدمة سعودية ١٠٠٪</span>
+    </div>
+  </div>
+  <div class="footer-bar">© 2026 One Trip Car Rent — جميع الحقوق محفوظة</div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---- overlay (overlayStrength = 0.62) ---- */
+  var dark = 0.62;
+  var f = function(n){ return n.toFixed(2); };
+  document.getElementById('overlay').style.background =
+    'linear-gradient(180deg, rgba(8,1,46,' + f(dark*0.55) + ') 0%, rgba(8,1,46,' +
+    f(dark*0.78) + ') 60%, rgba(8,1,46,' + f(Math.min(0.96, dark+0.2)) + ') 100%)';
+
+  var scrollTo = function(sel){
+    var el = document.querySelector(sel);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  /* ---- booking widget (real HTML) ---- */
+  var tabBar = document.getElementById('tabBar');
+  if (tabBar){
+    tabBar.addEventListener('click', function(e){
+      var btn = e.target.closest('.tab');
+      if (!btn) return;
+      tabBar.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  }
+  var returnState = false;
+  var returnToggle = document.getElementById('returnToggle');
+  var returnCheckbox = document.getElementById('returnCheckbox');
+  if (returnToggle && returnCheckbox){
+    returnToggle.addEventListener('click', function(e){
+      e.preventDefault();
+      returnState = !returnState;
+      returnCheckbox.classList.toggle('checked', returnState);
+    });
+  }
+  var searchBtn = document.getElementById('searchBtn');
+  if (searchBtn){
+    searchBtn.addEventListener('click', function(){
+      var loc = (document.querySelector('.form-card input') || {}).value || '';
+      var activeTab = (tabBar && tabBar.querySelector('.tab.active')) ? tabBar.querySelector('.tab.active').textContent.trim() : '';
+      console.log('بحث:', { tab: activeTab, location: loc, returnDifferent: returnState });
+      window.location.href = 'create-booking.html';   // go to the results page
+    });
+  }
+
+  /* ===========================================================
+     FLEET DATA  —  this is the single source of truth.
+     A future admin dashboard / API only needs to replace
+     `window.fleetData` (or PATCH a car object) and call
+     renderFleet(). Everything below renders from this.
+     =========================================================== */
+  window.fleetData = {
+    intro: {
+      eyebrow: 'خيارات تناسبك',
+      heading1: 'سيارات مميزة',
+      heading2: 'في أسطولنا',
+      subtext: 'مجموعة واسعة من السيارات الحديثة بأفضل الأسعار وخدمة عملاء استثنائية'
+    },
+    cars: [
+      { id:'camry23',  order:1, category:'سيدان متوسطة',  name:'تويوتا كامري 2023', image:'assets/cars/camry.png',   price:299, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:false, badge:null,          discount:null, visible:true },
+      { id:'accent25', order:2, category:'سيدان صغيرة',   name:'هيونداي أكسنت 2025', image:'assets/cars/accent.png', price:259, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:true,  badge:'الأكثر طلبًا', discount:null, visible:true },
+      { id:'sunny26',  order:3, category:'سيدان اقتصادية', name:'نيسان صني 2026',   image:'assets/cars/sunny26.png', price:249, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:false, badge:null,          discount:null, visible:true },
+      { id:'sunny25',  order:4, category:'سيدان اقتصادية', name:'نيسان صني 2025',   image:'assets/cars/sunny25.png', price:249, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:false, badge:null,          discount:null, visible:true }
+    ]
+  };
+
+  var ORNAMENT = '<svg width="34" height="34" viewBox="0 0 48 48" fill="none" stroke="#f5901e" stroke-width="1.6"><path d="M24 6l4 6 7-1-1 7 6 4-6 4 1 7-7-1-4 6-4-6-7 1 1-7-6-4 6-4-1-7 7 1z"/><circle cx="24" cy="24" r="6"/></svg>';
+
+  function fmtPrice(c){
+    var price = c.discount && c.discount.price != null ? c.discount.price : c.price;
+    var html = '';
+    if (c.discount && c.discount.price != null){
+      html += '<span class="car-old-price">' + c.price + '</span>';
+    }
+    html += '<div class="car-price">' + price + ' <small>' + c.currency + ' / ' + c.unit + '</small></div>';
+    return html;
+  }
+
+  function renderFleet(){
+    var data = window.fleetData;
+    // bind intro text
+    document.querySelectorAll('[data-bind]').forEach(function(el){
+      var k = el.getAttribute('data-bind');
+      if (data.intro[k] != null) el.textContent = data.intro[k];
+    });
+    var track = document.getElementById('fleetTrack');
+    if (!track) return;
+    var cars = data.cars.filter(function(c){ return c.visible !== false; })
+                        .sort(function(a,b){ return (a.order||0) - (b.order||0); });
+    track.innerHTML = '';
+    cars.forEach(function(c){
+      var card = document.createElement('article');
+      card.className = 'car-card' + (c.featured ? ' featured' : '');
+      card.dataset.id = c.id;
+      var disc = c.discount && c.discount.percent ? '<div class="car-discount-tag">خصم ' + c.discount.percent + '%</div>' : '';
+      var badge = c.badge ? '<div class="car-badge">' + c.badge + '</div>' : '';
+      card.innerHTML =
+        badge + disc +
+        '<div class="car-ornament">' + ORNAMENT + '</div>' +
+        '<div class="car-cat">' + c.category + '</div>' +
+        '<h3 class="car-name">' + c.name + '</h3>' +
+        '<div class="car-photo"><img src="' + c.image + '" alt="' + c.name + '"></div>' +
+        '<div class="car-price-band">' + fmtPrice(c) + '<div class="car-tax">' + c.taxNote + '</div></div>' +
+        '<button class="car-book" type="button">احجز الآن' +
+          '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
+        '</button>';
+      card.querySelector('.car-book').addEventListener('click', function(){
+        console.log('احجز:', c.id, c.name);
+        scrollTo('#bookingWidget');
+      });
+      track.appendChild(card);
+    });
+  }
+
+  /* ---- fleet carousel arrows ----
+     RTL scroll range here is 0 (rightmost / first car) .. negative (leftmost / last).
+     We drive scrollLeft explicitly with scrollTo (scrollBy's sign is unreliable in RTL). */
+  var track = document.getElementById('fleetTrack');
+  // Manual tween: native smooth-scroll to a negative scrollLeft is broken in RTL here,
+  // so we animate scrollLeft directly (the instant setter does accept negatives).
+  var _anim;
+  function animateTo(target){
+    if (!track) return;
+    cancelAnimationFrame(_anim);
+    // rAF is paused in hidden tabs -> jump instantly so it always lands.
+    if (document.hidden || typeof requestAnimationFrame !== 'function'){ track.scrollLeft = target; return; }
+    var start = track.scrollLeft, delta = target - start, t0 = null, dur = 360;
+    function frame(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var e = p < .5 ? 2*p*p : 1 - Math.pow(-2*p+2, 2)/2;  // easeInOutQuad
+      track.scrollLeft = start + delta * e;
+      if (p < 1) _anim = requestAnimationFrame(frame);
+    }
+    _anim = requestAnimationFrame(frame);
+  }
+  function nudge(dir){           // dir: -1 = forward (reveal next), +1 = back
+    if (!track) return;
+    var step = Math.min(540, track.clientWidth * 0.85);
+    var min  = -(track.scrollWidth - track.clientWidth);   // most-negative position
+    animateTo(Math.max(min, Math.min(0, track.scrollLeft + (dir < 0 ? -step : step))));
+  }
+  var fp = document.getElementById('fleetPrev'), fn = document.getElementById('fleetNext');
+  if (fp) fp.addEventListener('click', function(){ nudge(-1); }); // ‹ : forward (reveal next cars)
+  if (fn) fn.addEventListener('click', function(){ nudge(1);  }); // › : back
+  var fva = document.getElementById('fleetViewAll');
+  if (fva) fva.addEventListener('click', function(){
+    // reveal the whole row (a real build would route to the full catalog page)
+    if (track) animateTo(-(track.scrollWidth - track.clientWidth));
+    console.log('عرض جميع السيارات');
+  });
+
+  renderFleet();
+  window.renderFleet = renderFleet;   // expose for the future admin
+
+  /* ---- video: keep it looping smoothly without hanging ---- */
+  var v = document.getElementById('heroVideo');
+  if (v){
+    v.muted = true; v.defaultMuted = true; v.playsInline = true;
+    var kick = function(){ var p = v.play(); if (p && p.catch) p.catch(function(){}); };
+    kick();
+    // Manual loop — some encodings don't honour the loop attribute reliably.
+    v.addEventListener('ended', function(){ try{ v.currentTime = 0; }catch(err){} kick(); });
+    v.addEventListener('canplay', kick);
+    v.addEventListener('stalled', kick);
+    v.addEventListener('waiting', kick);
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) kick(); });
+    // Watchdog: nudge/restart if playback freezes or reaches the end.
+    var last = 0;
+    setInterval(function(){
+      if (!v.duration) return;
+      if (v.currentTime >= v.duration - 0.35){ try{ v.currentTime = 0; }catch(err){} kick(); return; }
+      if (!v.paused && v.currentTime === last && v.readyState >= 2) kick();
+      last = v.currentTime;
+    }, 1000);
+  }
+})();
+</script>
+<script src="anim.js"></script>
+</body>
+</html>

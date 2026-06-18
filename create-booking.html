@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>احجز سيارتك — One Trip Car Rent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="anim.css">
+<script>(function(d){d.documentElement.className+=' js-anim';window.__af=setTimeout(function(){d.documentElement.classList.remove('js-anim');},2000);})(document);</script>
+<style>
+  :root{
+    --blue:#1b2a7a;--indigo:#2300d9;--orange:#f5901e;--orange-soft:#f7a23e;
+    --ink:#1b2440;--muted:#5a6488;--line:#e4e8f5;--cream:#f4f6fd;--field:#d8def0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Tajawal',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:#fff;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;}
+  input,select,button{font-family:inherit;}
+  ::placeholder{color:#9aa0b4;}
+
+  .sadu-strip{position:absolute;top:0;left:0;right:0;height:6px;z-index:40;background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#fff 24px,#fff 30px);opacity:.95;}
+
+  /* ---- header (transparent over the blue band) ---- */
+  .site-header{position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:28px;padding:18px 48px 0;background:transparent;}
+  .logo-badge img{height:74px;width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.4));}
+  .main-nav{display:flex;align-items:center;gap:4px;flex:1;justify-content:center;}
+  .main-nav a{color:rgba(255,255,255,.85);font-weight:600;font-size:15.5px;padding:10px 14px;border-radius:10px;transition:.15s;}
+  .main-nav a:hover{color:#fff;background:rgba(255,255,255,.1);}
+  .main-nav a.active{color:#fff;font-weight:800;background:rgba(255,255,255,.12);}
+  .nav-dd{position:relative;display:inline-flex;}
+  .dd-caret{margin-right:3px;transition:transform .15s;}
+  .nav-dd:hover .dd-caret{transform:rotate(180deg);}
+  .dd-menu{position:absolute;top:calc(100% + 4px);right:0;min-width:190px;background:#fff;border-radius:13px;box-shadow:0 20px 44px rgba(15,22,72,.24);padding:8px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.16s;z-index:60;}
+  .nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu{opacity:1;visibility:visible;transform:translateY(0);}
+  .dd-menu a{display:flex;align-items:center;gap:9px;color:#1b2440;font-weight:700;font-size:14.5px;padding:11px 14px;border-radius:9px;}
+  .dd-menu a:hover{background:#f4f6fd;color:#1b2a7a;}
+  .header-actions{display:flex;align-items:center;gap:16px;}
+  .login-link{color:#fff;font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .login-link:hover{color:var(--orange);}
+  .btn-orange{background:var(--orange);color:#1a0a00;font-weight:800;font-size:15px;padding:12px 24px;border-radius:12px;box-shadow:0 12px 24px rgba(245,144,30,.34);white-space:nowrap;display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;transition:.15s;}
+  .btn-orange:hover{filter:brightness(1.06);transform:translateY(-1px);}
+
+  /* ---- booking band ---- */
+  .book-band{position:relative;overflow:hidden;color:#fff;padding:0 0 64px;background:radial-gradient(120% 130% at 85% 0%, #2a0fb0 0%, #1b2a7a 48%, #111a52 100%);}
+  .book-inner{position:relative;z-index:3;max-width:1320px;margin:0 auto;padding:52px 48px 0;}
+  .crumb{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);font-size:14px;font-weight:600;margin-bottom:14px;}
+  .crumb a:hover{color:#fff;}
+  .book-band h1{margin:0 0 6px;font-weight:900;font-size:clamp(28px,3.4vw,44px);}
+  .book-band h1 em{font-style:normal;color:var(--orange);}
+  .book-band .lead{margin:0 0 30px;color:rgba(255,255,255,.82);font-size:17px;}
+
+  /* ---- booking widget (same as homepage) ---- */
+  .booking{position:relative;z-index:5;max-width:1320px;margin:0 auto;}
+  .tab-bar{display:flex;align-items:stretch;background:var(--blue);border-radius:22px 22px 0 0;overflow:hidden;min-height:64px;box-shadow:0 -2px 0 rgba(0,0,0,.05);}
+  .tab{display:flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:15px;padding:0 20px;border:none;cursor:pointer;white-space:nowrap;transition:.15s;background:transparent;color:var(--orange-soft);}
+  .tab.active{background:var(--orange);color:var(--blue);font-weight:800;}
+  .tab-divider{width:1px;background:rgba(245,144,30,.35);margin:18px 0;}
+  .form-card{position:relative;overflow:hidden;background:#fff;border-radius:0 0 26px 26px;padding:30px 34px 38px;box-shadow:0 40px 80px rgba(15,22,72,.32);}
+  .form-skyline{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;opacity:.85;pointer-events:none;}
+  .form-content{position:relative;z-index:2;}
+  .field-grid{display:grid;grid-template-columns:1.7fr 1.25fr 1.25fr;gap:18px;align-items:end;}
+  .field-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+  .field-label{color:var(--blue);font-weight:800;font-size:15.5px;display:block;margin-bottom:10px;}
+  .field-label.inline{margin-bottom:0;}
+  .return-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;color:#6b7088;font-weight:600;font-size:13px;}
+  .checkbox{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;border:2px solid #cbd2ec;background:#fff;transition:.15s;}
+  .checkbox.checked{border-color:var(--orange);background:var(--orange);}
+  .checkbox svg{display:none;}
+  .checkbox.checked svg{display:block;}
+  .field-box{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--field);border-radius:13px;padding:0 15px;height:58px;transition:border-color .15s;}
+  .field-box:focus-within{border-color:var(--blue);}
+  .field-box input{border:none;background:transparent;outline:none;width:100%;font-size:15.5px;font-weight:600;color:var(--blue);}
+  .dt-row{display:flex;gap:10px;}
+  .dt-row .field-box{padding:0 13px;gap:8px;}
+  .dt-row .field-box.date{flex:1.25;}
+  .dt-row .field-box.time{flex:1;}
+  .dt-row .field-box input{font-size:14.5px;}
+  .search-row{margin-top:26px;display:flex;justify-content:flex-end;}
+  .search-btn{display:inline-flex;align-items:center;gap:12px;background:var(--blue);color:#eef1ff;border:none;font-weight:800;font-size:17px;padding:15px 58px;border-radius:13px;cursor:pointer;box-shadow:0 14px 28px rgba(27,42,122,.4);transition:.15s;}
+  .search-btn:hover{filter:brightness(1.13);transform:translateY(-1px);}
+
+  /* ---- results ---- */
+  .results{max-width:1320px;margin:0 auto;padding:34px 48px 80px;}
+  .filterbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 14px 34px rgba(27,42,122,.06);margin-bottom:26px;}
+  .filterbar .count{font-weight:800;color:var(--blue);font-size:16px;margin-left:auto;}
+  .filterbar .count em{font-style:normal;color:var(--orange);}
+  .fctrl{display:flex;align-items:center;gap:8px;}
+  .fctrl label{font-size:13.5px;font-weight:700;color:var(--muted);}
+  .fctrl select{height:44px;border:1.5px solid var(--line);border-radius:11px;padding:0 12px;font-size:14.5px;font-weight:700;color:var(--blue);background:#fff;outline:none;cursor:pointer;}
+  .fctrl select:focus{border-color:var(--blue);}
+  .chkline{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;}
+  .chkline input{width:18px;height:18px;accent-color:var(--orange);}
+  .view-toggle{display:flex;gap:4px;background:var(--cream);border-radius:11px;padding:4px;}
+  .view-toggle button{width:38px;height:36px;border:none;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .view-toggle button.active{background:#fff;color:var(--blue);box-shadow:0 4px 10px rgba(27,42,122,.12);}
+
+  .cars{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .cars.list{grid-template-columns:1fr;}
+  .car{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:.18s;}
+  .cars.list .car{flex-direction:row;align-items:center;}
+  .car:hover{transform:translateY(-4px);box-shadow:0 28px 56px rgba(27,42,122,.14);border-color:#d6ddf6;}
+  .car-media{position:relative;}
+  .car-cat{position:absolute;top:12px;right:14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--orange);background:#fff5ea;padding:5px 11px;border-radius:999px;}
+  .car-badge{position:absolute;top:12px;left:14px;font-size:12px;font-weight:800;color:#fff;background:var(--orange);padding:5px 10px;border-radius:8px;}
+  .car-photo{height:150px;display:flex;align-items:center;justify-content:center;padding:8px 18px;}
+  .cars.list .car-media{flex:0 0 38%;}
+  .cars.list .car-photo{height:170px;}
+  .car-photo img{max-height:150px;width:auto;max-width:100%;}
+  .cars.list .car-photo img{max-height:170px;}
+  .car-body{padding:6px 20px 20px;display:flex;flex-direction:column;flex:1;}
+  .car-name{margin:0 0 4px;font-size:20px;font-weight:900;color:var(--ink);}
+  .car-specs{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 0;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .spec{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:600;}
+  .spec svg{color:var(--blue);}
+  .car-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:auto;}
+  .price b{font-size:25px;font-weight:900;color:var(--blue);}
+  .price .cur{font-size:14px;font-weight:800;color:var(--orange);}
+  .price .per{font-size:12.5px;color:var(--muted);font-weight:600;display:block;}
+  .car-foot .btn-blue{background:var(--blue);color:#eef1ff;border:none;font-weight:800;font-size:15px;padding:12px 24px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s;box-shadow:0 12px 24px rgba(27,42,122,.28);}
+  .car-foot .btn-blue:hover{filter:brightness(1.12);transform:translateY(-1px);}
+  .car.soldout{opacity:.6;}
+  .car.soldout .btn-blue{background:#9aa3c8;box-shadow:none;cursor:not-allowed;}
+  .no-results{text-align:center;padding:60px 20px;color:var(--muted);font-size:18px;font-weight:700;}
+
+  /* ---- footer ---- */
+  .site-footer{background:#0e1640;color:#cdd3ee;padding:54px 48px 24px;}
+  .footer-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:36px;}
+  .footer-brand img{height:58px;margin-bottom:16px;background:#fff;border-radius:12px;padding:8px 12px;}
+  .footer-brand p{margin:0;color:#9aa3cf;font-size:14.5px;line-height:1.8;max-width:300px;}
+  .fcol h4{margin:0 0 16px;font-size:16px;font-weight:800;color:#fff;}
+  .fcol a{display:block;color:#aab2da;font-size:14.5px;padding:6px 0;transition:.15s;}
+  .fcol a:hover{color:var(--orange);}
+  .cities{display:flex;flex-wrap:wrap;gap:8px;}
+  .cities span{font-size:13px;color:#aab2da;background:rgba(255,255,255,.06);padding:5px 11px;border-radius:999px;}
+  .footer-bottom{max-width:1320px;margin:34px auto 0;padding-top:22px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#8b93bf;font-size:13.5px;}
+  .socials{display:flex;gap:10px;}
+  .socials a{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:#cdd3ee;transition:.15s;}
+  .socials a:hover{background:var(--orange);color:#1a0a00;}
+
+  @media (max-width:980px){
+    .cars{grid-template-columns:repeat(2,1fr);}
+    .field-grid{grid-template-columns:1fr;}
+    .footer-inner{grid-template-columns:1fr 1fr;}
+    .main-nav{display:none;}
+    .tab-bar{overflow-x:auto;}
+  }
+  @media (max-width:600px){
+    .site-header,.book-inner,.results,.site-footer{padding-left:18px;padding-right:18px;}
+    .cars,.footer-inner{grid-template-columns:1fr;}
+    .cars.list .car{flex-direction:column;align-items:stretch;}
+    .filterbar .count{margin-left:0;width:100%;order:-1;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== BOOKING BAND (header + search widget) ===== -->
+<section class="book-band">
+  <div class="sadu-strip"></div>
+  <header class="site-header">
+    <a class="logo-badge" href="index.html"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></a>
+    <nav class="main-nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="index.html#fleet">الأسطول</a>
+      <div class="nav-dd">
+        <a href="long-term.html">تأجير طويل الأجل<svg class="dd-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="dd-menu">
+          <a href="long-term.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg>أفراد</a>
+          <a href="corporate.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l7-4 7 4v14M3 21h18M7 10h.01M7 14h.01M13 10h.01M13 14h.01"/></svg>شركات</a>
+        </div>
+      </div>
+      <a href="index.html#bookingWidget">الاشتراك الشهري</a>
+    </nav>
+    <div class="header-actions">
+      <a href="#" class="login-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        تسجيل الدخول
+      </a>
+    </div>
+  </header>
+
+  <div class="book-inner">
+    <div class="crumb"><a href="index.html">الرئيسية</a> › <span>احجز سيارتك</span></div>
+    <h1>احجز <em>سيارتك</em></h1>
+    <p class="lead">حدّد موقعك وتواريخك واختر من أسطولنا — كل شيء في خطوات بسيطة.</p>
+  </div>
+
+  <!-- booking widget -->
+  <section class="booking" id="bookingWidget">
+    <div class="tab-bar" id="tabBar">
+      <button class="tab active" data-tab="0">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.5l1.2-4.6A2.2 2.2 0 0 1 8.3 10.3h7.4a2.2 2.2 0 0 1 2.1 1.6l1.2 4.6"/><path d="M4 16.5h16v2.2a1 1 0 0 1-1 1h-1.6a1 1 0 0 1-1-1v-1.2H7.6v1.2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
+        ابحث الآن
+      </button>
+      <button class="tab" data-tab="1">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M5.5 18 4 8l4.5 3.4L12 5l3.5 6.4L20 8l-1.5 10"/></svg>
+        الاشتراك الشهري
+      </button>
+      <span class="tab-divider"></span>
+      <button class="tab" data-tab="2">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
+        إدارة الحجز
+      </button>
+      <span class="tab-divider"></span>
+      <button class="tab" data-tab="3">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><polyline points="14 3 14 8 19 8"/></svg>
+        تأجير طويل الأجل
+      </button>
+      <span class="tab-divider"></span>
+      <button class="tab" data-tab="4">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="18" y2="10.5"/><line x1="18" y1="20" x2="6" y2="10.5"/><path d="M12 10c-1.7-1.1-2.3-2.9-1.7-4.7.9.7 1.4 1.6 1.7 2.7.3-1.1.8-2 1.7-2.7.6 1.8 0 3.6-1.7 4.7Z" fill="currentColor" stroke="none"/></svg>
+        بلو ليموزين
+      </button>
+    </div>
+
+    <div class="form-card">
+      <img class="form-skyline" src="booking-skyline.png" alt="" aria-hidden="true">
+      <div class="form-content">
+        <div class="field-grid">
+          <div>
+            <div class="field-head">
+              <label class="field-label inline">موقع الاستلام و التسليم</label>
+              <label class="return-toggle" id="returnToggle">
+                <span class="checkbox" id="returnCheckbox"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                الرجوع لموقع مختلف
+              </label>
+            </div>
+            <div class="field-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+              <input type="text" placeholder="مكان البحث — الرياض، مطار الملك خالد…">
+            </div>
+          </div>
+          <div>
+            <label class="field-label">تاريخ و وقت التسليم</label>
+            <div class="dt-row">
+              <div class="field-box date"><input type="text" placeholder="التاريخ"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg></div>
+              <div class="field-box time"><input type="text" placeholder="الوقت"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">تاريخ و وقت العودة</label>
+            <div class="dt-row">
+              <div class="field-box date"><input type="text" placeholder="التاريخ"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg></div>
+              <div class="field-box time"><input type="text" placeholder="الوقت"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="search-row">
+          <button class="search-btn" id="searchBtn" type="button">بحث
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ===== RESULTS ===== -->
+<section class="results" id="results">
+  <div class="filterbar">
+    <div class="fctrl"><label>الترتيب حسب</label>
+      <select id="sortSel">
+        <option value="rec">المُوصى به</option>
+        <option value="price-asc">الأقل سعرًا</option>
+        <option value="price-desc">الأعلى سعرًا</option>
+        <option value="new">الأحدث</option>
+      </select>
+    </div>
+    <div class="fctrl"><label>نطاق السعر</label>
+      <select id="priceSel">
+        <option value="0">كل الأسعار</option>
+        <option value="120">حتى ١٢٠ ريال</option>
+        <option value="180">حتى ١٨٠ ريال</option>
+        <option value="250">حتى ٢٥٠ ريال</option>
+      </select>
+    </div>
+    <label class="chkline"><input type="checkbox" id="showUnavail"> عرض السيارات غير المتوفرة</label>
+    <div class="view-toggle" id="viewToggle">
+      <button data-view="grid" class="active" aria-label="شبكة"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+      <button data-view="list" aria-label="قائمة"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+    <div class="count"><em id="resCount">٦</em> سيارة متاحة</div>
+  </div>
+
+  <div class="cars" id="carsGrid"><!-- injected --></div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/onetrip-logo.png" alt="One Trip Car Rent">
+      <p>منصّة تنقّل سعودية حديثة للتأجير اليومي والشهري وطويل الأجل — بهوية سعودية في كل تفصيلة.</p>
+    </div>
+    <div class="fcol"><h4>الشركة</h4><a href="#">من نحن</a><a href="#">الوظائف</a><a href="#">الامتياز التجاري</a><a href="index.html#fleet">الأسطول</a></div>
+    <div class="fcol"><h4>خدماتنا</h4><a href="create-booking.html">التأجير اليومي</a><a href="long-term.html">تأجير طويل الأجل</a><a href="corporate.html">حلول الشركات</a><a href="#">ليموزين</a></div>
+    <div class="fcol"><h4>مدن نخدمها</h4><div class="cities"><span>الرياض</span><span>جدة</span><span>مكة</span><span>المدينة</span><span>الدمام</span><span>أبها</span><span>العُلا</span><span>حائل</span><span>جازان</span><span>ينبع</span></div></div>
+  </div>
+  <div class="footer-bottom">
+    <span>One Trip Car Rent © جميع الحقوق محفوظة ٢٠٢٦</span>
+    <div class="socials">
+      <a href="#" aria-label="x"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L6 22H2.9l7.5-8.6L2 2h6.5l4.5 6.7L18.9 2z"/></svg></a>
+      <a href="#" aria-label="instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+      <a href="#" aria-label="youtube"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.5-.4-5.1a2.6 2.6 0 0 0-1.8-1.8C19 4.7 12 4.7 12 4.7s-7 0-8.8.4A2.6 2.6 0 0 0 1.4 6.9C1 8.5 1 12 1 12s0 3.5.4 5.1a2.6 2.6 0 0 0 1.8 1.8c1.8.4 8.8.4 8.8.4s7 0 8.8-.4a2.6 2.6 0 0 0 1.8-1.8C23 15.5 23 12 23 12zM10 15.5v-7l6 3.5-6 3.5z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---- booking widget interactions (same behaviour as homepage) ---- */
+  var tabBar=document.getElementById('tabBar');
+  if(tabBar) tabBar.addEventListener('click',function(e){
+    var b=e.target.closest('.tab'); if(!b)return;
+    tabBar.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    b.classList.add('active');
+  });
+  var rState=false, rT=document.getElementById('returnToggle'), rC=document.getElementById('returnCheckbox');
+  if(rT&&rC) rT.addEventListener('click',function(e){e.preventDefault();rState=!rState;rC.classList.toggle('checked',rState);});
+  var sb=document.getElementById('searchBtn');
+  if(sb) sb.addEventListener('click',function(){ document.getElementById('results').scrollIntoView({behavior:'smooth'}); });
+
+  /* ===========================================================
+     CARS DATA — single source (admin-ready). Daily pricing.
+     =========================================================== */
+  window.bookingCars = [
+    {id:'camry23',  name:'تويوتا كامري 2023', category:'سيدان متوسطة',  image:'assets/cars/camry.png',   price:180, year:2023, seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:'الأكثر طلبًا'},
+    {id:'accent25', name:'هيونداي أكسنت 2025', category:'سيدان صغيرة',  image:'assets/cars/accent.png', price:120, year:2025, seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:null},
+    {id:'sunny26',  name:'نيسان صني 2026',    category:'سيدان اقتصادية', image:'assets/cars/sunny26.png', price:110, year:2026, seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:'جديد'},
+    {id:'sunny25',  name:'نيسان صني 2025',    category:'سيدان اقتصادية', image:'assets/cars/sunny25.png', price:105, year:2025, seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:null},
+    {id:'camry23f', name:'تويوتا كامري 2023 — فل', category:'سيدان متوسطة', image:'assets/cars/camry.png', price:210, year:2023, seats:5, bags:3, gear:'أوتوماتيك', doors:4, ac:true, available:true, badge:null},
+    {id:'accent25s',name:'هيونداي أكسنت 2025 — ستاندر', category:'سيدان صغيرة', image:'assets/cars/accent.png', price:115, year:2025, seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, available:false, badge:null}
+  ];
+
+  var S={
+    seat:'<path d="M5 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5M4 11h13a2 2 0 0 1 2 2v5h-2M4 11v7M7 18h8"/>',
+    bag:'<rect x="6" y="8" width="12" height="12" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+    door:'<path d="M14 3H7a2 2 0 0 0-2 2v16h11V3zM14 3l5 4v14"/>',
+    ac:'<path d="M12 3v18M5 7l14 10M19 7L5 17"/>'
+  };
+  function sp(p){return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+  function toAr(n){var m={'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'};return n.toString().replace(/[0-9]/g,function(d){return m[d];});}
+
+  var grid=document.getElementById('carsGrid');
+  function currentList(){
+    var list=window.bookingCars.slice();
+    var showUn=document.getElementById('showUnavail').checked;
+    if(!showUn) list=list.filter(function(c){return c.available;});
+    var maxP=parseInt(document.getElementById('priceSel').value,10)||0;
+    if(maxP) list=list.filter(function(c){return c.price<=maxP;});
+    var sort=document.getElementById('sortSel').value;
+    if(sort==='price-asc') list.sort(function(a,b){return a.price-b.price;});
+    else if(sort==='price-desc') list.sort(function(a,b){return b.price-a.price;});
+    else if(sort==='new') list.sort(function(a,b){return b.year-a.year;});
+    return list;
+  }
+  function render(){
+    var list=currentList();
+    document.getElementById('resCount').textContent=toAr(list.length);
+    if(!list.length){ grid.innerHTML='<div class="no-results">لا يوجد نتائج مطابقة — جرّب توسيع نطاق السعر.</div>'; return; }
+    grid.innerHTML=list.map(function(c){
+      return '<article class="car'+(c.available?'':' soldout')+'" data-id="'+c.id+'">'
+        + '<div class="car-media">'
+          + '<span class="car-cat">'+sp(S.gear)+c.category+'</span>'
+          + (c.badge?'<span class="car-badge">'+c.badge+'</span>':'')
+          + '<div class="car-photo"><img src="'+c.image+'" alt="'+c.name+'"></div>'
+        + '</div>'
+        + '<div class="car-body">'
+          + '<h3 class="car-name">'+c.name+'</h3>'
+          + '<div class="car-specs">'
+            + '<span class="spec">'+sp(S.seat)+toAr(c.seats)+' مقاعد</span>'
+            + '<span class="spec">'+sp(S.bag)+toAr(c.bags)+' حقيبة</span>'
+            + '<span class="spec">'+sp(S.gear)+c.gear+'</span>'
+            + '<span class="spec">'+sp(S.door)+toAr(c.doors)+' أبواب</span>'
+            + '<span class="spec">'+sp(S.ac)+(c.ac?'مكيّف':'بدون')+'</span>'
+          + '</div>'
+          + '<div class="car-foot">'
+            + '<div class="price"><b>'+toAr(c.price)+'</b> <span class="cur">ريال</span><span class="per">/ يوميًا — لا يشمل الضريبة</span></div>'
+            + '<button class="btn-blue" type="button"'+(c.available?'':' disabled')+'>'+(c.available?'احجز الآن':'غير متاح')
+              + (c.available?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>':'')
+            + '</button>'
+          + '</div>'
+        + '</div>'
+      + '</article>';
+    }).join('');
+    grid.querySelectorAll('.car .btn-blue:not([disabled])').forEach(function(btn){
+      btn.addEventListener('click',function(){ console.log('احجز:', btn.closest('.car').dataset.id); });
+    });
+    if(window.__animScan) window.__animScan();
+  }
+  window.renderBookingCars=render;
+
+  document.getElementById('sortSel').addEventListener('change',render);
+  document.getElementById('priceSel').addEventListener('change',render);
+  document.getElementById('showUnavail').addEventListener('change',render);
+  document.getElementById('viewToggle').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    this.querySelectorAll('button').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    grid.classList.toggle('list', b.getAttribute('data-view')==='list');
+  });
+
+  render();
+})();
+</script>
+<script src="anim.js"></script>
+</body>
+</html>
