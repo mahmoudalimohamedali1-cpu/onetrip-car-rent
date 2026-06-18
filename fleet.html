@@ -54,6 +54,12 @@
   .book-band h1 em{font-style:normal;color:var(--orange);}
   .book-band .lead{margin:0 0 30px;color:rgba(255,255,255,.82);font-size:17px;}
 
+  /* ---- full-image hero (header overlaid, image shown complete) ---- */
+  .fleet-hero{position:relative;background:#0a0e1a;line-height:0;}
+  .fleet-hero-img{display:block;width:100%;height:auto;}      /* full image, never cropped */
+  .fleet-hero-top{position:absolute;top:0;left:0;right:0;z-index:5;line-height:normal;}
+  .search-wrap{background:#f4f7ff;padding:42px 48px 8px;}      /* light section for the search widget */
+
   /* ---- booking widget (same as homepage) ---- */
   .booking{position:relative;z-index:5;max-width:1320px;margin:0 auto;}
   .tab-bar{display:flex;align-items:stretch;background:var(--blue);border-radius:22px 22px 0 0;overflow:hidden;min-height:64px;box-shadow:0 -2px 0 rgba(0,0,0,.05);}
@@ -160,7 +166,9 @@
 <body>
 
 <!-- ===== BOOKING BAND (header + search widget) ===== -->
-<section class="book-band">
+<section class="fleet-hero">
+  <img class="fleet-hero-img" src="assets/fleet-hero.png" alt="رحلة واحدة — تجارب لا تُنسى | One Trip Car Rent">
+  <div class="fleet-hero-top">
   <div class="sadu-strip"></div>
   <header class="site-header">
     <a class="logo-badge" href="index.html"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></a>
@@ -183,14 +191,11 @@
       </a>
     </div>
   </header>
-
-  <div class="book-inner">
-    <div class="crumb"><a href="index.html">الرئيسية</a> › <span>الأسطول</span></div>
-    <h1>أسطول <em>One Trip</em></h1>
-    <p class="lead">تصفّح كل سياراتنا الحديثة — حدّد موقعك وتواريخك واختر سيارتك بأفضل سعر.</p>
   </div>
+</section>
 
-  <!-- booking widget -->
+<!-- search + filters (below the full hero image) -->
+<section class="search-wrap">
   <section class="booking" id="bookingWidget">
     <div class="tab-bar" id="tabBar">
       <button class="tab active" data-tab="0">
