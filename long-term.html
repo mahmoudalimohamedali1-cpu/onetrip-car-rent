@@ -353,6 +353,7 @@
   </div>
 </footer>
 
+<script src="cars.js"></script>
 <script>
 (function(){
   'use strict';
@@ -379,17 +380,10 @@
   }).join('');
 
   /* ===========================================================
-     CARS DATA — single source of truth (admin-ready).
-     priceByMonths: monthly SAR for each rental duration.
+     CARS DATA — from the shared catalog (cars.js). Monthly pricing
+     (priceByMonths: SAR per month for each rental duration).
      =========================================================== */
-  window.ltCars = [
-    {id:'camry23',  name:'تويوتا كامري 2023', category:'سيدان متوسطة',  image:'assets/cars/camry.png',   seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:2968,24:2822,36:2408}},
-    {id:'accent25', name:'هيونداي أكسنت 2025', category:'سيدان صغيرة',  image:'assets/cars/accent.png', seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1736,24:1652,36:1406}},
-    {id:'sunny26',  name:'نيسان صني 2026',    category:'سيدان اقتصادية', image:'assets/cars/sunny26.png', seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1641,24:1562,36:1327}},
-    {id:'sunny25',  name:'نيسان صني 2025',    category:'سيدان اقتصادية', image:'assets/cars/sunny25.png', seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1590,24:1510,36:1290}},
-    {id:'camry23b', name:'تويوتا كامري 2023 — فل', category:'سيدان متوسطة', image:'assets/cars/camry.png', seats:5, bags:3, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:3080,24:2929,36:2468}},
-    {id:'accent25b',name:'هيونداي أكسنت 2025 — ستاندر', category:'سيدان صغيرة', image:'assets/cars/accent.png', seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, priceByMonths:{12:1680,24:1600,36:1360}}
-  ];
+  window.ltCars = OneTrip.ltCars();
 
   var months = 12;
   function fmt(n){ return n.toLocaleString('en-US'); }

@@ -196,73 +196,7 @@
 
 <!-- search + filters (below the full hero image) -->
 <section class="search-wrap">
-  <section class="booking" id="bookingWidget">
-    <div class="tab-bar" id="tabBar">
-      <button class="tab active" data-tab="0">
-        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.5l1.2-4.6A2.2 2.2 0 0 1 8.3 10.3h7.4a2.2 2.2 0 0 1 2.1 1.6l1.2 4.6"/><path d="M4 16.5h16v2.2a1 1 0 0 1-1 1h-1.6a1 1 0 0 1-1-1v-1.2H7.6v1.2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
-        ابحث الآن
-      </button>
-      <button class="tab" data-tab="1">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M5.5 18 4 8l4.5 3.4L12 5l3.5 6.4L20 8l-1.5 10"/></svg>
-        الاشتراك الشهري
-      </button>
-      <span class="tab-divider"></span>
-      <button class="tab" data-tab="2">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
-        إدارة الحجز
-      </button>
-      <span class="tab-divider"></span>
-      <button class="tab" data-tab="3">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><polyline points="14 3 14 8 19 8"/></svg>
-        تأجير طويل الأجل
-      </button>
-      <span class="tab-divider"></span>
-      <button class="tab" data-tab="4">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="18" y2="10.5"/><line x1="18" y1="20" x2="6" y2="10.5"/><path d="M12 10c-1.7-1.1-2.3-2.9-1.7-4.7.9.7 1.4 1.6 1.7 2.7.3-1.1.8-2 1.7-2.7.6 1.8 0 3.6-1.7 4.7Z" fill="currentColor" stroke="none"/></svg>
-        بلو ليموزين
-      </button>
-    </div>
-
-    <div class="form-card">
-      <img class="form-skyline" src="booking-skyline.png" alt="" aria-hidden="true">
-      <div class="form-content">
-        <div class="field-grid">
-          <div>
-            <div class="field-head">
-              <label class="field-label inline">موقع الاستلام و التسليم</label>
-              <label class="return-toggle" id="returnToggle">
-                <span class="checkbox" id="returnCheckbox"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                الرجوع لموقع مختلف
-              </label>
-            </div>
-            <div class="field-box">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>
-              <input type="text" placeholder="مكان البحث — الرياض، مطار الملك خالد…">
-            </div>
-          </div>
-          <div>
-            <label class="field-label">تاريخ و وقت التسليم</label>
-            <div class="dt-row">
-              <div class="field-box date"><input type="text" placeholder="التاريخ"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg></div>
-              <div class="field-box time"><input type="text" placeholder="الوقت"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div>
-            </div>
-          </div>
-          <div>
-            <label class="field-label">تاريخ و وقت العودة</label>
-            <div class="dt-row">
-              <div class="field-box date"><input type="text" placeholder="التاريخ"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg></div>
-              <div class="field-box time"><input type="text" placeholder="الوقت"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div>
-            </div>
-          </div>
-        </div>
-        <div class="search-row">
-          <button class="search-btn" id="searchBtn" type="button">بحث
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
+  <section class="booking" id="bookingWidget"><!-- search widget injected by OneTrip.mountBookingWidget (ui.js) --></section>
 </section>
 
 <!-- ===== RESULTS ===== -->
@@ -317,9 +251,14 @@
   </div>
 </footer>
 
+<script src="cars.js"></script>
+<script src="ui.js"></script>
 <script>
 (function(){
   'use strict';
+
+  /* mount the shared search widget, then wire its interactions */
+  OneTrip.mountBookingWidget('#bookingWidget');
 
   /* ---- booking widget interactions (same behaviour as homepage) ---- */
   var tabBar=document.getElementById('tabBar');
@@ -334,16 +273,9 @@
   if(sb) sb.addEventListener('click',function(){ document.getElementById('results').scrollIntoView({behavior:'smooth'}); });
 
   /* ===========================================================
-     CARS DATA — single source (admin-ready). Daily pricing.
+     CARS DATA — from the shared catalog (cars.js). Daily pricing.
      =========================================================== */
-  window.bookingCars = [
-    {id:'camry23',  name:'تويوتا كامري 2023', category:'سيدان متوسطة',  image:'assets/cars/camry.png',   price:180, year:2023, seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:'الأكثر طلبًا'},
-    {id:'accent25', name:'هيونداي أكسنت 2025', category:'سيدان صغيرة',  image:'assets/cars/accent.png', price:120, year:2025, seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:null},
-    {id:'sunny26',  name:'نيسان صني 2026',    category:'سيدان اقتصادية', image:'assets/cars/sunny26.png', price:110, year:2026, seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:'جديد'},
-    {id:'sunny25',  name:'نيسان صني 2025',    category:'سيدان اقتصادية', image:'assets/cars/sunny25.png', price:105, year:2025, seats:5, bags:1, gear:'أوتوماتيك', doors:4, ac:true, available:true,  badge:null},
-    {id:'camry23f', name:'تويوتا كامري 2023 — فل', category:'سيدان متوسطة', image:'assets/cars/camry.png', price:210, year:2023, seats:5, bags:3, gear:'أوتوماتيك', doors:4, ac:true, available:true, badge:null},
-    {id:'accent25s',name:'هيونداي أكسنت 2025 — ستاندر', category:'سيدان صغيرة', image:'assets/cars/accent.png', price:115, year:2025, seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true, available:false, badge:null}
-  ];
+  window.bookingCars = OneTrip.bookingCars();
 
   var S={
     seat:'<path d="M5 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5M4 11h13a2 2 0 0 1 2 2v5h-2M4 11v7M7 18h8"/>',
