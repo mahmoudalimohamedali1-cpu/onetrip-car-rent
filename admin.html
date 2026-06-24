@@ -182,9 +182,10 @@
     <img src="assets/onetrip-logo.png" alt="One Trip">
     <h1>لوحة التحكم</h1>
     <p>سجّل الدخول لإدارة الأسطول والمحتوى</p>
-    <input id="pass" type="password" placeholder="كلمة المرور" autocomplete="off">
+    <input id="user" type="text" placeholder="اسم المستخدم" autocomplete="username" style="margin-bottom:10px">
+    <input id="pass" type="password" placeholder="كلمة المرور" autocomplete="current-password">
     <button class="btn btn-pri" style="width:100%;justify-content:center" id="loginBtn">دخول</button>
-    <div class="hint">نسخة تجريبية — كلمة المرور: <b>onetrip</b> (المصادقة الحقيقية تيجي مع Supabase)</div>
+    <div class="hint">المدير: <b>admin</b> / <b>onetrip</b> — والموظفين بحسابات تنشئها من قسم «الموظفين».</div>
   </div>
 </div>
 
@@ -204,12 +205,14 @@
     <button class="nav-i" data-sec="addons"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 22l-8-6.5v-9L12 2Z"/><path d="M12 22V12M20 6.5 12 12 4 6.5"/></svg> الإضافات <span class="ct" id="ctAddons">0</span></button>
     <button class="nav-i" data-sec="promos"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 3 8v8l6 6h8l6-6V8l-6-6H9Z"/><path d="M8.5 8.5h.01M15.5 15.5h.01M15 9l-6 6"/></svg> أكواد الخصم <span class="ct" id="ctPromos">0</span></button>
     <button class="nav-i" data-sec="intro"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg> واجهة الرئيسية</button>
+    <button class="nav-i" data-sec="users"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> الموظفين</button>
     <div class="side-foot">نسخة تجريبية (localStorage) — البيانات على هذا المتصفح فقط. تنتقل لـSupabase لاحقًا.</div>
   </aside>
 
   <header class="topbar">
     <div class="pg" id="pgTitle">لوحة التحكم</div>
     <div class="acts">
+      <span class="tbtn" id="whoami" style="cursor:default;background:#eef2ff;color:#1b2a7a;font-weight:800"></span>
       <a class="tbtn" href="index.html" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M21 3l-9 9M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg> معاينة الموقع</a>
       <button class="tbtn danger" id="resetBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg> استرجاع الافتراضي</button>
       <button class="tbtn" id="logoutBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> خروج</button>
@@ -380,6 +383,17 @@
       </div>
     </section>
 
+    <!-- USERS / EMPLOYEES -->
+    <section class="sect" id="sec-users">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>الموظفين والصلاحيات</h2><span class="sub">أنشئ حسابات للموظفين وحدّد لكل واحد الأقسام المسموح له بها (مثلًا: المحادثات فقط)</span></div>
+          <button class="btn btn-org" id="addUser"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة موظف</button>
+        </div>
+        <div style="overflow:auto" id="usersTable"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -488,6 +502,29 @@
   </div>
 </div>
 
+<!-- ===== USER MODAL ===== -->
+<div class="modal" id="userModal">
+  <div class="modal-card" style="max-width:560px">
+    <div class="modal-h"><h3 id="userModalTitle">إضافة موظف</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="u-id">
+      <div class="grid2">
+        <div class="f"><label>الاسم *</label><input id="u-name" placeholder="أحمد علي"></div>
+        <div class="f"><label>اسم المستخدم *</label><input id="u-username" placeholder="ahmed" dir="ltr"></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label>كلمة المرور *</label><input id="u-pass" type="text" placeholder="••••••" dir="ltr"></div>
+        <div class="f"><label>الدور</label><select id="u-role"><option value="agent">موظف خدمة عملاء</option><option value="admin">مدير (كل الصلاحيات)</option></select></div>
+      </div>
+      <div id="u-perms-wrap">
+        <div class="sub-h">الأقسام المسموح بها للموظف</div>
+        <div id="u-sections" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveUser">حفظ الموظف</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="cars.js"></script>
@@ -542,17 +579,95 @@
   var tEl=$('#toast'),tT;
   function toast(msg,kind){ tEl.textContent=msg; tEl.className='toast on '+(kind||''); clearTimeout(tT); tT=setTimeout(function(){tEl.className='toast '+(kind||'');},2200); }
 
+  /* ---------- users / permissions (نظام صلاحيات الموظفين — localStorage تجريبي) ---------- */
+  var UK='ot_users';
+  /* الأقسام اللي ينفع تتمنح للموظف (الأدمن عنده كله) */
+  var GRANT=[['chat','المحادثات'],['leads','الطلبات'],['bookings','الحجوزات'],['cars','السيارات'],['cats','الفئات'],['branches','الفروع'],['promos','أكواد الخصم'],['addons','الإضافات'],['intro','واجهة الرئيسية'],['whatsapp','واتساب بيزنس'],['supabase','مزامنة Supabase']];
+  function seedUsers(){ if(localStorage.getItem(UK)==null) save(UK,[{id:'u_admin',name:'المدير',username:'admin',pass:'onetrip',role:'admin',sections:[]}]); }
+  function users(){ return load(UK,[]); }
+  function curUser(){
+    var id=sessionStorage.getItem('ot_user');
+    var u=users().filter(function(x){return x.id===id;})[0];
+    if(u) return u;
+    if(sessionStorage.getItem('ot_admin')==='1') return {id:'u_admin',name:'المدير',role:'admin',sections:[]};
+    return null;
+  }
+  function isAdmin(){ var u=curUser(); return !!(u&&u.role==='admin'); }
+  function allowed(sec){ if(sec==='users') return isAdmin(); if(isAdmin()) return true; var u=curUser(); return !!(u&&(u.sections||[]).indexOf(sec)>=0); }
+
+  function applyPerms(){
+    var u=curUser();
+    var w=$('#whoami'); if(w) w.textContent = u ? ((u.name||u.username||'مستخدم')+' · '+(u.role==='admin'?'مدير':'موظف')) : '';
+    $$('.nav-i').forEach(function(b){ b.style.display = allowed(b.getAttribute('data-sec'))?'':'none'; });
+    var rb=$('#resetBtn'); if(rb) rb.style.display=isAdmin()?'':'none';
+    /* لو القسم النشِط مش مسموح، انتقل لأول قسم مسموح (مثلًا الموظف يهبط على المحادثات) */
+    var active=$('.nav-i.active');
+    var okActive = active && active.style.display!=='none';
+    if(!okActive){ var first=$$('.nav-i').filter(function(b){return b.style.display!=='none';})[0]; if(first) first.click(); }
+  }
+
   /* ---------- login ---------- */
-  function showApp(){ $('#login').style.display='none'; $('#app').classList.add('on'); seed(); renderAll(); }
-  if(sessionStorage.getItem('ot_admin')==='1') showApp();
-  function tryLogin(){ if($('#pass').value.trim()==='onetrip'){ sessionStorage.setItem('ot_admin','1'); showApp(); } else { toast('كلمة المرور غير صحيحة','err'); } }
+  function showApp(){ $('#login').style.display='none'; $('#app').classList.add('on'); seedUsers(); seed(); renderAll(); applyPerms(); }
+  if(sessionStorage.getItem('ot_admin')==='1' || sessionStorage.getItem('ot_user')) showApp();
+  function tryLogin(){
+    seedUsers();
+    var un=($('#user')?$('#user').value.trim():''), pw=$('#pass').value.trim();
+    var u=users().filter(function(x){return x.username===un && x.pass===pw;})[0];
+    if(!u && !un && pw==='onetrip') u=users().filter(function(x){return x.role==='admin';})[0]; /* توافق قديم: كلمة المرور وحدها */
+    if(u){ sessionStorage.setItem('ot_user',u.id); sessionStorage.setItem('ot_admin', u.role==='admin'?'1':'0'); showApp(); }
+    else toast('بيانات الدخول غير صحيحة','err');
+  }
   $('#loginBtn').addEventListener('click',tryLogin);
   $('#pass').addEventListener('keydown',function(e){if(e.key==='Enter')tryLogin();});
-  $('#logoutBtn').addEventListener('click',function(){ sessionStorage.removeItem('ot_admin'); location.reload(); });
+  if($('#user')) $('#user').addEventListener('keydown',function(e){if(e.key==='Enter')tryLogin();});
+  $('#logoutBtn').addEventListener('click',function(){ sessionStorage.removeItem('ot_admin'); sessionStorage.removeItem('ot_user'); location.reload(); });
+
+  /* ---------- users management UI ---------- */
+  function secLabel(s){ var g=GRANT.filter(function(x){return x[0]===s;})[0]; return g?g[1]:s; }
+  function renderUsers(){
+    var box=$('#usersTable'); if(!box) return;
+    if(!isAdmin()){ box.innerHTML='<div class="empty" style="padding:24px">هذا القسم للمدير فقط.</div>'; return; }
+    seedUsers();
+    var rows=users().map(function(u){
+      var perms = u.role==='admin' ? 'كل الصلاحيات' : ((u.sections||[]).map(secLabel).join('، ')||'—');
+      var del = u.id==='u_admin' ? '' : '<button class="iact del" data-du="'+u.id+'" title="حذف"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>';
+      return '<tr><td><b>'+esc(u.name||'')+'</b></td><td dir="ltr" style="text-align:right">'+esc(u.username||'')+'</td>'+
+        '<td>'+(u.role==='admin'?'<span class="pill orange">مدير</span>':'<span class="pill blue">موظف</span>')+'</td>'+
+        '<td style="color:#5a6488;font-size:13px;max-width:280px">'+esc(perms)+'</td>'+
+        '<td><div class="rowacts"><button class="iact" data-eu="'+u.id+'" title="تعديل"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+del+'</div></td></tr>';
+    }).join('');
+    box.innerHTML='<table><thead><tr><th>الاسم</th><th>المستخدم</th><th>الدور</th><th>الصلاحيات</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#usersTable [data-eu]').forEach(function(b){b.addEventListener('click',function(){openUser(b.getAttribute('data-eu'));});});
+    $$('#usersTable [data-du]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف هذا الموظف؟')){ save(UK,users().filter(function(x){return x.id!==b.getAttribute('data-du');})); renderUsers(); toast('تم الحذف','ok'); } });});
+  }
+  function toggleRoleUI(){ var ag=$('#u-role').value==='agent'; var wrap=$('#u-perms-wrap'); if(wrap) wrap.style.display=ag?'':'none'; }
+  function openUser(id){
+    if(!isAdmin()) return;
+    var u = id ? users().filter(function(x){return x.id===id;})[0] : {id:'',name:'',username:'',pass:'',role:'agent',sections:['chat']};
+    if(!u) return;
+    $('#u-id').value=u.id||''; $('#u-name').value=u.name||''; $('#u-username').value=u.username||''; $('#u-pass').value=u.pass||'';
+    $('#u-role').value=u.role||'agent';
+    $('#u-sections').innerHTML=GRANT.map(function(g){ var ck=(u.sections||[]).indexOf(g[0])>=0?'checked':''; return '<label class="toggle" style="font-size:13px;height:42px"><input type="checkbox" value="'+g[0]+'" '+ck+'> '+g[1]+'</label>'; }).join('');
+    $('#userModalTitle').textContent = id?'تعديل موظف':'إضافة موظف';
+    toggleRoleUI();
+    openModal('#userModal');
+  }
+  if($('#u-role')) $('#u-role').addEventListener('change',toggleRoleUI);
+  if($('#addUser')) $('#addUser').addEventListener('click',function(){ openUser(''); });
+  if($('#saveUser')) $('#saveUser').addEventListener('click',function(){
+    var id=$('#u-id').value || ('u_'+Date.now());
+    var name=$('#u-name').value.trim(), un=$('#u-username').value.trim(), pw=$('#u-pass').value.trim(), role=$('#u-role').value;
+    if(!name||!un||!pw){ toast('اكمل الاسم واسم المستخدم وكلمة المرور','err'); return; }
+    if(users().some(function(x){return x.username===un && x.id!==id;})){ toast('اسم المستخدم مستخدم بالفعل','err'); return; }
+    var secs = role==='admin' ? [] : $$('#u-sections input:checked').map(function(c){return c.value;});
+    var arr=users(), i=arr.findIndex(function(x){return x.id===id;}), rec={id:id,name:name,username:un,pass:pw,role:role,sections:secs};
+    if(i>=0) arr[i]=rec; else arr.push(rec);
+    save(UK,arr); closeModal(); renderUsers(); toast('تم حفظ الموظف ✓','ok');
+  });
   $('#resetBtn').addEventListener('click',function(){ if(confirm('استرجاع كل البيانات للوضع الافتراضي؟ (هيمسح تعديلاتك على هذا المتصفح)')){ [K.cars,K.cats,K.br,K.leads,K.intro].forEach(function(k){localStorage.removeItem(k);}); seed(); renderAll(); toast('تم الاسترجاع','ok'); } });
 
   /* ---------- nav ---------- */
-  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',supabase:'مزامنة Supabase'};
+  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',supabase:'مزامنة Supabase',users:'الموظفين'};
   $$('.nav-i').forEach(function(b){ b.addEventListener('click',function(){
     $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
@@ -560,12 +675,13 @@
     if(s==='chat') renderInbox();
     if(s==='whatsapp') renderWa();
     if(s==='supabase') renderSb();
+    if(s==='users') renderUsers();
   });});
 
   /* ---------- renderers ---------- */
   /* عزل الأعطال: لو رندرر واحد رمى استثناء، ما يوقّفش باقي اللوحة (وخصوصًا قسم المحادثات) */
   function safeRender(fn){ try{ fn(); }catch(e){ if(window.console&&console.warn) console.warn('renderAll: تخطّي رندرر فشل —', e&&e.message); } }
-  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderIntro,renderChatBadge].forEach(safeRender); }
+  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderIntro,renderChatBadge,renderUsers].forEach(safeRender); }
   function renderCounts(){
     $('#ctCars').textContent=toAr(DB.cars.all().length);
     $('#ctCats').textContent=toAr(DB.cats.all().length);
