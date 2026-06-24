@@ -413,6 +413,12 @@
   function botReply(convId, userText){
     var conv = getConversation(convId);
     if (!conv) return null;
+    /* لو المحادثة اتحوّلت لموظف (pending) أو اتقفلت، أو فيه موظف بشري ردّ فيها بالفعل —
+       البوت يسكت تمامًا ويسيب الموظف يرد (مايردّش على رسايل العميل بعد التحويل) */
+    if (conv.status === 'pending' || conv.status === 'closed') return null;
+    if (Array.isArray(conv.messages)) {
+      for (var k = 0; k < conv.messages.length; k++){ if (conv.messages[k].from === 'agent') return null; }
+    }
     var t = String(userText == null ? '' : userText);
 
     if (/سعر|اسعار|أسعار|تسعير|كم/.test(t)) return runQuickService(convId, 'prices');
