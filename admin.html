@@ -42,6 +42,9 @@
   .nav-i.active{background:linear-gradient(90deg,var(--orange),#ffa83a);color:#1a0a00;}
   .nav-i .ct{margin-right:auto;font-size:12px;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:1px 8px;font-weight:800;}
   .nav-i.active .ct{background:rgba(0,0,0,.18);color:#1a0a00;}
+  /* تنبيه بصري: بادج المحادثات ينبض عند وصول رسالة جديدة */
+  @keyframes ot-badge-pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,144,30,.55);}50%{box-shadow:0 0 0 7px rgba(245,144,30,0);}}
+  .nav-i .ct.has-new{background:var(--orange)!important;color:#1a0a00!important;animation:ot-badge-pulse 1.15s infinite;}
   .side-foot{margin-top:auto;font-size:11.5px;color:#7e87b8;padding:10px 8px 0;line-height:1.6;}
 
   .main{grid-area:main;padding:26px;overflow:auto;}
@@ -214,6 +217,7 @@
     <div class="pg" id="pgTitle">لوحة التحكم</div>
     <div class="acts">
       <span class="tbtn" id="whoami" style="cursor:default;background:#eef2ff;color:#1b2a7a;font-weight:800"></span>
+      <button class="tbtn" id="soundToggle" title="تشغيل/إيقاف صوت تنبيه الرسائل الجديدة"></button>
       <a class="tbtn" href="index.html" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M21 3l-9 9M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg> معاينة الموقع</a>
       <button class="tbtn danger" id="resetBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg> استرجاع الافتراضي</button>
       <button class="tbtn" id="logoutBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> خروج</button>
@@ -637,7 +641,7 @@
   }
 
   /* ---------- login ---------- */
-  function showApp(){ $('#login').style.display='none'; $('#app').classList.add('on'); seedUsers(); seed(); renderAll(); applyPerms(); }
+  function showApp(){ $('#login').style.display='none'; $('#app').classList.add('on'); seedUsers(); seed(); renderAll(); applyPerms(); initNotify(); }
   if(sessionStorage.getItem('ot_admin')==='1' || sessionStorage.getItem('ot_user')) showApp();
   function tryLogin(){
     seedUsers();
@@ -702,7 +706,7 @@
     $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
     $('#pgTitle').textContent=titles[s]||'';
-    if(s==='chat'){ renderInbox(); loadChatSettings(); }
+    if(s==='chat'){ renderInbox(); loadChatSettings(); clearNotify(); }
     if(s==='whatsapp') renderWa();
     if(s==='supabase') renderSb();
     if(s==='surveys') renderSurveys();
@@ -1141,11 +1145,62 @@
   }); });
   $('#convSearch').addEventListener('input',renderInbox);
 
-  // realtime: rerender on any change + keep badge live
+  /* ========== تنبيه الموظف عند رسالة/محادثة جديدة (صوت + بصري) ========== */
+  var SNDK='ot_admin_sound', _ac=null, _notifyPrev=-1, _baseTitle=(document.title||'لوحة التحكم'), _titleTimer=null;
+  function soundOn(){ try{ return localStorage.getItem(SNDK)!=='0'; }catch(e){ return true; } }
+  function renderSoundBtn(){
+    var b=$('#soundToggle'); if(!b) return; var on=soundOn();
+    var icOn='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>';
+    var icOff='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
+    b.innerHTML=(on?icOn:icOff)+' '+(on?'الصوت مفعّل':'صامت'); b.style.opacity=on?'1':'.55';
+  }
+  function setSound(on){ try{ localStorage.setItem(SNDK,on?'1':'0'); }catch(e){} renderSoundBtn(); if(on) beep(); }
+  function beep(){
+    if(!soundOn()) return;
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+      _ac=_ac||new AC(); if(_ac.state==='suspended'){ _ac.resume(); }
+      [[880,0],[1175,0.18]].forEach(function(p){
+        var o=_ac.createOscillator(), g=_ac.createGain(); o.connect(g); g.connect(_ac.destination);
+        o.type='sine'; o.frequency.value=p[0]; var t=_ac.currentTime+p[1];
+        g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.012); g.gain.exponentialRampToValueAtTime(0.0001,t+0.15);
+        o.start(t); o.stop(t+0.16);
+      });
+    }catch(e){}
+  }
+  function stopTitle(){ if(_titleTimer){ clearInterval(_titleTimer); _titleTimer=null; } if(_baseTitle) document.title=_baseTitle; }
+  function flashTitle(n){ stopTitle(); var on=false; _titleTimer=setInterval(function(){ document.title= on? _baseTitle : ('🔔 ('+toAr(n)+') رسالة جديدة'); on=!on; },1000); }
+  function relevantUnread(){
+    var c=CHAT(); if(!c) return 0;
+    try{
+      if(isAdmin()) return c.unreadAgentTotal()||0;
+      var me=curUser(), id=me&&me.id, arr=c.listConversations()||[], n=0;
+      arr.forEach(function(x){ if(x.assignedTo===id || !x.assignedTo) n+=(x.unreadAgent||0); });
+      return n;
+    }catch(e){ return 0; }
+  }
+  function pulseBadge(on){ var el=$('#ctChat'); if(el) el.classList.toggle('has-new',!!on); }
+  function clearNotify(){ stopTitle(); pulseBadge(false); _notifyPrev=relevantUnread(); }
+  function notifyMaybe(){
+    var cur=relevantUnread();
+    var viewing = $('#sec-chat').classList.contains('on') && document.hasFocus();
+    if(_notifyPrev>=0 && cur>_notifyPrev && !viewing){ beep(); pulseBadge(true); flashTitle(cur); toast('🔔 وصلت رسالة جديدة','ok'); }
+    _notifyPrev=cur;
+  }
+  function initNotify(){
+    _baseTitle=document.title||'لوحة التحكم'; _notifyPrev=relevantUnread(); renderSoundBtn();
+    var resume=function(){ try{ if(_ac&&_ac.state==='suspended') _ac.resume(); }catch(e){} };
+    document.addEventListener('click',resume); document.addEventListener('keydown',resume);
+    window.addEventListener('focus',function(){ if($('#sec-chat').classList.contains('on')) clearNotify(); });
+  }
+  if($('#soundToggle')) $('#soundToggle').addEventListener('click',function(){ setSound(!soundOn()); });
+
+  // realtime: rerender on any change + keep badge live + تنبيه
   (function(){
     var c=CHAT(); if(!c||!c.on) return;
     c.on('change',function(){
       renderChatBadge();
+      notifyMaybe();
       if($('#sec-chat').classList.contains('on')){ renderInbox(); if(selConv) renderThread(c.getConversation(selConv)||{}); }
       if($('#sec-surveys').classList.contains('on')) safeRender(renderSurveys);
     });
