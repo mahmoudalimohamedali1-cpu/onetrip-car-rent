@@ -353,6 +353,10 @@
           <div class="f"><label>Access Token</label><input id="wa-token" type="password" placeholder="EAAB…" dir="ltr"></div>
           <div class="f"><label>Verify Token</label><input id="wa-verify" placeholder="onetrip-verify" dir="ltr"></div>
           <button class="btn btn-pri" id="saveWa">حفظ الإعدادات</button>
+          <div class="wa-hint" style="margin-top:14px">
+            <b>تجربة بدون نشر:</b> اضغط الزر لمحاكاة رسالة واردة من عميل على واتساب — هتظهر فورًا في قسم <b>المحادثات</b> وتقدر تردّ عليها، والرد يتسجّل في <b>صندوق الصادر</b> تحت (جاهز ليرسله البريدج للعميل على واتساب بعد النشر).
+            <div style="margin-top:10px"><button class="btn btn-org" id="waSimulate"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.3A8.5 8.5 0 1 1 21 11.5Z"/></svg> محاكاة رسالة واتساب واردة</button></div>
+          </div>
         </div>
         <div class="panel-h" style="border-top:1px solid var(--line)"><div><h2 style="font-size:16px">صندوق الصادر (Outbox)</h2><span class="sub">رسائل بانتظار الإرسال عبر البريدج — للتشخيص</span></div></div>
         <div class="modal-b" id="waOutbox"></div>
@@ -995,6 +999,21 @@
     var cfg={ enabled:$('#wa-enabled').checked, businessPhone:$('#wa-phone').value.trim(),
       phoneNumberId:$('#wa-pnid').value.trim(), token:$('#wa-token').value.trim(), verifyToken:$('#wa-verify').value.trim() };
     if(save(WAK,cfg)) toast('تم حفظ إعدادات واتساب ✓','ok');
+  });
+
+  /* محاكاة رسالة واتساب واردة — لتجربة المسار كاملًا بدون نشر السيرفر */
+  var _waSim=0;
+  if($('#waSimulate')) $('#waSimulate').addEventListener('click',function(){
+    var c=CHAT();
+    if(!c||!c.WhatsApp||!c.WhatsApp.ingestInbound){ toast('وحدة الدردشة (chat.js) غير محمّلة','err'); return; }
+    _waSim++;
+    var samples=['السلام عليكم، السيارة متاحة بكرة؟','عايز أأجر كامري لمدة أسبوع','كم سعر التأجير الشهري؟','ممكن أستلم من مطار الملك خالد؟'];
+    try{ c.WhatsApp.ingestInbound({ phone:'96650'+(100000+_waSim), name:'عميل واتساب '+toAr(_waSim), text:samples[_waSim%samples.length], waId:'wamid.SIM'+Date.now() }); }
+    catch(e){ toast('تعذّرت المحاكاة','err'); return; }
+    toast('وصلت رسالة واتساب — افتح «المحادثات» للرد','ok');
+    var navc=$('.nav-i[data-sec="chat"]'); if(navc) navc.click();
+    var list=c.listConversations&&c.listConversations(); if(list&&list[0]){ selConv=list[0].id; renderRoom(); }
+    renderInbox(); renderChatBadge();
   });
 
   /* ========== SUPABASE SYNC SETTINGS ========== */
