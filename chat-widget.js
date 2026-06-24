@@ -25,7 +25,8 @@
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
     bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg>',
     send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
-    dot: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>'
+    dot: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>',
+    chev: '<svg class="otchat-chev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
   };
 
   /* ---- safe access to the data layer (chat.js) ---- */
@@ -57,6 +58,7 @@
     this.open = false;
     this.mounted = false;
     this.askedPrechat = false;
+    this.quickOpen = true;       // الخدمات السريعة مفتوحة في البداية، وتنطوي وقت الكلام
     this.statusServiceId = null; // a quick-service awaiting a typed answer (e.g. 'status')
     this._onChange = this.rerender.bind(this);
     this.el = {};
@@ -78,6 +80,9 @@
     this.el.badge = root.querySelector('.otchat-badge');
     this.el.panel = root.querySelector('.otchat-panel');
     this.el.close = root.querySelector('.otchat-close');
+    this.el.quick = root.querySelector('.otchat-quick');
+    this.el.quickH = root.querySelector('.otchat-quick-h');
+    this.el.quickLbl = root.querySelector('.otchat-quick-h-lbl');
     this.el.quickGrid = root.querySelector('.otchat-quick-grid');
     this.el.list = root.querySelector('.otchat-list');
     this.el.prechat = root.querySelector('.otchat-prechat');
@@ -113,7 +118,10 @@
           '<button class="otchat-close" type="button" aria-label="إغلاق">' + SVG.x + '</button>' +
         '</header>' +
         '<div class="otchat-quick">' +
-          '<p class="otchat-quick-h">' + SVG.bolt + ' خدمات سريعة</p>' +
+          '<button class="otchat-quick-h" type="button" aria-expanded="true">' +
+            '<span class="otchat-quick-h-l">' + SVG.bolt + ' <span class="otchat-quick-h-lbl">خدمات سريعة</span></span>' +
+            '<span class="otchat-quick-chev">' + SVG.chev + '</span>' +
+          '</button>' +
           '<div class="otchat-quick-grid"></div>' +
         '</div>' +
         '<div class="otchat-list" role="log"></div>' +
@@ -137,6 +145,9 @@
     var self = this;
     this.el.launcher.addEventListener('click', function () { self.toggle(); });
     this.el.close.addEventListener('click', function () { self.setOpen(false); });
+
+    // الخدمات السريعة: زرار العنوان يفتح/يقفل (يرجّعها وقت ما العميل يحب)
+    if (this.el.quickH) this.el.quickH.addEventListener('click', function () { self.setQuickOpen(!self.quickOpen); });
 
     this.el.send.addEventListener('click', function () { self.handleSend(); });
     this.el.input.addEventListener('keydown', function (e) {
@@ -164,13 +175,25 @@
     this.open = !!v;
     this.root.classList.toggle('is-open', this.open);
     if (this.open) {
+      // ابدأ مطويّ لو فيه محادثة شغّالة (العميل بدأ كلام) — وإلا مفتوح للترحيب
+      var conv0 = this.currentConv();
+      var chatting = !!(conv0 && conv0.messages && conv0.messages.some(function (m) { return m.from === 'user'; }));
+      this.setQuickOpen(!chatting);
       this.rerender();
-      var conv = this.currentConv();
+      var conv = conv0;
       if (conv) safe(function () { Chat().markRead(conv.id, 'user'); });
       this.refreshBadge();
       var self = this;
       setTimeout(function () { self.scrollBottom(); if (self.el.input) self.el.input.focus(); }, 60);
     }
+  };
+
+  /* ---------- quick-services collapse (زرار العودة) ---------- */
+  Widget.prototype.setQuickOpen = function (v) {
+    this.quickOpen = !!v;
+    if (this.el.quick) this.el.quick.classList.toggle('is-collapsed', !this.quickOpen);
+    if (this.el.quickH) this.el.quickH.setAttribute('aria-expanded', this.quickOpen ? 'true' : 'false');
+    if (this.el.quickLbl) this.el.quickLbl.textContent = this.quickOpen ? 'خدمات سريعة' : 'الخدمات السريعة';
   };
 
   /* ---------- data helpers ---------- */
@@ -220,6 +243,7 @@
       if (!conv) return;
       self.setOpen(true);
       safe(function () { chat.runQuickService(conv.id, s.id); });
+      self.setQuickOpen(false); // اطوِ الخدمات بعد اختيار خدمة — وتظهر بزرار العودة
       self.rerender();
     });
   };
@@ -289,6 +313,7 @@
       if (!conv || !chat) { warned('send failed — no conversation / data layer.'); return; }
       self.el.input.value = '';
       self.el.input.style.height = 'auto';
+      self.setQuickOpen(false); // العميل بدأ يكتب → اطوِ الخدمات السريعة (ترجع بزرار العودة)
 
       // a quick-service asked for a typed answer (e.g. order status by phone)
       if (self.statusServiceId) {
