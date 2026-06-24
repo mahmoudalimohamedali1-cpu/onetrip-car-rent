@@ -568,9 +568,18 @@
       <span>متوفّر في جميع مناطق المملكة · خدمة سعودية ١٠٠٪</span>
     </div>
   </div>
+  <nav class="footer-legal" style="max-width:1180px;margin:0 auto;padding:18px 48px 2px;justify-content:center;border-top:1px solid rgba(255,255,255,.12);">
+    <a href="about.html">من نحن</a>
+    <a href="terms.html">الشروط والأحكام</a>
+    <a href="rental-terms.html">شروط وأحكام التأجير</a>
+    <a href="privacy.html">سياسة الخصوصية</a>
+    <a href="cancellation.html">سياسة الإلغاء والتعديل</a>
+    <a href="cookies.html">سياسة ملفات تعريف الارتباط</a>
+  </nav>
   <div class="footer-bar">© 2026 One Trip Car Rent — جميع الحقوق محفوظة</div>
 </footer>
 
+<script src="cars.js"></script>
 <script>
 (function(){
   'use strict';
@@ -618,25 +627,11 @@
   }
 
   /* ===========================================================
-     FLEET DATA  —  this is the single source of truth.
-     A future admin dashboard / API only needs to replace
-     `window.fleetData` (or PATCH a car object) and call
-     renderFleet(). Everything below renders from this.
+     FLEET DATA  —  rendered from the shared catalog (cars.js),
+     the single source of truth for every page. To edit a car,
+     change it once in cars.js; this page (and all others) follow.
      =========================================================== */
-  window.fleetData = {
-    intro: {
-      eyebrow: 'خيارات تناسبك',
-      heading1: 'سيارات مميزة',
-      heading2: 'في أسطولنا',
-      subtext: 'مجموعة واسعة من السيارات الحديثة بأفضل الأسعار وخدمة عملاء استثنائية'
-    },
-    cars: [
-      { id:'camry23',  order:1, category:'سيدان متوسطة',  name:'تويوتا كامري 2023', image:'assets/cars/camry.png',   price:299, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:false, badge:null,          discount:null, visible:true },
-      { id:'accent25', order:2, category:'سيدان صغيرة',   name:'هيونداي أكسنت 2025', image:'assets/cars/accent.png', price:259, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:true,  badge:'الأكثر طلبًا', discount:null, visible:true },
-      { id:'sunny26',  order:3, category:'سيدان اقتصادية', name:'نيسان صني 2026',   image:'assets/cars/sunny26.png', price:249, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:false, badge:null,          discount:null, visible:true },
-      { id:'sunny25',  order:4, category:'سيدان اقتصادية', name:'نيسان صني 2025',   image:'assets/cars/sunny25.png', price:249, currency:'ريال', unit:'يوم', taxNote:'السعر لا يشمل الضريبة', featured:false, badge:null,          discount:null, visible:true }
-    ]
-  };
+  window.fleetData = OneTrip.fleetData();
 
   var ORNAMENT = '<svg width="34" height="34" viewBox="0 0 48 48" fill="none" stroke="#f5901e" stroke-width="1.6"><path d="M24 6l4 6 7-1-1 7 6 4-6 4 1 7-7-1-4 6-4-6-7 1 1-7-6-4 6-4-1-7 7 1z"/><circle cx="24" cy="24" r="6"/></svg>';
 
