@@ -282,13 +282,14 @@
 <script>
 (function(){
   'use strict';
+  function otLead(lead){ try{ var a=JSON.parse(localStorage.getItem('ot_leads')||'[]'); lead.id='lead_'+Date.now(); lead.status='new'; var d=new Date(); lead.date=d.toLocaleDateString('ar-EG')+' '+d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}); a.push(lead); localStorage.setItem('ot_leads',JSON.stringify(a)); }catch(e){} }
   var f=document.getElementById('contactForm'), btn=document.getElementById('sendBtn');
   if(f) f.addEventListener('submit',function(e){
     e.preventDefault();
     var name=f.querySelector('input[type=text]').value.trim();
     var email=f.querySelector('input[type=email]').value.trim();
     if(!name || !email){ btn.textContent='من فضلك اكمل الاسم والبريد'; btn.style.background='#c0392b'; return; }
-    console.log('رسالة تواصل:', {name:name, email:email, phone:f.querySelector('input[type=tel]').value, subject:f.querySelector('select').value, message:f.querySelector('textarea').value});
+    otLead({type:'contact', name:name, email:email, phone:f.querySelector('input[type=tel]').value, subject:f.querySelector('select').value, message:f.querySelector('textarea').value});
     btn.innerHTML='تم إرسال رسالتك ✓'; btn.style.background='#138a52'; f.reset();
   });
   var mapBtn=document.querySelector('.map-btn');

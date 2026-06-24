@@ -463,6 +463,7 @@
   }).join('');
 
   /* selectable chips */
+  function otLead(lead){ try{ var a=JSON.parse(localStorage.getItem('ot_leads')||'[]'); lead.id='lead_'+Date.now(); lead.status='new'; var d=new Date(); lead.date=d.toLocaleDateString('ar-EG')+' '+d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}); a.push(lead); localStorage.setItem('ot_leads',JSON.stringify(a)); }catch(e){} }
   var sel={size:'1-5', duration:'1-3'};
   document.querySelectorAll('.chips').forEach(function(group){
     group.addEventListener('click', function(e){
@@ -473,7 +474,10 @@
     });
   });
   document.getElementById('quoteSubmit').addEventListener('click', function(){
-    console.log('طلب عرض سعر للشركات:', sel);
+    var fi=document.querySelectorAll('.q-fields input');
+    otLead({type:'corporate', name:(fi[1]&&fi[1].value.trim())||(fi[0]&&fi[0].value.trim())||'شركة',
+      company:(fi[0]&&fi[0].value.trim())||'', email:(fi[2]&&fi[2].value.trim())||'', phone:(fi[3]&&fi[3].value.trim())||'',
+      size:sel.size, duration:sel.duration});
     this.textContent='تم استلام طلبك ✓';
     this.style.background='#138a52';
   });

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة تحكم — One Trip Car Rent</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#1b2a7a;--indigo:#2300d9;--orange:#f5901e;--ink:#1b2440;--muted:#5a6488;--line:#e6e9f4;--cream:#f4f6fd;--bg:#eef1fa;--ok:#138a52;--red:#c0392b;}
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none;} img{display:block;} button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  ::placeholder{color:#9aa0b4;}
+
+  /* ---- login ---- */
+  .login{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 130% at 80% 0%,#2a0fb0,#1b2a7a 55%,#111a52);}
+  .login-card{background:#fff;border-radius:22px;padding:36px 34px;width:min(380px,92vw);box-shadow:0 40px 80px rgba(8,12,40,.5);text-align:center;}
+  .login-card img{height:74px;margin:0 auto 14px;}
+  .login-card h1{margin:0 0 4px;font-size:22px;color:var(--blue);font-weight:900;}
+  .login-card p{margin:0 0 20px;color:var(--muted);font-size:14px;}
+  .login-card input{width:100%;height:52px;border:1.5px solid var(--line);border-radius:13px;padding:0 14px;font-size:15px;font-weight:600;text-align:center;outline:none;margin-bottom:14px;}
+  .login-card input:focus{border-color:var(--blue);}
+  .login-card .hint{font-size:12.5px;color:#98a0bd;margin-top:12px;}
+
+  /* ---- shell ---- */
+  .app{display:none;min-height:100vh;}
+  .app.on{display:grid;grid-template-columns:248px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"side top" "side main";}
+  .topbar{grid-area:top;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 26px;position:sticky;top:0;z-index:30;}
+  .topbar .pg{font-weight:900;font-size:19px;color:var(--blue);}
+  .topbar .acts{display:flex;align-items:center;gap:10px;}
+  .tbtn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:700;font-size:13.5px;padding:9px 14px;border-radius:10px;}
+  .tbtn:hover{background:var(--cream);color:var(--blue);}
+  .tbtn.danger:hover{background:#fdece9;color:var(--red);border-color:#f3c6bd;}
+
+  .side{grid-area:side;background:#101a4d;color:#cdd3ee;padding:20px 16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;}
+  .side .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .side .brand img{height:46px;background:#fff;border-radius:10px;padding:5px 8px;}
+  .side .brand b{font-size:15px;color:#fff;font-weight:800;line-height:1.3;}
+  .nav-i{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:11px;color:#aeb6dd;font-weight:700;font-size:15px;transition:.15s;border:none;background:transparent;width:100%;text-align:right;}
+  .nav-i:hover{background:rgba(255,255,255,.06);color:#fff;}
+  .nav-i.active{background:linear-gradient(90deg,var(--orange),#ffa83a);color:#1a0a00;}
+  .nav-i .ct{margin-right:auto;font-size:12px;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:1px 8px;font-weight:800;}
+  .nav-i.active .ct{background:rgba(0,0,0,.18);color:#1a0a00;}
+  .side-foot{margin-top:auto;font-size:11.5px;color:#7e87b8;padding:10px 8px 0;line-height:1.6;}
+
+  .main{grid-area:main;padding:26px;overflow:auto;}
+  .sect{display:none;} .sect.on{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---- stat cards ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:8px;}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;box-shadow:0 12px 30px rgba(27,42,122,.05);}
+  .stat .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eaf0ff,#fff2e3);color:var(--blue);margin-bottom:12px;}
+  .stat b{display:block;font-size:30px;font-weight:900;color:var(--blue);line-height:1;}
+  .stat span{font-size:14px;color:var(--muted);font-weight:600;}
+
+  /* ---- panel + table ---- */
+  .panel{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px rgba(27,42,122,.05);overflow:hidden;}
+  .panel-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .panel-h h2{margin:0;font-size:18px;font-weight:900;color:var(--blue);}
+  .panel-h .sub{font-size:13px;color:var(--muted);font-weight:600;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{text-align:right;padding:13px 18px;font-size:14px;border-bottom:1px solid #f0f2fa;vertical-align:middle;}
+  th{background:#fafbff;color:var(--muted);font-weight:800;font-size:12.5px;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:#fcfdff;}
+  .cthumb{width:64px;height:42px;object-fit:contain;border-radius:8px;background:#f4f6fd;border:1px solid var(--line);}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;}
+  .pill.green{background:#e2f7ec;color:#138a52;} .pill.gray{background:#eef0f7;color:#7a829e;}
+  .pill.orange{background:#fff3e2;color:#c47712;} .pill.blue{background:#e9edff;color:var(--blue);}
+  .price{font-weight:900;color:var(--blue);}
+  .rowacts{display:flex;gap:6px;justify-content:flex-start;}
+  .iact{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+  .iact:hover{background:var(--cream);color:var(--blue);} .iact.del:hover{background:#fdece9;color:var(--red);border-color:#f3c6bd;}
+  .empty{padding:40px;text-align:center;color:var(--muted);font-weight:700;}
+
+  /* ---- buttons ---- */
+  .btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:11px;font-weight:800;font-size:14.5px;padding:11px 20px;transition:.15s;}
+  .btn-pri{background:var(--blue);color:#fff;box-shadow:0 10px 22px rgba(27,42,122,.28);} .btn-pri:hover{filter:brightness(1.12);}
+  .btn-org{background:var(--orange);color:#1a0a00;box-shadow:0 10px 22px rgba(245,144,30,.3);} .btn-org:hover{filter:brightness(1.06);}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink);} .btn-ghost:hover{background:var(--cream);}
+
+  /* ---- modal ---- */
+  .modal{position:fixed;inset:0;z-index:120;display:none;align-items:flex-start;justify-content:center;background:rgba(10,16,46,.55);padding:30px 16px;overflow:auto;}
+  .modal.on{display:flex;}
+  .modal-card{background:#fff;border-radius:20px;width:min(720px,100%);box-shadow:0 50px 100px rgba(8,12,40,.4);animation:pop .2s ease;}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+  .modal-h{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line);}
+  .modal-h h3{margin:0;font-size:19px;font-weight:900;color:var(--blue);}
+  .x{width:36px;height:36px;border-radius:10px;border:none;background:#f1f3fb;color:var(--muted);font-size:18px;}
+  .x:hover{background:#fdece9;color:var(--red);}
+  .modal-b{padding:22px 24px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .f{margin-bottom:14px;} .f.full{grid-column:1/-1;}
+  .f label{display:block;font-weight:800;font-size:13px;margin-bottom:6px;color:var(--ink);}
+  .f input,.f select,.f textarea{width:100%;height:46px;border:1.5px solid var(--line);border-radius:11px;padding:0 13px;font-size:14.5px;font-weight:600;color:var(--ink);outline:none;background:#fcfdff;}
+  .f textarea{height:auto;padding:11px 13px;line-height:1.6;resize:vertical;}
+  .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--blue);background:#fff;}
+  .imgrow{display:flex;gap:12px;align-items:center;}
+  .imgrow .prev{width:90px;height:60px;object-fit:contain;border-radius:10px;border:1px solid var(--line);background:#f4f6fd;flex:0 0 auto;}
+  .toggle{display:flex;align-items:center;gap:10px;background:#fcfdff;border:1.5px solid var(--line);border-radius:11px;padding:0 13px;height:46px;font-weight:700;font-size:14px;cursor:pointer;}
+  .toggle input{width:18px;height:18px;accent-color:var(--orange);}
+  .modal-f{display:flex;justify-content:flex-end;gap:10px;padding:18px 24px;border-top:1px solid var(--line);background:#fafbff;border-radius:0 0 20px 20px;}
+  .sub-h{font-size:13px;font-weight:800;color:var(--orange);margin:6px 0 10px;padding-top:6px;border-top:1px dashed var(--line);}
+
+  /* ---- toast ---- */
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-weight:700;font-size:14px;padding:12px 22px;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.3);opacity:0;transition:.25s;z-index:300;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.ok{background:var(--ok);} .toast.err{background:var(--red);}
+
+  @media (max-width:820px){
+    .app.on{grid-template-columns:1fr;grid-template-areas:"top" "main";}
+    .side{display:none;}
+    .grid2,.grid3{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div class="login" id="login">
+  <div class="login-card">
+    <img src="assets/onetrip-logo.png" alt="One Trip">
+    <h1>لوحة التحكم</h1>
+    <p>سجّل الدخول لإدارة الأسطول والمحتوى</p>
+    <input id="pass" type="password" placeholder="كلمة المرور" autocomplete="off">
+    <button class="btn btn-pri" style="width:100%;justify-content:center" id="loginBtn">دخول</button>
+    <div class="hint">نسخة تجريبية — كلمة المرور: <b>onetrip</b> (المصادقة الحقيقية تيجي مع Supabase)</div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="app" id="app">
+  <aside class="side">
+    <div class="brand"><img src="assets/onetrip-logo.png" alt=""><b>One Trip<br>لوحة التحكم</b></div>
+    <button class="nav-i active" data-sec="dash"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> لوحة التحكم</button>
+    <button class="nav-i" data-sec="cars"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2-5a2 2 0 0 1 2-1.3h10A2 2 0 0 1 19 8l2 5M5 13h14v5H5zM7 18v2M17 18v2"/></svg> السيارات <span class="ct" id="ctCars">0</span></button>
+    <button class="nav-i" data-sec="cats"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> الفئات <span class="ct" id="ctCats">0</span></button>
+    <button class="nav-i" data-sec="branches"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg> الفروع <span class="ct" id="ctBr">0</span></button>
+    <button class="nav-i" data-sec="leads"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg> الطلبات <span class="ct" id="ctLeads">0</span></button>
+    <button class="nav-i" data-sec="intro"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg> واجهة الرئيسية</button>
+    <div class="side-foot">نسخة تجريبية (localStorage) — البيانات على هذا المتصفح فقط. تنتقل لـSupabase لاحقًا.</div>
+  </aside>
+
+  <header class="topbar">
+    <div class="pg" id="pgTitle">لوحة التحكم</div>
+    <div class="acts">
+      <a class="tbtn" href="index.html" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M21 3l-9 9M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg> معاينة الموقع</a>
+      <button class="tbtn danger" id="resetBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg> استرجاع الافتراضي</button>
+      <button class="tbtn" id="logoutBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> خروج</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section class="sect on" id="sec-dash">
+      <div class="stats" id="dashStats"></div>
+      <div style="height:18px"></div>
+      <div class="panel">
+        <div class="panel-h"><h2>أحدث الطلبات</h2><span class="sub">آخر ما وصل من فورمات الموقع</span></div>
+        <div id="dashLeads"></div>
+      </div>
+    </section>
+
+    <!-- CARS -->
+    <section class="sect" id="sec-cars">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>السيارات</h2><span class="sub">أضِف وعدّل سيارات الأسطول — تظهر فورًا على الموقع</span></div>
+          <button class="btn btn-org" id="addCar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة سيارة</button>
+        </div>
+        <div style="overflow:auto" id="carsTable"></div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="sect" id="sec-cats">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>الفئات</h2><span class="sub">تصنيفات السيارات (تظهر في فلاتر الموقع ونموذج السيارة)</span></div>
+          <button class="btn btn-org" id="addCat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة فئة</button>
+        </div>
+        <div id="catsTable"></div>
+      </div>
+    </section>
+
+    <!-- BRANCHES -->
+    <section class="sect" id="sec-branches">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>الفروع</h2><span class="sub">مواقع الاستلام والتسليم</span></div>
+          <button class="btn btn-org" id="addBr"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة فرع</button>
+        </div>
+        <div id="brTable"></div>
+      </div>
+    </section>
+
+    <!-- LEADS -->
+    <section class="sect" id="sec-leads">
+      <div class="panel">
+        <div class="panel-h"><div><h2>الطلبات</h2><span class="sub">رسائل التواصل وطلبات الشركات/طويل الأجل</span></div></div>
+        <div style="overflow:auto" id="leadsTable"></div>
+      </div>
+    </section>
+
+    <!-- INTRO -->
+    <section class="sect" id="sec-intro">
+      <div class="panel" style="max-width:680px">
+        <div class="panel-h"><div><h2>واجهة سكشن الأسطول (الرئيسية)</h2><span class="sub">النصوص اللي تظهر فوق كروت السيارات في الرئيسية</span></div></div>
+        <div class="modal-b">
+          <div class="f"><label>التنويه (eyebrow)</label><input id="in-eyebrow"></div>
+          <div class="grid2">
+            <div class="f"><label>العنوان (سطر ١)</label><input id="in-h1"></div>
+            <div class="f"><label>العنوان المميّز (سطر ٢ — برتقالي)</label><input id="in-h2"></div>
+          </div>
+          <div class="f"><label>الوصف</label><textarea id="in-sub" rows="3"></textarea></div>
+          <button class="btn btn-pri" id="saveIntro">حفظ</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ===== CAR MODAL ===== -->
+<div class="modal" id="carModal">
+  <div class="modal-card">
+    <div class="modal-h"><h3 id="carModalTitle">إضافة سيارة</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="c-id">
+      <div class="grid2">
+        <div class="f"><label>الاسم *</label><input id="c-name" placeholder="تويوتا كامري 2023"></div>
+        <div class="f"><label>الفئة</label><select id="c-category"></select></div>
+      </div>
+      <div class="f full">
+        <label>الصورة</label>
+        <div class="imgrow">
+          <img class="prev" id="c-prev" alt="">
+          <input id="c-image" placeholder="assets/cars/camry.png" style="flex:1">
+          <label class="btn btn-ghost" style="cursor:pointer;white-space:nowrap">رفع صورة<input type="file" id="c-file" accept="image/*" hidden></label>
+        </div>
+      </div>
+      <div class="grid3">
+        <div class="f"><label>سنة الصنع</label><input id="c-year" type="number" value="2025"></div>
+        <div class="f"><label>المقاعد</label><input id="c-seats" type="number" value="5"></div>
+        <div class="f"><label>الحقائب</label><input id="c-bags" type="number" value="2"></div>
+        <div class="f"><label>الأبواب</label><input id="c-doors" type="number" value="4"></div>
+        <div class="f"><label>ناقل الحركة</label><select id="c-gear"><option>أوتوماتيك</option><option>عادي</option></select></div>
+        <div class="f"><label>مكيّف</label><label class="toggle"><input type="checkbox" id="c-ac" checked> يوجد تكييف</label></div>
+      </div>
+
+      <div class="sub-h">الأسعار</div>
+      <div class="grid3">
+        <div class="f"><label>السعر اليومي (ريال)</label><input id="c-daily" type="number" value="150"></div>
+        <div class="f"><label>سعر الرئيسية (ريال/يوم)</label><input id="c-showcase" type="number" placeholder="فارغ = مش على الرئيسية"></div>
+        <div class="f"><label>متاح للحجز</label><label class="toggle"><input type="checkbox" id="c-available" checked> متاح</label></div>
+        <div class="f"><label>شهري — ١٢ شهر</label><input id="c-m12" type="number"></div>
+        <div class="f"><label>شهري — ٢٤ شهر</label><input id="c-m24" type="number"></div>
+        <div class="f"><label>شهري — ٣٦ شهر</label><input id="c-m36" type="number"></div>
+      </div>
+
+      <div class="sub-h">العرض والترتيب</div>
+      <div class="grid3">
+        <div class="f"><label>الترتيب</label><input id="c-order" type="number" value="10"></div>
+        <div class="f"><label>على الرئيسية</label><label class="toggle"><input type="checkbox" id="c-onHomepage"> إظهار في الرئيسية</label></div>
+        <div class="f"><label>مميّزة (كرت بارز)</label><label class="toggle"><input type="checkbox" id="c-featured"> مميّزة</label></div>
+        <div class="f"><label>شارة الحجز</label><input id="c-bookingBadge" placeholder="مثال: الأكثر طلبًا / جديد"></div>
+        <div class="f"><label>شارة الرئيسية</label><input id="c-showcaseBadge" placeholder="مثال: الأكثر طلبًا"></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveCar">حفظ السيارة</button></div>
+  </div>
+</div>
+
+<!-- ===== BRANCH MODAL ===== -->
+<div class="modal" id="brModal">
+  <div class="modal-card" style="max-width:520px">
+    <div class="modal-h"><h3 id="brModalTitle">إضافة فرع</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="b-id">
+      <div class="f"><label>اسم الفرع *</label><input id="b-name" placeholder="فرع العليا"></div>
+      <div class="grid2">
+        <div class="f"><label>المدينة</label><input id="b-city" placeholder="الرياض"></div>
+        <div class="f"><label>الهاتف</label><input id="b-phone" placeholder="9200 32104"></div>
+      </div>
+      <div class="f"><label>العنوان</label><input id="b-address" placeholder="شارع العليا - بجوار برج المملكة"></div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveBr">حفظ الفرع</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="cars.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s));};
+  var toAr=function(n){return (n==null?'':n).toString().replace(/[0-9]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'[d];});};
+
+  /* ---------- DATA LAYER (localStorage demo — same interface for Supabase later) ---------- */
+  var K={cars:'ot_catalog',cats:'ot_categories',br:'ot_branches',leads:'ot_leads',intro:'ot_intro'};
+  function load(k,f){ try{var v=JSON.parse(localStorage.getItem(k)); return v==null?f:v;}catch(e){return f;} }
+  function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){toast('مساحة التخزين ممتلئة (الصور كبيرة؟)','err');return false;} }
+  var DEFCARS=(window.OneTrip&&window.OneTrip.defaultCars)||[];
+  var DEFINTRO=(window.OneTrip&&window.OneTrip.defaultIntro)||{};
+
+  function seed(){
+    if(localStorage.getItem(K.cars)==null) save(K.cars, JSON.parse(JSON.stringify(DEFCARS)));
+    if(localStorage.getItem(K.cats)==null){
+      var seen={}, cats=[];
+      load(K.cars,[]).forEach(function(c){ if(c.category&&!seen[c.category]){seen[c.category]=1;cats.push({id:'cat_'+cats.length,name:c.category});} });
+      ['دفع رباعي','فاخرة'].forEach(function(n){ if(!seen[n]) cats.push({id:'cat_'+cats.length,name:n}); });
+      save(K.cats,cats);
+    }
+    if(localStorage.getItem(K.br)==null) save(K.br,[
+      {id:'br_1',name:'فرع العليا',city:'الرياض',address:'شارع العليا - بجوار برج المملكة',phone:'9200 32104'},
+      {id:'br_2',name:'مطار الملك خالد',city:'الرياض',address:'صالة الوصول الدولية',phone:'9200 32104'}
+    ]);
+    if(localStorage.getItem(K.leads)==null) save(K.leads,[]);
+  }
+  var DB={
+    cars:{ all:function(){return load(K.cars,[]).slice().sort(function(a,b){return (a.order||0)-(b.order||0);});},
+           put:function(c){var a=load(K.cars,[]);var i=a.findIndex(function(x){return x.id===c.id;}); if(i>=0)a[i]=c; else a.push(c); save(K.cars,a);},
+           del:function(id){save(K.cars,load(K.cars,[]).filter(function(x){return x.id!==id;}));} },
+    cats:{ all:function(){return load(K.cats,[]);},
+           put:function(c){var a=load(K.cats,[]);var i=a.findIndex(function(x){return x.id===c.id;});if(i>=0)a[i]=c;else a.push(c);save(K.cats,a);},
+           del:function(id){save(K.cats,load(K.cats,[]).filter(function(x){return x.id!==id;}));} },
+    br:{ all:function(){return load(K.br,[]);},
+         put:function(c){var a=load(K.br,[]);var i=a.findIndex(function(x){return x.id===c.id;});if(i>=0)a[i]=c;else a.push(c);save(K.br,a);},
+         del:function(id){save(K.br,load(K.br,[]).filter(function(x){return x.id!==id;}));} },
+    leads:{ all:function(){return load(K.leads,[]).slice().reverse();},
+            setStatus:function(id,st){var a=load(K.leads,[]);var x=a.find(function(l){return l.id===id;});if(x){x.status=st;save(K.leads,a);}},
+            del:function(id){save(K.leads,load(K.leads,[]).filter(function(x){return x.id!==id;}));} },
+    intro:{ get:function(){return load(K.intro,DEFINTRO);}, set:function(o){save(K.intro,o);} }
+  };
+
+  /* ---------- toast ---------- */
+  var tEl=$('#toast'),tT;
+  function toast(msg,kind){ tEl.textContent=msg; tEl.className='toast on '+(kind||''); clearTimeout(tT); tT=setTimeout(function(){tEl.className='toast '+(kind||'');},2200); }
+
+  /* ---------- login ---------- */
+  function showApp(){ $('#login').style.display='none'; $('#app').classList.add('on'); seed(); renderAll(); }
+  if(sessionStorage.getItem('ot_admin')==='1') showApp();
+  function tryLogin(){ if($('#pass').value.trim()==='onetrip'){ sessionStorage.setItem('ot_admin','1'); showApp(); } else { toast('كلمة المرور غير صحيحة','err'); } }
+  $('#loginBtn').addEventListener('click',tryLogin);
+  $('#pass').addEventListener('keydown',function(e){if(e.key==='Enter')tryLogin();});
+  $('#logoutBtn').addEventListener('click',function(){ sessionStorage.removeItem('ot_admin'); location.reload(); });
+  $('#resetBtn').addEventListener('click',function(){ if(confirm('استرجاع كل البيانات للوضع الافتراضي؟ (هيمسح تعديلاتك على هذا المتصفح)')){ [K.cars,K.cats,K.br,K.leads,K.intro].forEach(function(k){localStorage.removeItem(k);}); seed(); renderAll(); toast('تم الاسترجاع','ok'); } });
+
+  /* ---------- nav ---------- */
+  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',intro:'واجهة الرئيسية'};
+  $$('.nav-i').forEach(function(b){ b.addEventListener('click',function(){
+    $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
+    var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
+    $('#pgTitle').textContent=titles[s];
+  });});
+
+  /* ---------- renderers ---------- */
+  function renderAll(){ renderCounts(); renderDash(); renderCars(); renderCats(); renderBranches(); renderLeads(); renderIntro(); }
+  function renderCounts(){
+    $('#ctCars').textContent=toAr(DB.cars.all().length);
+    $('#ctCats').textContent=toAr(DB.cats.all().length);
+    $('#ctBr').textContent=toAr(DB.br.all().length);
+    var nw=DB.leads.all().filter(function(l){return l.status!=='handled';}).length;
+    $('#ctLeads').textContent=toAr(nw);
+  }
+  function statCard(ic,n,label){ return '<div class="stat"><div class="ic">'+ic+'</div><b>'+toAr(n)+'</b><span>'+label+'</span></div>'; }
+  function renderDash(){
+    var cars=DB.cars.all(), av=cars.filter(function(c){return c.available;}).length, hp=cars.filter(function(c){return c.onHomepage;}).length;
+    var nw=DB.leads.all().filter(function(l){return l.status!=='handled';}).length;
+    var I={car:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2-5a2 2 0 0 1 2-1.3h10A2 2 0 0 1 19 8l2 5M5 13h14v5H5z"/></svg>',
+      ok:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#138a52" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+      star:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>',
+      tag:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>',
+      pin:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>',
+      mail:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9"><path d="M4 4h16v12H7l-3 3z"/></svg>'};
+    $('#dashStats').innerHTML=
+      statCard(I.car,cars.length,'إجمالي السيارات')+statCard(I.ok,av,'متاحة للحجز')+statCard(I.star,hp,'على الرئيسية')+
+      statCard(I.tag,DB.cats.all().length,'الفئات')+statCard(I.pin,DB.br.all().length,'الفروع')+statCard(I.mail,nw,'طلبات جديدة');
+    var leads=DB.leads.all().slice(0,5);
+    $('#dashLeads').innerHTML = leads.length? leadTable(leads) : '<div class="empty">لا توجد طلبات بعد — لما حد يبعت من فورم تواصل/الشركات هيظهر هنا.</div>';
+  }
+
+  function renderCars(){
+    var cars=DB.cars.all();
+    if(!cars.length){ $('#carsTable').innerHTML='<div class="empty">مفيش سيارات — اضغط «إضافة سيارة».</div>'; return; }
+    var rows=cars.map(function(c){
+      return '<tr>'+
+        '<td><img class="cthumb" src="'+(c.image||'')+'" alt="" onerror="this.style.visibility=\'hidden\'"></td>'+
+        '<td><b>'+esc(c.name)+'</b></td>'+
+        '<td><span class="pill blue">'+esc(c.category||'')+'</span></td>'+
+        '<td>'+toAr(c.year||'')+'</td>'+
+        '<td class="price">'+toAr(c.daily||0)+' <small style="color:#f5901e">ريال</small></td>'+
+        '<td>'+(c.available?'<span class="pill green">متاح</span>':'<span class="pill gray">غير متاح</span>')+'</td>'+
+        '<td>'+(c.onHomepage?'<span class="pill orange">نعم'+(c.featured?' ★':'')+'</span>':'<span class="pill gray">—</span>')+'</td>'+
+        '<td>'+toAr(c.order||0)+'</td>'+
+        '<td><div class="rowacts"><button class="iact" data-edit="'+c.id+'" title="تعديل"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+          '<button class="iact del" data-del="'+c.id+'" title="حذف"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></td>'+
+      '</tr>';
+    }).join('');
+    $('#carsTable').innerHTML='<table><thead><tr><th>الصورة</th><th>الاسم</th><th>الفئة</th><th>الموديل</th><th>اليومي</th><th>الحالة</th><th>الرئيسية</th><th>الترتيب</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#carsTable [data-edit]').forEach(function(b){b.addEventListener('click',function(){openCar(b.getAttribute('data-edit'));});});
+    $$('#carsTable [data-del]').forEach(function(b){b.addEventListener('click',function(){ var id=b.getAttribute('data-del'); if(confirm('حذف السيارة دي؟')){DB.cars.del(id);renderAll();toast('تم الحذف','ok');} });});
+  }
+
+  function renderCats(){
+    var cats=DB.cats.all();
+    var cars=DB.cars.all();
+    var rows=cats.map(function(c){
+      var used=cars.filter(function(x){return x.category===c.name;}).length;
+      return '<tr><td><b>'+esc(c.name)+'</b></td><td>'+toAr(used)+' سيارة</td>'+
+        '<td><div class="rowacts"><button class="iact" data-edc="'+c.id+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+        '<button class="iact del" data-dc="'+c.id+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></td></tr>';
+    }).join('');
+    $('#catsTable').innerHTML = cats.length? '<table><thead><tr><th>الفئة</th><th>الاستخدام</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">مفيش فئات.</div>';
+    $$('#catsTable [data-edc]').forEach(function(b){b.addEventListener('click',function(){ var c=DB.cats.all().find(function(x){return x.id===b.getAttribute('data-edc');}); var nn=prompt('اسم الفئة:',c.name); if(nn&&nn.trim()){ var old=c.name; c.name=nn.trim(); DB.cats.put(c); var cars=load(K.cars,[]); cars.forEach(function(x){if(x.category===old)x.category=c.name;}); save(K.cars,cars); renderAll(); toast('تم التعديل','ok'); } });});
+    $$('#catsTable [data-dc]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف الفئة؟')){DB.cats.del(b.getAttribute('data-dc'));renderAll();toast('تم الحذف','ok');} });});
+  }
+  $('#addCat').addEventListener('click',function(){ var n=prompt('اسم الفئة الجديدة:'); if(n&&n.trim()){ DB.cats.put({id:'cat_'+Date.now(),name:n.trim()}); renderAll(); toast('تمت الإضافة','ok'); } });
+
+  function renderBranches(){
+    var br=DB.br.all();
+    var rows=br.map(function(c){
+      return '<tr><td><b>'+esc(c.name)+'</b></td><td><span class="pill blue">'+esc(c.city||'')+'</span></td><td>'+esc(c.address||'')+'</td><td dir="ltr" style="text-align:right">'+esc(c.phone||'')+'</td>'+
+      '<td><div class="rowacts"><button class="iact" data-edb="'+c.id+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+      '<button class="iact del" data-db="'+c.id+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></td></tr>';
+    }).join('');
+    $('#brTable').innerHTML = br.length? '<table><thead><tr><th>الفرع</th><th>المدينة</th><th>العنوان</th><th>الهاتف</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">مفيش فروع.</div>';
+    $$('#brTable [data-edb]').forEach(function(b){b.addEventListener('click',function(){openBr(b.getAttribute('data-edb'));});});
+    $$('#brTable [data-db]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف الفرع؟')){DB.br.del(b.getAttribute('data-db'));renderAll();toast('تم الحذف','ok');} });});
+  }
+
+  function leadTable(leads){
+    var tmap={contact:'تواصل',corporate:'شركات',longterm:'طويل الأجل'};
+    var rows=leads.map(function(l){
+      var det=[l.email,l.phone,l.company,l.subject,l.size&&('حجم: '+l.size),l.duration&&('مدة: '+l.duration),l.message].filter(Boolean).join(' · ');
+      return '<tr><td><span class="pill orange">'+(tmap[l.type]||l.type||'طلب')+'</span></td><td><b>'+esc(l.name||'—')+'</b></td><td style="max-width:380px;color:#5a6488">'+esc(det)+'</td>'+
+        '<td style="white-space:nowrap;color:#98a0bd">'+esc(l.date||'')+'</td>'+
+        '<td>'+(l.status==='handled'?'<span class="pill gray">تم</span>':'<span class="pill green">جديد</span>')+'</td>'+
+        '<td><div class="rowacts"><button class="iact" data-lh="'+l.id+'" title="تحديد كمنفّذ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>'+
+        '<button class="iact del" data-ld="'+l.id+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></td></tr>';
+    }).join('');
+    return '<table><thead><tr><th>النوع</th><th>الاسم</th><th>التفاصيل</th><th>التاريخ</th><th>الحالة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+  function renderLeads(){
+    var leads=DB.leads.all();
+    $('#leadsTable').innerHTML = leads.length? leadTable(leads) : '<div class="empty">لا توجد طلبات بعد.</div>';
+    bindLeadActions('#leadsTable'); bindLeadActions('#dashLeads');
+  }
+  function bindLeadActions(root){
+    $$(root+' [data-lh]').forEach(function(b){b.addEventListener('click',function(){DB.leads.setStatus(b.getAttribute('data-lh'),'handled');renderAll();});});
+    $$(root+' [data-ld]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف الطلب؟')){DB.leads.del(b.getAttribute('data-ld'));renderAll();} });});
+  }
+
+  function renderIntro(){ var i=DB.intro.get(); $('#in-eyebrow').value=i.eyebrow||''; $('#in-h1').value=i.heading1||''; $('#in-h2').value=i.heading2||''; $('#in-sub').value=i.subtext||''; }
+  $('#saveIntro').addEventListener('click',function(){ DB.intro.set({eyebrow:$('#in-eyebrow').value,heading1:$('#in-h1').value,heading2:$('#in-h2').value,subtext:$('#in-sub').value}); toast('تم الحفظ — حدّث الرئيسية','ok'); });
+
+  /* ---------- car modal ---------- */
+  function fillCats(){ $('#c-category').innerHTML=DB.cats.all().map(function(c){return '<option>'+esc(c.name)+'</option>';}).join(''); }
+  function openCar(id){
+    fillCats();
+    var c = id? DB.cars.all().find(function(x){return x.id===id;}) : null;
+    $('#carModalTitle').textContent = c? 'تعديل سيارة' : 'إضافة سيارة';
+    var g=function(s){return $(s);};
+    g('#c-id').value=c?c.id:''; g('#c-name').value=c?c.name:''; g('#c-category').value=c?c.category:(DB.cats.all()[0]||{}).name||'';
+    g('#c-image').value=c?c.image:''; setPrev(c?c.image:'');
+    g('#c-year').value=c?c.year:2025; g('#c-seats').value=c?c.seats:5; g('#c-bags').value=c?c.bags:2; g('#c-doors').value=c?c.doors:4;
+    g('#c-gear').value=c?c.gear:'أوتوماتيك'; g('#c-ac').checked=c?!!c.ac:true;
+    g('#c-daily').value=c?c.daily:150; g('#c-showcase').value=(c&&c.showcase!=null)?c.showcase:''; g('#c-available').checked=c?!!c.available:true;
+    var m=(c&&c.monthly)||{}; g('#c-m12').value=m[12]||''; g('#c-m24').value=m[24]||''; g('#c-m36').value=m[36]||'';
+    g('#c-order').value=c?c.order:(DB.cars.all().length+1);
+    g('#c-onHomepage').checked=c?!!c.onHomepage:false; g('#c-featured').checked=c?!!c.featured:false;
+    g('#c-bookingBadge').value=(c&&c.bookingBadge)||''; g('#c-showcaseBadge').value=(c&&c.showcaseBadge)||'';
+    openModal('#carModal');
+  }
+  function setPrev(src){ var p=$('#c-prev'); if(src){p.src=src;p.style.visibility='visible';}else{p.removeAttribute('src');p.style.visibility='hidden';} }
+  $('#c-image').addEventListener('input',function(){setPrev(this.value);});
+  $('#c-file').addEventListener('change',function(){ var f=this.files[0]; if(!f)return; var r=new FileReader(); r.onload=function(){ $('#c-image').value=r.result; setPrev(r.result); }; r.readAsDataURL(f); });
+  $('#addCar').addEventListener('click',function(){openCar(null);});
+  $('#saveCar').addEventListener('click',function(){
+    var name=$('#c-name').value.trim(); if(!name){toast('اكتب اسم السيارة','err');return;}
+    var num=function(s){var v=parseFloat($(s).value);return isNaN(v)?null:v;};
+    var id=$('#c-id').value || ('car_'+Date.now());
+    var sc=num('#c-showcase');
+    var car={ id:id, name:name, category:$('#c-category').value, image:$('#c-image').value.trim(),
+      year:num('#c-year'), seats:num('#c-seats'), bags:num('#c-bags'), doors:num('#c-doors'),
+      gear:$('#c-gear').value, ac:$('#c-ac').checked, daily:num('#c-daily')||0, available:$('#c-available').checked,
+      bookingBadge:$('#c-bookingBadge').value.trim()||null,
+      onHomepage:$('#c-onHomepage').checked, order:num('#c-order')||0, showcase:sc, featured:$('#c-featured').checked,
+      showcaseBadge:$('#c-showcaseBadge').value.trim()||null,
+      monthly:{12:num('#c-m12'),24:num('#c-m24'),36:num('#c-m36')} };
+    DB.cars.put(car); closeModal(); renderAll(); toast('تم حفظ السيارة ✓','ok');
+  });
+
+  /* ---------- branch modal ---------- */
+  function openBr(id){ var c=id?DB.br.all().find(function(x){return x.id===id;}):null; $('#brModalTitle').textContent=c?'تعديل فرع':'إضافة فرع';
+    $('#b-id').value=c?c.id:''; $('#b-name').value=c?c.name:''; $('#b-city').value=c?c.city:''; $('#b-phone').value=c?c.phone:''; $('#b-address').value=c?c.address:''; openModal('#brModal'); }
+  $('#addBr').addEventListener('click',function(){openBr(null);});
+  $('#saveBr').addEventListener('click',function(){ var name=$('#b-name').value.trim(); if(!name){toast('اكتب اسم الفرع','err');return;}
+    DB.br.put({id:$('#b-id').value||('br_'+Date.now()),name:name,city:$('#b-city').value.trim(),address:$('#b-address').value.trim(),phone:$('#b-phone').value.trim()}); closeModal(); renderAll(); toast('تم حفظ الفرع ✓','ok'); });
+
+  /* ---------- modal helpers ---------- */
+  function openModal(s){$(s).classList.add('on');}
+  function closeModal(){$$('.modal').forEach(function(m){m.classList.remove('on');});}
+  $$('[data-close]').forEach(function(b){b.addEventListener('click',closeModal);});
+  $$('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)closeModal();});});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+  function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+})();
+</script>
+</body>
+</html>

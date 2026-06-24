@@ -20,7 +20,7 @@
 
   var TAX_NOTE = 'السعر لا يشمل الضريبة';
 
-  var CARS = [
+  var BUILTIN = [
     {
       id:'camry23', name:'تويوتا كامري 2023', category:'سيدان متوسطة', image:'assets/cars/camry.png',
       year:2023, seats:5, bags:2, gear:'أوتوماتيك', doors:4, ac:true,
@@ -65,6 +65,13 @@
     }
   ];
 
+  /* Admin override: the dashboard (admin.html) saves the live catalog to
+     localStorage['ot_catalog']; if present we use it so edits appear on the
+     public site. Falls back to the built-in list above. (Demo data layer —
+     swaps to Supabase later with the same shape.) */
+  var CARS = BUILTIN;
+  try { var _sc = JSON.parse(localStorage.getItem('ot_catalog')); if (Array.isArray(_sc) && _sc.length) CARS = _sc; } catch(e){}
+
   /* intro copy for the homepage fleet section */
   var INTRO = {
     eyebrow: 'خيارات تناسبك',
@@ -72,6 +79,7 @@
     heading2: 'في أسطولنا',
     subtext: 'مجموعة واسعة من السيارات الحديثة بأفضل الأسعار وخدمة عملاء استثنائية'
   };
+  try { var _si = JSON.parse(localStorage.getItem('ot_intro')); if (_si && _si.heading1) INTRO = _si; } catch(e){}
 
   function byOrder(a,b){ return (a.order||0) - (b.order||0); }
   function sorted(){ return CARS.slice().sort(byOrder); }
@@ -111,8 +119,10 @@
   }
 
   window.OneTrip = window.OneTrip || {};
-  window.OneTrip.cars       = CARS;
-  window.OneTrip.fleetData  = fleetData;
+  window.OneTrip.cars        = CARS;
+  window.OneTrip.defaultCars = BUILTIN;   // built-in catalog (admin seeds from this)
+  window.OneTrip.defaultIntro= { eyebrow:'خيارات تناسبك', heading1:'سيارات مميزة', heading2:'في أسطولنا', subtext:'مجموعة واسعة من السيارات الحديثة بأفضل الأسعار وخدمة عملاء استثنائية' };
+  window.OneTrip.fleetData   = fleetData;
   window.OneTrip.bookingCars = bookingCars;
-  window.OneTrip.ltCars     = ltCars;
+  window.OneTrip.ltCars      = ltCars;
 })();
