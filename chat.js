@@ -85,12 +85,17 @@
     }
   } catch(e){}
 
+  var firing = false;
   function fire(event){
     var cbs = listeners[event];
     if (!cbs) return;
-    for (var i = 0; i < cbs.length; i++){
-      try { cbs[i](); } catch(e){}
-    }
+    if (firing) return;            // حماية من التكرار المتداخل (re-entrancy) — يكسر أي حلقة بثّ لا نهائية
+    firing = true;
+    try {
+      for (var i = 0; i < cbs.length; i++){
+        try { cbs[i](); } catch(e){}
+      }
+    } finally { firing = false; }
   }
 
   /* emit: يُستدعى بعد أي تعديل — يبثّ للتبويبات الأخرى ثم يطلق محليًا */
@@ -226,23 +231,25 @@
     var i = findIndex(arr, convId);
     if (i === -1) return;
     var conv = arr[i];
+    var changed = false;          // نبثّ فقط لو فعلًا اتغيّر حاجة — يكسر حلقة rerender↔markRead
 
     if (side === 'agent') {
-      conv.unreadAgent = 0;
+      if (conv.unreadAgent) { conv.unreadAgent = 0; changed = true; }
       if (Array.isArray(conv.messages)) {
         for (var a = 0; a < conv.messages.length; a++){
-          if (conv.messages[a].from === 'user') conv.messages[a].read = true;
+          if (conv.messages[a].from === 'user' && !conv.messages[a].read) { conv.messages[a].read = true; changed = true; }
         }
       }
     } else if (side === 'user') {
-      conv.unreadUser = 0;
+      if (conv.unreadUser) { conv.unreadUser = 0; changed = true; }
       if (Array.isArray(conv.messages)) {
         for (var u = 0; u < conv.messages.length; u++){
           var f = conv.messages[u].from;
-          if (f === 'agent' || f === 'bot') conv.messages[u].read = true;
+          if ((f === 'agent' || f === 'bot') && !conv.messages[u].read) { conv.messages[u].read = true; changed = true; }
         }
       }
     }
+    if (!changed) return;
     saveChats(arr);
     emit();
   }
