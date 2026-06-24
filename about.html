@@ -4,143 +4,426 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>من نحن — One Trip Car Rent</title>
+<meta name="description" content="تعرّف على One Trip Car Rent — منصّة تأجير سيارات سعودية تجمع الجودة والاعتمادية والمرونة وخدمة عملاء استثنائية في كل رحلة.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="anim.css">
-<script>(function(d){d.documentElement.className+=' js-anim';window.__af=setTimeout(function(){d.documentElement.classList.remove('js-anim');},2000);})(document);</script>
 <style>
-  :root{--blue:#1b2a7a;--indigo:#2300d9;--orange:#f5901e;--orange-soft:#f7a23e;--ink:#1b2440;--muted:#5a6488;--line:#e4e8f5;--cream:#f4f6fd;}
-  *{box-sizing:border-box;} html{scroll-behavior:smooth;} html,body{margin:0;padding:0;}
-  body{font-family:'Tajawal',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:#fff;}
-  a{color:inherit;text-decoration:none;} img{display:block;}
-  .sadu-strip{height:6px;background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#fff 24px,#fff 30px);opacity:.95;}
-  .site-header{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:14px 48px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;}
-  .logo-badge img{height:64px;width:auto;}
-  .main-nav{display:flex;align-items:center;gap:4px;flex:1;justify-content:center;}
-  .main-nav a{color:var(--muted);font-weight:600;font-size:15.5px;padding:10px 14px;border-radius:10px;transition:.15s;}
-  .main-nav a:hover{color:var(--blue);background:var(--cream);}
-  .nav-dd{position:relative;display:inline-flex;}
-  .dd-caret{margin-right:3px;transition:transform .15s;} .nav-dd:hover .dd-caret{transform:rotate(180deg);}
-  .dd-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:190px;background:#fff;border-radius:13px;box-shadow:0 20px 44px rgba(15,22,72,.18);padding:8px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.16s;z-index:60;}
-  .nav-dd:hover .dd-menu{opacity:1;visibility:visible;transform:translateY(0);}
-  .dd-menu a{display:flex;align-items:center;gap:9px;color:#1b2440;font-weight:700;font-size:14.5px;padding:11px 14px;border-radius:9px;}
-  .dd-menu a:hover{background:#f4f6fd;color:#1b2a7a;}
-  .header-actions{display:flex;align-items:center;gap:16px;}
-  .login-link{color:var(--ink);font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:7px;white-space:nowrap;}
-  .login-link:hover{color:var(--blue);}
-  .btn-orange{background:var(--orange);color:#1a0a00;font-weight:800;font-size:15px;padding:11px 22px;border-radius:12px;box-shadow:0 12px 24px rgba(245,144,30,.32);white-space:nowrap;border:none;cursor:pointer;}
-  .btn-orange:hover{filter:brightness(1.06);}
-  .legal-hero{position:relative;overflow:hidden;color:#fff;padding:46px 48px 40px;background:radial-gradient(120% 140% at 85% 0%, #2a0fb0 0%, #1b2a7a 50%, #111a52 100%);}
-  .legal-hero-inner{max-width:980px;margin:0 auto;}
-  .crumb{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);font-size:14px;font-weight:600;margin-bottom:12px;}
-  .crumb a:hover{color:#fff;}
-  .legal-hero h1{margin:0;font-weight:900;font-size:clamp(28px,3.4vw,46px);}
-  .legal-hero p{margin:10px 0 0;color:rgba(255,255,255,.82);font-size:18px;line-height:1.7;}
-  .legal-article{max-width:900px;margin:-22px auto 70px;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 70px rgba(27,42,122,.1);padding:40px 44px 48px;position:relative;z-index:2;}
-  .legal-article h2{margin:30px 0 10px;font-size:21px;font-weight:900;color:var(--blue);position:relative;padding-right:16px;}
-  .legal-article h2::before{content:"";position:absolute;right:0;top:6px;bottom:6px;width:5px;border-radius:3px;background:var(--orange);}
-  .legal-article h2:first-child{margin-top:0;}
-  .legal-article p{margin:0 0 13px;color:#41495f;font-size:16px;line-height:1.95;}
-  .legal-updated{margin-top:34px;padding-top:18px;border-top:1px dashed var(--line);color:var(--muted);font-size:13.5px;font-weight:600;}
-  .site-footer{background:#0e1640;color:#cdd3ee;padding:54px 48px 24px;}
-  .footer-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:36px;}
-  .footer-brand img{height:58px;margin-bottom:16px;background:#fff;border-radius:12px;padding:8px 12px;}
-  .footer-brand p{margin:0;color:#9aa3cf;font-size:14.5px;line-height:1.8;max-width:300px;}
-  .fcol h4{margin:0 0 16px;font-size:16px;font-weight:800;color:#fff;}
-  .fcol a{display:block;color:#aab2da;font-size:14.5px;padding:6px 0;}
-  .fcol a:hover{color:var(--orange);}
-  .cities{display:flex;flex-wrap:wrap;gap:8px;} .cities span{font-size:13px;color:#aab2da;background:rgba(255,255,255,.06);padding:5px 11px;border-radius:999px;}
-  .footer-bottom{max-width:1320px;margin:34px auto 0;padding-top:22px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#8b93bf;font-size:13.5px;}
-  .socials{display:flex;gap:10px;} .socials a{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:#cdd3ee;}
-  .socials a:hover{background:var(--orange);color:#1a0a00;}
-  @media (max-width:980px){.footer-inner{grid-template-columns:1fr 1fr;} .main-nav{display:none;}}
-  @media (max-width:600px){.site-header,.legal-hero,.site-footer{padding-left:18px;padding-right:18px;} .legal-article{padding:28px 22px;margin-left:14px;margin-right:14px;} .footer-inner{grid-template-columns:1fr;}}
+  :root{
+    --ink:#15103A;        /* darkest heading */
+    --indigo:#2A14C4;     /* primary brand indigo */
+    --indigo2:#4A2BE0;
+    --orange:#F2911E;     /* brand orange */
+    --muted:#56516F;
+    --muted2:#837E9C;
+    --line:#ECEDF4;
+    --cream:#FBFAFF;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Tajawal',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:#fff;overflow-x:hidden;}
+  a{text-decoration:none;}
+  img{display:block;}
+
+  /* ---------- ambient animations (CSS only — content always visible) ---------- */
+  @keyframes ot-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+  @keyframes ot-pulse{0%,100%{box-shadow:0 14px 30px -10px rgba(242,145,30,.7);}50%{box-shadow:0 14px 44px -6px rgba(242,145,30,.95);}}
+  @keyframes ot-kenburns{0%{transform:scale(1.05) translate(0,0);}100%{transform:scale(1.13) translate(-1.5%,-1.2%);}}
+  @media (prefers-reduced-motion: reduce){
+    .dot,.car-photo,.cta-pulse{animation:none !important;}
+  }
+
+  /* ---------- nav ---------- */
+  .site-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+  .nav{max-width:1240px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;gap:28px;}
+  .nav .logo img{height:52px;width:auto;}
+  .nav-links{display:flex;align-items:center;gap:26px;margin-inline-start:8px;font-size:16px;font-weight:500;}
+  .nav-links a{color:#4A4668;transition:color .15s;}
+  .nav-links a:hover{color:var(--indigo);}
+  .nav-links a.active{color:var(--indigo);font-weight:700;}
+  .nav-cta{margin-inline-start:auto;display:flex;align-items:center;gap:14px;}
+  .nav-login{color:var(--indigo);font-weight:700;font-size:15px;}
+  .nav-book{background:var(--orange);color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;transition:filter .15s,transform .15s;}
+  .nav-book:hover{filter:brightness(1.06);transform:translateY(-1px);}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;background:radial-gradient(120% 120% at 80% 0%, #F3F1FF 0%, #FBFAFF 42%, #FFFFFF 100%);overflow:hidden;}
+  .dot{position:absolute;border-radius:50%;animation:ot-float 6s ease-in-out infinite;}
+  .dot.d1{top:70px;left:8%;width:14px;height:14px;background:var(--orange);opacity:.5;}
+  .dot.d2{top:180px;left:22%;width:9px;height:9px;background:var(--indigo);opacity:.35;animation-duration:7.5s;animation-delay:.8s;}
+  .dot.d3{top:110px;right:12%;width:11px;height:11px;background:var(--indigo);opacity:.3;animation-duration:8s;animation-delay:.4s;}
+  .hero-grid{max-width:1240px;margin:0 auto;padding:16px 28px 0;display:grid;grid-template-columns:1fr 1.05fr;align-items:center;gap:20px;min-height:560px;}
+  .hero-copy{padding:30px 0 60px;}
+  .hero-badge-row{display:flex;align-items:center;gap:16px;}
+  .hero-badge-row .logo img{height:54px;width:auto;}
+  .pill{display:inline-flex;align-items:center;gap:9px;background:#fff;border:1px solid #ECE9FF;padding:8px 16px;border-radius:999px;font-size:14px;font-weight:700;color:var(--indigo);box-shadow:0 6px 18px -10px rgba(42,20,196,.4);}
+  .pill .dotmark{width:8px;height:8px;border-radius:50%;background:var(--orange);display:inline-block;}
+  .hero h1{font-size:clamp(38px,5.2vw,64px);line-height:1.08;font-weight:900;margin:22px 0 0;letter-spacing:-1px;}
+  .hero h1 .b{color:var(--indigo);}
+  .hero h1 .o{color:var(--orange);}
+  .hero-lead{font-size:19px;line-height:1.85;color:var(--muted);max-width:540px;margin:22px 0 0;font-weight:500;}
+  .hero-actions{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+  .btn-orange{background:var(--orange);color:#fff;font-weight:800;font-size:16px;padding:15px 30px;border-radius:14px;transition:filter .15s,transform .15s;}
+  .btn-orange:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .cta-pulse{animation:ot-pulse 3s ease-in-out infinite;}
+  .btn-ghost{background:#fff;color:var(--indigo);font-weight:800;font-size:16px;padding:15px 30px;border-radius:14px;border:1.5px solid #E3DFFB;transition:border-color .15s,transform .15s;}
+  .btn-ghost:hover{border-color:var(--indigo);transform:translateY(-1px);}
+  .stats{display:flex;gap:34px;margin-top:40px;flex-wrap:wrap;}
+  .stat b{display:block;font-size:30px;font-weight:900;color:var(--ink);}
+  .stat span{font-size:14px;color:var(--muted2);font-weight:600;}
+  .stat-sep{width:1px;background:#E7E4F2;}
+
+  .car-stage{position:relative;align-self:center;padding:36px 0 64px;}
+  .car-panel{position:relative;height:400px;border-radius:28px;overflow:hidden;background:#1C1644;box-shadow:0 30px 60px -34px rgba(42,20,196,.5);border:1px solid #E7E2FB;}
+  .car-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 58%;transform:scale(1.05);animation:ot-kenburns 22s ease-in-out infinite alternate;will-change:transform;}
+  .car-scrim{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(180deg,rgba(15,11,42,0) 0%,rgba(15,11,42,.5) 100%);}
+
+  /* ---------- intro strip ---------- */
+  .intro{background:var(--cream);border-top:1px solid #F0EEF9;border-bottom:1px solid #F0EEF9;}
+  .intro-inner{max-width:1000px;margin:0 auto;padding:64px 28px;text-align:center;}
+  .intro-inner p{font-size:clamp(20px,2.4vw,27px);line-height:1.85;font-weight:700;color:#2A2350;margin:0;}
+  .intro-inner .o{color:var(--orange);}
+
+  /* ---------- section shell ---------- */
+  .section{max-width:1240px;margin:0 auto;}
+  .eyebrow{font-size:15px;font-weight:800;letter-spacing:1px;color:var(--orange);}
+  .head-center{text-align:center;}
+  .head-center h2{font-size:clamp(30px,3.6vw,44px);font-weight:900;margin:12px 0 0;letter-spacing:-.5px;}
+
+  /* ---------- vision / mission ---------- */
+  .vm{padding:92px 28px 30px;}
+  .vm-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
+  .vm-card{position:relative;overflow:hidden;border-radius:26px;padding:44px;}
+  .vm-card .blob{position:absolute;top:-40px;left:-40px;width:160px;height:160px;border-radius:50%;}
+  .vm-card.indigo{background:var(--indigo);color:#fff;}
+  .vm-card.indigo .blob{background:rgba(255,255,255,.06);}
+  .vm-card.white{background:#fff;border:1.5px solid #ECEAF7;}
+  .vm-card.white .blob{background:rgba(242,145,30,.07);}
+  .vm-card .kicker{font-size:15px;font-weight:800;letter-spacing:1px;color:var(--orange);}
+  .vm-card h3{font-size:28px;font-weight:900;margin:14px 0 16px;line-height:1.3;}
+  .vm-card.white h3{color:var(--ink);}
+  .vm-card p{font-size:17px;line-height:1.9;margin:0;font-weight:500;}
+  .vm-card.indigo p{color:#D6D0FF;}
+  .vm-card.white p{color:var(--muted);}
+
+  /* ---------- values ---------- */
+  .values{padding:70px 28px;}
+  .values .head-center{margin-bottom:48px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .value-card{background:#fff;border:1.5px solid #EEECF7;border-radius:22px;padding:32px;transition:transform .25s,box-shadow .25s,border-color .25s;}
+  .value-card:hover{transform:translateY(-6px);box-shadow:0 26px 44px -26px rgba(42,20,196,.4);border-color:#E0DBFB;}
+  .value-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;}
+  .value-card h4{font-size:21px;font-weight:900;margin:20px 0 10px;color:var(--ink);}
+  .value-card p{font-size:16px;line-height:1.8;color:#5C577A;margin:0;font-weight:500;}
+
+  /* ---------- services (dark) ---------- */
+  .services{background:var(--ink);color:#fff;overflow:hidden;position:relative;}
+  .services .glow{position:absolute;top:-80px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(242,145,30,.12);filter:blur(10px);}
+  .services-inner{max-width:1240px;margin:0 auto;padding:90px 28px;}
+  .services-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:46px;}
+  .services-head h2{font-size:clamp(30px,3.6vw,44px);font-weight:900;margin:12px 0 0;letter-spacing:-.5px;}
+  .services-head p{font-size:17px;color:#B7B2D4;max-width:380px;margin:0;line-height:1.8;font-weight:500;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .service-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:30px;transition:background .25s,transform .25s;}
+  .service-card:hover{background:rgba(242,145,30,.14);transform:translateY(-5px);}
+  .service-no{font-size:13px;font-weight:800;color:var(--orange);}
+  .service-card h4{font-size:20px;font-weight:900;margin:16px 0 8px;}
+  .service-card p{font-size:15px;line-height:1.7;color:#ADA8CC;margin:0;font-weight:500;}
+
+  /* ---------- why us ---------- */
+  .why{padding:92px 28px;}
+  .why .head-center{margin-bottom:46px;}
+  .reasons{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .reason{display:flex;align-items:center;gap:16px;background:var(--cream);border:1px solid #EFEDF8;border-radius:16px;padding:22px 24px;}
+  .reason .check{flex:none;width:40px;height:40px;border-radius:12px;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;}
+  .reason span{font-size:17px;font-weight:700;color:#2A2350;}
+
+  /* ---------- CTA ---------- */
+  .cta-wrap{max-width:1240px;margin:0 auto 90px;padding:0 28px;}
+  .cta{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--indigo) 0%,var(--indigo2) 100%);border-radius:30px;padding:64px 56px;text-align:center;}
+  .cta .blob1{position:absolute;bottom:-60px;left:-30px;width:220px;height:220px;border-radius:50%;background:rgba(242,145,30,.18);}
+  .cta .blob2{position:absolute;top:-50px;right:-20px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07);}
+  .cta h2{position:relative;font-size:clamp(28px,3.6vw,46px);font-weight:900;color:#fff;margin:0;line-height:1.25;}
+  .cta p{position:relative;font-size:18px;color:#D7D1FF;max-width:560px;margin:18px auto 0;line-height:1.8;font-weight:500;}
+  .cta-actions{position:relative;display:flex;gap:14px;justify-content:center;margin-top:32px;flex-wrap:wrap;}
+  .cta-actions .btn-orange{font-size:17px;padding:16px 34px;}
+  .btn-translucent{background:rgba(255,255,255,.12);color:#fff;font-weight:800;font-size:17px;padding:16px 34px;border-radius:14px;border:1px solid rgba(255,255,255,.25);transition:background .15s;}
+  .btn-translucent:hover{background:rgba(255,255,255,.2);}
+
+  /* ---------- footer ---------- */
+  .site-footer{background:#0F0B2A;color:#fff;}
+  .footer-inner{max-width:1240px;margin:0 auto;padding:70px 28px 30px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:40px;}
+  .footer-brand .logo-box{background:#fff;display:inline-block;padding:10px 16px;border-radius:14px;}
+  .footer-brand .logo-box img{height:48px;}
+  .footer-brand p{font-size:15px;line-height:1.8;color:#A39FC4;margin:18px 0 0;max-width:280px;font-weight:500;}
+  .fcol h5{font-size:15px;font-weight:800;margin:0 0 16px;color:var(--orange);}
+  .fcol .links{display:flex;flex-direction:column;gap:12px;font-size:15px;}
+  .fcol .links a{color:#C6C2E0;transition:color .15s;}
+  .fcol .links a:hover{color:var(--orange);}
+  .cities{display:flex;flex-wrap:wrap;gap:8px;font-size:14px;}
+  .cities span{color:#C6C2E0;}
+  .cities .sep{color:#4B4670;}
+  .footer-bottom{border-top:1px solid rgba(255,255,255,.08);}
+  .footer-bottom-inner{max-width:1240px;margin:0 auto;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;font-size:14px;color:#837E9C;}
+  .footer-legal{display:flex;flex-wrap:wrap;gap:9px 18px;}
+  .footer-legal a{color:#A39FC4;font-weight:600;transition:color .15s;}
+  .footer-legal a:hover{color:var(--orange);}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:920px){
+    .hero-grid{grid-template-columns:1fr;}
+    .car-stage{order:-1;padding:24px 0 0;}
+    .vm-grid{grid-template-columns:1fr;}
+    .grid4{grid-template-columns:repeat(2,1fr);}
+    .reasons{grid-template-columns:repeat(2,1fr);}
+    .footer-inner{grid-template-columns:1fr 1fr;}
+    .nav-links{display:none;}
+  }
+  @media (max-width:560px){
+    .grid3,.grid4,.reasons,.footer-inner{grid-template-columns:1fr;}
+    .nav{padding:12px 18px;}
+    .hero-grid,.intro-inner,.vm,.values,.services-inner,.why,.cta-wrap{padding-left:18px;padding-right:18px;}
+    .vm-card,.cta{padding:36px 26px;}
+    .stats{gap:20px;}
+  }
 </style>
 </head>
 <body>
-<div class="sadu-strip"></div>
+
+<!-- ===== NAV ===== -->
 <header class="site-header">
-  <a class="logo-badge" href="index.html"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></a>
-  <nav class="main-nav">
-    <a href="index.html">الرئيسية</a>
-    <a href="fleet.html">الأسطول</a>
-    <div class="nav-dd"><a href="long-term.html">تأجير طويل الأجل<svg class="dd-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
-      <div class="dd-menu"><a href="long-term.html">أفراد</a><a href="corporate.html">شركات</a></div></div>
-    <a href="index.html#bookingWidget">الاشتراك الشهري</a>
-    <a href="contact.html">تواصل معنا</a>
+  <nav class="nav">
+    <a class="logo" href="index.html"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></a>
+    <div class="nav-links">
+      <a href="index.html">الرئيسية</a>
+      <a href="fleet.html">الأسطول</a>
+      <a href="long-term.html">تأجير طويل الأجل</a>
+      <a href="about.html" class="active">من نحن</a>
+      <a href="contact.html">تواصل معنا</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="nav-login">تسجيل الدخول</a>
+      <a href="create-booking.html" class="nav-book">احجز الآن</a>
+    </div>
   </nav>
-  <div class="header-actions">
-    <a href="#" class="login-link">تسجيل الدخول</a>
-    <a href="create-booking.html" class="btn-orange">احجز الآن</a>
-  </div>
 </header>
-<section class="legal-hero"><div class="legal-hero-inner">
-  <div class="crumb"><a href="index.html">الرئيسية</a> &rsaquo; <span>من نحن</span></div>
-  <h1>من نحن</h1>
-  <p>نُعيد تعريف تجربة تأجير السيارات</p>
-</div></section>
-<article class="legal-article">
-  <p>في One Trip Car Rent، نؤمن بأن تأجير السيارة لا يقتصر على توفير مركبة فحسب، بل يتعلق بتقديم تجربة متكاملة تجمع بين الجودة، والاعتمادية، والمرونة، وخدمة العملاء المتميزة.</p>
-  <p>من هذا المنطلق، نسعى إلى تقديم حلول تأجير سيارات تلبي احتياجات الأفراد والشركات، من خلال أسطول متنوع من المركبات الحديثة، وإجراءات تشغيل احترافية، وخدمة تعتمد على الشفافية والالتزام في جميع مراحل رحلة العميل.</p>
-  <p>سواء كنت تبحث عن سيارة للاستخدام الشخصي، أو تحتاج إلى حلول تأجير مرنة لدعم أعمال شركتك، فإننا نعمل على تقديم خدمات مصممة لتواكب احتياجاتك وتمنحك تجربة تأجير سهلة وموثوقة.</p>
-  <h2>رؤيتنا</h2>
-  <p>أن نكون من الشركات الرائدة في قطاع تأجير السيارات بالمملكة العربية السعودية، من خلال تقديم حلول تنقل مبتكرة، وتجربة عملاء استثنائية، وخدمات تعتمد على الجودة والموثوقية والابتكار.</p>
-  <h2>رسالتنا</h2>
-  <p>توفير خدمات تأجير سيارات احترافية تركز على احتياجات عملائنا، وتقدم حلولًا مرنة للأفراد والشركات، مع الالتزام بأعلى معايير الجودة، والشفافية، وخدمة العملاء.</p>
-  <h2>قيمنا</h2>
-  <h2>الجودة</h2>
-  <p>نلتزم بتوفير مركبات يتم فحصها وصيانتها بصورة دورية لضمان أعلى مستويات السلامة والأداء.</p>
-  <h2>الاحترافية</h2>
-  <p>نعتمد على إجراءات تشغيل واضحة وفريق عمل مؤهل لتقديم تجربة تأجير سهلة وموثوقة.</p>
-  <h2>الشفافية</h2>
-  <p>نحرص على وضوح الأسعار، والعقود، وجميع تفاصيل الخدمة، بما يضمن بناء علاقة قائمة على الثقة مع عملائنا.</p>
-  <h2>الاعتمادية</h2>
-  <p>نلتزم بتنفيذ وعودنا وتقديم خدمات يمكن لعملائنا الاعتماد عليها في جميع الأوقات.</p>
-  <h2>التركيز على العميل</h2>
-  <p>نضع احتياجات العميل في مقدمة أولوياتنا، ونعمل باستمرار على تطوير خدماتنا بما يحقق أعلى مستويات الرضا.</p>
-  <h2>خدماتنا</h2>
-  <p>تقدم One Trip Car Rent مجموعة متكاملة من حلول التأجير، تشمل:</p>
-  <p>التأجير اليومي.</p>
-  <p>التأجير الشهري.</p>
-  <p>التأجير طويل الأجل.</p>
-  <p>حلول تأجير الشركات.</p>
-  <h2>لماذا One Trip Car Rent؟</h2>
-  <p>لأننا نجمع بين:</p>
-  <p>أسطول حديث ومتجدد.</p>
-  <p>خيارات تأجير مرنة.</p>
-  <p>أسعار تنافسية.</p>
-  <p>إجراءات حجز سهلة وسريعة.</p>
-  <p>خدمة عملاء احترافية.</p>
-  <p>حلول مخصصة للأفراد والشركات.</p>
-  <p>التزام بمعايير الجودة والسلامة.</p>
-  <h2>التزامنا</h2>
-  <p>نلتزم في One Trip Car Rent بتقديم خدمات تعتمد على الجودة والموثوقية والشفافية، مع العمل المستمر على تطوير خدماتنا، وتبني أفضل الممارسات، وبناء علاقات طويلة الأمد مع عملائنا وشركائنا.</p>
-  <h2>انطلق معنا</h2>
-  <p>سواء كنت تحتاج إلى سيارة ليوم واحد، أو تبحث عن شريك موثوق لإدارة احتياجات النقل في شركتك، فإن فريق One Trip Car Rent  مستعد لمساعدتك في اختيار الحل الأمثل.</p>
-  <h2>One Trip Car Rent...  شريكك في كل رحلة</h2>
-  <p class="legal-updated">آخر تحديث: يونيو ٢٠٢٦ — One Trip Car Rent</p>
-</article>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <span class="dot d1"></span>
+  <span class="dot d2"></span>
+  <span class="dot d3"></span>
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <div class="hero-badge-row">
+        <span class="logo"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></span>
+        <span class="pill"><span class="dotmark"></span>من نحن</span>
+      </div>
+      <h1>نُعيد تعريف تجربة<br><span class="b">تأجير</span> <span class="o">السيارات</span></h1>
+      <p class="hero-lead">في One Trip Car Rent، تأجير السيارة ليس مجرد توفير مركبة — بل تجربة متكاملة تجمع بين الجودة والاعتمادية والمرونة وخدمة عملاء استثنائية في كل رحلة.</p>
+      <div class="hero-actions">
+        <a href="create-booking.html" class="btn-orange cta-pulse">احجز سيارتك الآن</a>
+        <a href="#values" class="btn-ghost">تعرّف على قيمنا</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>+10</b><span>مدن نخدمها</span></div>
+        <div class="stat-sep"></div>
+        <div class="stat"><b>24/7</b><span>دعم متواصل</span></div>
+        <div class="stat-sep"></div>
+        <div class="stat"><b>٪100</b><span>شفافية الأسعار</span></div>
+      </div>
+    </div>
+
+    <div class="car-stage">
+      <div class="car-panel">
+        <img class="car-photo" src="assets/onetrip-car.png" alt="سيارة One Trip Car Rent أمام أفق الرياض">
+        <div class="car-scrim"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INTRO STRIP ===== -->
+<section class="intro">
+  <div class="intro-inner">
+    <p>نسعى لتقديم حلول تأجير سيارات تلبي احتياجات الأفراد والشركات، عبر أسطول متنوع من المركبات الحديثة، وإجراءات تشغيل احترافية، وخدمة تعتمد على <span class="o">الشفافية والالتزام</span> في كل مراحل رحلة العميل.</p>
+  </div>
+</section>
+
+<!-- ===== VISION / MISSION ===== -->
+<section class="section vm">
+  <div class="vm-grid">
+    <div class="vm-card indigo">
+      <span class="blob"></span>
+      <div class="kicker">رؤيتنا</div>
+      <h3>رواد التنقل في المملكة</h3>
+      <p>أن نكون من الشركات الرائدة في قطاع تأجير السيارات بالمملكة العربية السعودية، عبر حلول تنقل مبتكرة وتجربة عملاء استثنائية تعتمد على الجودة والموثوقية والابتكار.</p>
+    </div>
+    <div class="vm-card white">
+      <span class="blob"></span>
+      <div class="kicker">رسالتنا</div>
+      <h3>خدمة تتمحور حول العميل</h3>
+      <p>توفير خدمات تأجير احترافية تركز على احتياجات عملائنا، وتقدم حلولًا مرنة للأفراد والشركات، مع الالتزام بأعلى معايير الجودة والشفافية وخدمة العملاء.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VALUES ===== -->
+<section class="section values" id="values">
+  <div class="head-center">
+    <div class="eyebrow">قيمنا</div>
+    <h2>المبادئ التي تقود كل رحلة</h2>
+  </div>
+  <div class="grid3">
+    <div class="value-card">
+      <div class="value-icon" style="background:#FCEBD4;color:#F2911E;">◆</div>
+      <h4>الجودة</h4>
+      <p>مركبات يتم فحصها وصيانتها دوريًا لضمان أعلى مستويات السلامة والأداء.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon" style="background:#E2DCFB;color:#2A14C4;">◈</div>
+      <h4>الاحترافية</h4>
+      <p>إجراءات تشغيل واضحة وفريق عمل مؤهل لتجربة تأجير سهلة وموثوقة.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon" style="background:#FCEBD4;color:#F2911E;">○</div>
+      <h4>الشفافية</h4>
+      <p>وضوح الأسعار والعقود وتفاصيل الخدمة لبناء علاقة قائمة على الثقة.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon" style="background:#E2DCFB;color:#2A14C4;">◇</div>
+      <h4>الاعتمادية</h4>
+      <p>نلتزم بتنفيذ وعودنا وتقديم خدمات يمكن الاعتماد عليها في كل وقت.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon" style="background:#FCEBD4;color:#F2911E;">◐</div>
+      <h4>التركيز على العميل</h4>
+      <p>احتياج العميل أولويتنا، ونطوّر خدماتنا باستمرار لأعلى مستويات الرضا.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon" style="background:#E2DCFB;color:#2A14C4;">◑</div>
+      <h4>الابتكار</h4>
+      <p>نتبنى أفضل الممارسات وحلول التنقل الحديثة لتجربة تأجير أذكى.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICES ===== -->
+<section class="services">
+  <span class="glow"></span>
+  <div class="services-inner">
+    <div class="services-head">
+      <div>
+        <div class="eyebrow">خدماتنا</div>
+        <h2>منظومة تأجير متكاملة</h2>
+      </div>
+      <p>حلول مرنة مصمّمة لتواكب احتياجك — ليوم واحد أو لرحلة طويلة الأمد.</p>
+    </div>
+    <div class="grid4">
+      <div class="service-card">
+        <div class="service-no">٠١</div>
+        <h4>التأجير اليومي</h4>
+        <p>سيارة جاهزة ليومك بإجراءات حجز سريعة وسهلة.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-no">٠٢</div>
+        <h4>التأجير الشهري</h4>
+        <p>مرونة شهرية بأسعار تنافسية دون التزام طويل.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-no">٠٣</div>
+        <h4>طويل الأجل</h4>
+        <p>حلول ممتدة موثوقة لاحتياجاتك المتكررة.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-no">٠٤</div>
+        <h4>حلول الشركات</h4>
+        <p>إدارة أسطول مخصصة تدعم أعمال شركتك.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHY US ===== -->
+<section class="section why">
+  <div class="head-center">
+    <div class="eyebrow">لماذا One Trip؟</div>
+    <h2>لأننا نجمع كل ما تحتاجه في مكان واحد</h2>
+  </div>
+  <div class="reasons">
+    <div class="reason"><span class="check">✓</span><span>أسطول حديث ومتجدد</span></div>
+    <div class="reason"><span class="check">✓</span><span>خيارات تأجير مرنة</span></div>
+    <div class="reason"><span class="check">✓</span><span>أسعار تنافسية</span></div>
+    <div class="reason"><span class="check">✓</span><span>حجز سهل وسريع</span></div>
+    <div class="reason"><span class="check">✓</span><span>خدمة عملاء احترافية</span></div>
+    <div class="reason"><span class="check">✓</span><span>التزام بالجودة والسلامة</span></div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-wrap">
+  <div class="cta">
+    <span class="blob1"></span>
+    <span class="blob2"></span>
+    <h2>انطلق معنا في كل رحلة</h2>
+    <p>سيارة ليوم واحد أو شريك موثوق لإدارة أسطول شركتك — فريق One Trip مستعد لمساعدتك في اختيار الحل الأمثل.</p>
+    <div class="cta-actions">
+      <a href="create-booking.html" class="btn-orange">احجز الآن</a>
+      <a href="contact.html" class="btn-translucent">تواصل معنا</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
 <footer class="site-footer">
   <div class="footer-inner">
-    <div class="footer-brand"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"><p>منصّة تنقّل سعودية حديثة للتأجير اليومي والشهري وطويل الأجل — بهوية سعودية في كل تفصيلة.</p></div>
-    <div class="fcol"><h4>الشركة</h4><a href="about.html">من نحن</a><a href="#">الوظائف</a><a href="#">الامتياز التجاري</a><a href="fleet.html">الأسطول</a></div>
-    <div class="fcol"><h4>خدماتنا</h4><a href="create-booking.html">التأجير اليومي</a><a href="long-term.html">تأجير طويل الأجل</a><a href="corporate.html">حلول الشركات</a><a href="contact.html">تواصل معنا</a></div>
-    <div class="fcol"><h4>مدن نخدمها</h4><div class="cities"><span>الرياض</span><span>جدة</span><span>مكة</span><span>المدينة</span><span>الدمام</span><span>أبها</span><span>العُلا</span><span>حائل</span><span>جازان</span><span>ينبع</span></div></div>
+    <div class="footer-brand">
+      <span class="logo-box"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></span>
+      <p>منصّة تنقّل سعودية حديثة للتأجير اليومي والشهري وطويل الأجل — بهوية سعودية في كل تفصيلة.</p>
+    </div>
+    <div class="fcol">
+      <h5>الشركة</h5>
+      <div class="links">
+        <a href="about.html">من نحن</a>
+        <a href="#">الوظائف</a>
+        <a href="fleet.html">الأسطول</a>
+      </div>
+    </div>
+    <div class="fcol">
+      <h5>خدماتنا</h5>
+      <div class="links">
+        <a href="create-booking.html">التأجير اليومي</a>
+        <a href="long-term.html">تأجير طويل الأجل</a>
+        <a href="corporate.html">حلول الشركات</a>
+      </div>
+    </div>
+    <div class="fcol">
+      <h5>مدن نخدمها</h5>
+      <div class="cities">
+        <span>الرياض</span><span class="sep">·</span>
+        <span>جدة</span><span class="sep">·</span>
+        <span>مكة</span><span class="sep">·</span>
+        <span>المدينة</span><span class="sep">·</span>
+        <span>الدمام</span><span class="sep">·</span>
+        <span>أبها</span><span class="sep">·</span>
+        <span>العُلا</span>
+      </div>
+    </div>
   </div>
   <div class="footer-bottom">
-    <nav class="footer-legal">
-      <a href="about.html">من نحن</a>
-      <a href="terms.html">الشروط والأحكام</a>
-      <a href="rental-terms.html">شروط وأحكام التأجير</a>
-      <a href="privacy.html">سياسة الخصوصية</a>
-      <a href="cancellation.html">سياسة الإلغاء والتعديل</a>
-      <a href="cookies.html">سياسة ملفات تعريف الارتباط</a>
-    </nav>
-    <span>One Trip Car Rent &copy; جميع الحقوق محفوظة ٢٠٢٦</span>
-    <div class="socials"><a href="#" aria-label="x"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7 8 8.2 12h-6.4l-5-7.3L6 22H2.9l7.5-8.6L2 2h6.5l4.5 6.7L18.9 2z"/></svg></a></div>
+    <div class="footer-bottom-inner">
+      <nav class="footer-legal">
+        <a href="terms.html">الشروط والأحكام</a>
+        <a href="rental-terms.html">شروط وأحكام التأجير</a>
+        <a href="privacy.html">سياسة الخصوصية</a>
+        <a href="cancellation.html">سياسة الإلغاء والتعديل</a>
+        <a href="cookies.html">سياسة ملفات تعريف الارتباط</a>
+      </nav>
+      <span>One Trip Car Rent © جميع الحقوق محفوظة ٢٠٢٦</span>
+    </div>
   </div>
 </footer>
-<script src="anim.js"></script>
+
 </body>
 </html>
