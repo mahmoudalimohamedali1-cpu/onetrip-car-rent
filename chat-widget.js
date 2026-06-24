@@ -255,7 +255,9 @@
     var chat = Chat();
     if (!chat) { warned('cannot start conversation — OneTrip.Chat missing.'); done(null); return; }
     var conv = this.currentConv();
-    if (conv) { done(conv); return; }
+    // محادثة نشطة موجودة → استخدمها. المقفولة تبدأ محادثة جديدة (بعد التقييم/الإغلاق).
+    if (conv && conv.status !== 'closed') { done(conv); return; }
+    if (conv && conv.status === 'closed') { this._lastCustomer = { name: conv.name, phone: conv.phone }; }
 
     if (!this.askedPrechat) {
       this.askedPrechat = true;
@@ -263,8 +265,9 @@
       this.showPrechat(true);
       return;
     }
-    // already asked/skipped — just create
-    var created = safe(function () { return chat.startConversation({ channel: 'web' }); }, null);
+    // already asked/skipped — أنشئ محادثة جديدة (نحمل اسم/جوال العميل لو موجودين)
+    var info = this._lastCustomer || {};
+    var created = safe(function () { return chat.startConversation({ channel: 'web', name: info.name, phone: info.phone }); }, null);
     this.seedWelcome(created);
     done(created);
   };

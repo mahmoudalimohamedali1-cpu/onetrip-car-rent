@@ -330,11 +330,13 @@
           إعدادات الشات (رسالة الإغلاق + التقييم)
         </summary>
         <div class="modal-b" style="border-top:1px solid var(--line)">
+          <div class="f"><label>رسالة الانتظار (تُرسل للعميل طالما لم يفتح الموظف المحادثة)</label><textarea id="cs-waiting" rows="2"></textarea></div>
           <div class="f"><label>رسالة الإغلاق (تُرسل تلقائيًا عند إنهاء المحادثة)</label><textarea id="cs-close" rows="2"></textarea></div>
           <div class="grid2">
-            <div class="f"><label>تفعيل التقييم (CSAT)</label><label class="toggle"><input type="checkbox" id="cs-survey"> اطلب تقييم العميل بعد الإغلاق</label></div>
+            <div class="f"><label>تحويل المحادثة لموظف آخر بعد (دقائق) إذا لم تُفتح</label><input id="cs-reassign" type="number" min="0" placeholder="٣ — صفر لإيقاف التحويل" dir="ltr"></div>
             <div class="f"><label>سؤال التقييم</label><input id="cs-question" placeholder="كيف تقيّم خدمتنا؟"></div>
           </div>
+          <div class="f"><label>تفعيل التقييم (CSAT)</label><label class="toggle"><input type="checkbox" id="cs-survey"> اطلب تقييم العميل بعد الإغلاق</label></div>
           <button class="btn btn-pri" id="cs-save">حفظ الإعدادات</button>
         </div>
       </details>
@@ -560,10 +562,10 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="cars.js"></script>
+<script src="cars.js?v=5"></script>
 <script src="chat.js"></script>
 <script src="supabase-sync.js"></script>
-<script src="booking-core.js"></script>
+<script src="booking-core.js?v=5"></script>
 <script>
 (function(){
   'use strict';
@@ -1057,6 +1059,7 @@
       var snip=last?(last.type==='card'?'بطاقة معلومات':(last.text||'')):'لا رسائل';
       var initial=esc(((cv.name||'ز').trim()[0])||'ز');
       var chBadge=cv.channel==='whatsapp'?'<span class="ch-badge wa">واتساب</span>':'<span class="ch-badge">ويب</span>';
+      var newBadge=(!cv.agentOpened && cv.status!=='closed')?'<span class="ch-badge" style="background:#fff3e0;color:#f5901e">لم تُفتح</span>':'';
       var unread=cv.unreadAgent>0?'<span class="unread">'+toAr(cv.unreadAgent)+'</span>':'';
       var asg=cv.assignedTo?'<span class="ch-badge" style="background:#eef0f7;color:#5a6488">'+esc(agentName(cv.assignedTo))+'</span>':'';
       var claim=(!admin && !cv.assignedTo)?'<button class="qchip" data-claim="'+esc(cv.id)+'" style="margin-right:auto;padding:3px 9px;font-size:11px">تسليم لي</button>':'';
@@ -1064,7 +1067,7 @@
         '<div class="av">'+initial+'<span class="dot '+esc(cv.status||'open')+'"></span></div>'+
         '<div class="mid"><div class="top"><span class="nm">'+esc(cv.name||'زائر')+'</span><span class="tm">'+chatTime(cv.updatedAt)+'</span></div>'+
         '<div class="snip">'+esc(snip)+'</div>'+
-        '<div class="meta">'+chBadge+(cv.phone?'<span class="tm" dir="ltr">'+esc(cv.phone)+'</span>':'')+asg+unread+claim+'</div></div></div>';
+        '<div class="meta">'+chBadge+newBadge+(cv.phone?'<span class="tm" dir="ltr">'+esc(cv.phone)+'</span>':'')+asg+unread+claim+'</div></div></div>';
     }).join('');
     $$('#convList [data-claim]').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); var id=b.getAttribute('data-claim'); try{c.assign(id,myId);}catch(err){} toast('تم تسليم المحادثة لك ✓','ok'); renderInbox(); }); });
     $$('#convList [data-cv]').forEach(function(el){ el.addEventListener('click',function(){ openConv(el.getAttribute('data-cv')); }); });
@@ -1076,6 +1079,8 @@
     var c=CHAT(); if(!c) return;
     selConv=id;
     try{ c.markRead(id,'agent'); }catch(e){}
+    /* الموظف فتح المحادثة → يوقف رسائل الانتظار والتحويل التلقائي ويسنِدها له لو غير مسنودة */
+    try{ var me=curUser(); c.markOpened&&c.markOpened(id, me&&me.id); }catch(e){}
     renderRoom();
     renderInbox();
   }
@@ -1192,6 +1197,8 @@
     var resume=function(){ try{ if(_ac&&_ac.state==='suspended') _ac.resume(); }catch(e){} };
     document.addEventListener('click',resume); document.addEventListener('keydown',resume);
     window.addEventListener('focus',function(){ if($('#sec-chat').classList.contains('on')) clearNotify(); });
+    /* فحص دوري لتحويل المحادثات المتأخرة لموظف آخر (حسب إعداد الدقائق) */
+    if(!window.__otSweep){ window.__otSweep=setInterval(function(){ try{ var c=CHAT(); if(c&&c.reassignSweep) c.reassignSweep(); }catch(e){} },25000); }
   }
   if($('#soundToggle')) $('#soundToggle').addEventListener('click',function(){ setSound(!soundOn()); });
 
@@ -1211,12 +1218,14 @@
     var c=CHAT(); var s={}; try{ s=(c&&c.settings&&c.settings())||{}; }catch(e){ s={}; }
     var box=$('#chatSettingsBox'); if(!box) return;
     if($('#cs-close')) $('#cs-close').value=s.closeMessage||'';
+    if($('#cs-waiting')) $('#cs-waiting').value=s.waitingMessage||'';
     if($('#cs-survey')) $('#cs-survey').checked=s.surveyEnabled!==false;
     if($('#cs-question')) $('#cs-question').value=s.surveyQuestion||'';
+    if($('#cs-reassign')) $('#cs-reassign').value=(s.reassignMinutes!=null?s.reassignMinutes:3);
   }
   if($('#cs-save')) $('#cs-save').addEventListener('click',function(){
     var c=CHAT(); if(!c||!c.saveSettings){ toast('وحدة الدردشة غير محمّلة','err'); return; }
-    try{ c.saveSettings({ closeMessage:$('#cs-close').value, surveyEnabled:$('#cs-survey').checked, surveyQuestion:$('#cs-question').value.trim() }); toast('تم حفظ إعدادات الشات ✓','ok'); }
+    try{ c.saveSettings({ closeMessage:$('#cs-close').value, waitingMessage:$('#cs-waiting').value, surveyEnabled:$('#cs-survey').checked, surveyQuestion:$('#cs-question').value.trim(), reassignMinutes:parseInt($('#cs-reassign').value,10)||0 }); toast('تم حفظ إعدادات الشات ✓','ok'); }
     catch(e){ toast('تعذّر الحفظ','err'); }
   });
 

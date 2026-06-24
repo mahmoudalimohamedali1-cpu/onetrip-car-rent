@@ -31,7 +31,9 @@
   var DEFAULT_SETTINGS = {
     closeMessage: 'تم إنهاء المحادثة. شكرًا لتواصلك مع One Trip 🌟 نتمنى أن نكون قدّمنا لك خدمة مميزة.',
     surveyEnabled: true,
-    surveyQuestion: 'كيف تقيّم خدمتنا؟'
+    surveyQuestion: 'كيف تقيّم خدمتنا؟',
+    waitingMessage: 'جميع موظفينا مشغولون حاليًا بالرد على عملاء آخرين 🙏 برجاء الانتظار وسيتم الرد عليك في أقرب وقت.',
+    reassignMinutes: 3   /* لو الموظف ما فتحش المحادثة خلال هذه المدة تتحوّل لموظف آخر (0 = إيقاف) */
   };
 
   /* فرع افتراضي عند غياب ot_branches */
@@ -170,6 +172,9 @@
       channel: opts.channel || 'web',
       status: 'open',
       assignedTo: null,
+      assignedAt: 0,           /* وقت آخر إسناد (لحساب التحويل عند تأخر الموظف) */
+      agentOpened: false,      /* هل فتح الموظف المحادثة في اللوحة؟ */
+      waitingNotified: false,  /* هل أُرسلت رسالة الانتظار في فترة الانتظار الحالية؟ */
       unreadAgent: 0,
       unreadUser: 0,
       createdAt: now,
@@ -179,9 +184,44 @@
     };
   }
 
+  /* ---- توزيع المحادثات على الموظفين (round-robin بأقل حِمل) ---- */
+  function agents(){
+    var us = readJSON('ot_users', []);
+    if (!Array.isArray(us)) return [];
+    return us.filter(function(u){ return u && u.role === 'agent'; });
+  }
+  /* عدد المحادثات النشطة (غير المقفولة) المسنودة لكل موظف */
+  function agentLoad(){
+    var arr = loadChats(), load = {};
+    for (var i = 0; i < arr.length; i++){
+      var c = arr[i];
+      if (c.status !== 'closed' && c.assignedTo) load[c.assignedTo] = (load[c.assignedTo] || 0) + 1;
+    }
+    return load;
+  }
+  /* اختيار الموظف الأقل حِملًا (الفاضي) — مع استبعاد موظف معيّن عند التحويل */
+  function pickAgent(excludeId){
+    var ags = agents(); if (!ags.length) return null;
+    var load = agentLoad(), best = null, bestN = Infinity;
+    for (var i = 0; i < ags.length; i++){
+      var id = ags[i].id;
+      if (excludeId && id === excludeId) continue;
+      var n = load[id] || 0;
+      if (n < bestN){ bestN = n; best = id; }
+    }
+    return best;
+  }
+  /* إسناد تلقائي لكائن محادثة (قبل الحفظ) */
+  function autoAssignConv(conv, excludeId){
+    var id = pickAgent(excludeId || null);
+    if (id){ conv.assignedTo = id; conv.assignedAt = Date.now(); conv.agentOpened = false; conv.waitingNotified = false; }
+    return id;
+  }
+
   function startConversation(opts){
     var arr = loadChats();
     var conv = newConversation(opts);
+    autoAssignConv(conv);            /* وجّه المحادثة الجديدة لأقل موظف حِملًا */
     arr.push(conv);
     saveChats(arr);
     writeStr(K_SESSION, conv.id);
@@ -300,10 +340,63 @@
     var arr = loadChats();
     var i = findIndex(arr, convId);
     if (i === -1) return;
-    arr[i].assignedTo = agentName;
-    arr[i].updatedAt = Date.now();
+    var conv = arr[i];
+    var changed = (conv.assignedTo !== (agentName || null));
+    conv.assignedTo = agentName || null;
+    /* عند الإسناد لموظف مختلف: يبدأ مؤقّت جديد والموظف الجديد لازم يفتح المحادثة */
+    if (changed){
+      conv.assignedAt = agentName ? Date.now() : 0;
+      conv.agentOpened = false;
+      conv.waitingNotified = false;
+    }
+    conv.updatedAt = Date.now();
     saveChats(arr);
     emit();
+  }
+
+  /* markOpened — الموظف فتح المحادثة في اللوحة: يوقف رسائل الانتظار والتحويل التلقائي.
+     لو غير مسنودة يسنِدها لمن فتحها (بدون إعادة ضبط agentOpened). */
+  function markOpened(convId, byId){
+    var arr = loadChats();
+    var i = findIndex(arr, convId);
+    if (i === -1) return;
+    var conv = arr[i], changed = false;
+    if (!conv.agentOpened){ conv.agentOpened = true; changed = true; }
+    if (byId && !conv.assignedTo){ conv.assignedTo = byId; conv.assignedAt = Date.now(); changed = true; }
+    if (changed){ conv.updatedAt = Date.now(); saveChats(arr); emit(); }
+  }
+
+  /* checkReassign — لو الموظف ما فتحش المحادثة خلال reassignMinutes، حوّلها لموظف آخر فاضي */
+  function checkReassign(convId){
+    var mins = parseInt(settings().reassignMinutes, 10);
+    if (!mins || mins <= 0) return false;
+    var arr = loadChats();
+    var i = findIndex(arr, convId);
+    if (i === -1) return false;
+    var conv = arr[i];
+    if (conv.status === 'closed' || conv.agentOpened) return false;
+    if (!conv.assignedTo || !(conv.assignedAt > 0)) return false;
+    if (Date.now() - conv.assignedAt < mins * 60000) return false;
+    var next = pickAgent(conv.assignedTo);
+    if (!next || next === conv.assignedTo) return false;   /* لا يوجد موظف آخر فاضي */
+    conv.assignedTo = next;
+    conv.assignedAt = Date.now();
+    conv.waitingNotified = false;
+    conv.updatedAt = Date.now();
+    saveChats(arr);
+    emit();
+    return true;
+  }
+  /* reassignSweep — فحص دوري لكل المحادثات المتأخرة (تستدعيه اللوحة كل فترة) */
+  function reassignSweep(){
+    var arr = loadChats(), any = false;
+    for (var i = 0; i < arr.length; i++){
+      var c = arr[i];
+      if (c.status !== 'closed' && !c.agentOpened && c.assignedTo) {
+        if (checkReassign(c.id)) any = true;
+      }
+    }
+    return any;
   }
 
   function deleteConversation(id){
@@ -412,7 +505,7 @@
     return 'حالة طلبك' + name + ': ' + st + '.';
   }
 
-  function agentText(){ return 'جارٍ تحويلك لموظف خدمة العملاء…'; }
+  function agentText(){ return 'تم تحويلك إلى فريق خدمة العملاء، وسيتم الرد عليك في أقرب وقت 🙏'; }
 
   /* runQuickService — ينفّذ خدمة بالمعرّف ويضيف ردّها (from:'bot') للمحادثة */
   function runQuickService(convId, serviceId){
@@ -429,7 +522,6 @@
       return sendMessage(convId, { from:'bot', type:'text', text:statusText(conv), data:{ service:'status' } });
     }
     if (serviceId === 'agent') {
-      setStatus(convId, 'pending');
       return sendMessage(convId, { from:'bot', type:'text', text:agentText(), data:{ service:'agent' } });
     }
     /* خدمات روابط (book/longterm/corporate): نضيف رسالة إرشادية بالرابط */
@@ -441,35 +533,31 @@
     return null;
   }
 
-  /* botReply — توجيه عربي بالكلمات المفتاحية (الردود from:'bot') */
-  function botReply(convId, userText){
-    var conv = getConversation(convId);
-    if (!conv) return null;
-    /* لو المحادثة اتحوّلت لموظف (pending) أو اتقفلت، أو فيه موظف بشري ردّ فيها بالفعل —
-       البوت يسكت تمامًا ويسيب الموظف يرد (مايردّش على رسايل العميل بعد التحويل) */
-    if (conv.status === 'pending' || conv.status === 'closed') return null;
-    if (Array.isArray(conv.messages)) {
-      for (var k = 0; k < conv.messages.length; k++){ if (conv.messages[k].from === 'agent') return null; }
-    }
-    var t = String(userText == null ? '' : userText);
+  /* botReply — مساعد الانتظار: طول ما الموظف ما فتحش المحادثة، يرد على العميل
+     برسالة "جميع موظفينا مشغولون… برجاء الانتظار" (مرّة واحدة لكل فترة انتظار).
+     أول ما الموظف يفتح المحادثة (agentOpened) أو يقفلها — البوت يسكت ويسيب الموظف يرد. */
+  function botReply(convId /*, userText (لم يعد يُستخدم للتوجيه) */){
+    /* لو الموظف اتأخر في الفتح: حوّل لموظف آخر قبل أي رد */
+    checkReassign(convId);
 
-    if (/سعر|اسعار|أسعار|تسعير|كم/.test(t)) return runQuickService(convId, 'prices');
-    if (/فرع|فروع|موقع|مواقع|عنوان|وين/.test(t)) return runQuickService(convId, 'branches');
-    if (/حجز|احجز|أحجز|استئجار|تأجير|اجار|إيجار/.test(t)) {
-      return sendMessage(convId, { from:'bot', type:'text', text:'يمكنك الحجز الآن من هنا: create-booking.html', data:{ service:'book', href:'create-booking.html' } });
-    }
-    if (/شهر|شهري|طويل|باقة|باقات/.test(t)) {
-      return sendMessage(convId, { from:'bot', type:'text', text:'باقاتنا الشهرية متاحة هنا: long-term.html', data:{ service:'longterm', href:'long-term.html' } });
-    }
-    if (/شركة|شركات|مؤسسة|اعمال|أعمال/.test(t)) {
-      return sendMessage(convId, { from:'bot', type:'text', text:'حلول الشركات لدينا هنا: corporate.html', data:{ service:'corporate', href:'corporate.html' } });
-    }
-    if (/موظف|خدمة|بشري|بشر|انسان|إنسان|مندوب/.test(t)) return runQuickService(convId, 'agent');
-    if (/السلام|سلام|مرحبا|مرحبًا|اهلا|أهلا|هلا|هاي/.test(t)) {
-      return sendMessage(convId, { from:'bot', type:'text', text:'أهلًا بك في One Trip! كيف نقدر نساعدك؟ تقدر تسأل عن الأسعار، الفروع، الحجز، أو التحدث مع موظف.', data:{ service:'welcome' } });
-    }
-    /* رد افتراضي + اقتراح موظف */
-    return sendMessage(convId, { from:'bot', type:'text', text:'لم أفهم طلبك تمامًا. يمكنك السؤال عن الأسعار، الفروع، الحجز، الباقات الشهرية، أو اكتب "موظف" للتحدث مع موظف خدمة العملاء.', data:{ service:'fallback', suggest:'agent' } });
+    var arr = loadChats();
+    var i = findIndex(arr, convId);
+    if (i === -1) return null;
+    var conv = arr[i];
+
+    if (conv.status === 'closed') return null;   /* المحادثة منتهية */
+    if (conv.agentOpened) return null;           /* موظف بشري بيتابعها — مفيش رد آلي */
+    if (conv.waitingNotified) return null;        /* قلناله يستنى بالفعل في فترة الانتظار دي */
+
+    var m = newMessage({ from:'bot', type:'text', text:settings().waitingMessage, data:{ kind:'waiting' } });
+    if (!Array.isArray(conv.messages)) conv.messages = [];
+    conv.messages.push(m);
+    conv.unreadUser = (conv.unreadUser || 0) + 1;
+    conv.waitingNotified = true;
+    conv.updatedAt = Date.now();
+    saveChats(arr);
+    emit();
+    return m;
   }
 
   /* ------------------------------------------------------------
@@ -479,14 +567,18 @@
   function settings(){
     var saved = readJSON(K_SETTINGS, null);
     var out = {
-      closeMessage:   DEFAULT_SETTINGS.closeMessage,
-      surveyEnabled:  DEFAULT_SETTINGS.surveyEnabled,
-      surveyQuestion: DEFAULT_SETTINGS.surveyQuestion
+      closeMessage:    DEFAULT_SETTINGS.closeMessage,
+      surveyEnabled:   DEFAULT_SETTINGS.surveyEnabled,
+      surveyQuestion:  DEFAULT_SETTINGS.surveyQuestion,
+      waitingMessage:  DEFAULT_SETTINGS.waitingMessage,
+      reassignMinutes: DEFAULT_SETTINGS.reassignMinutes
     };
     if (saved && typeof saved === 'object') {
-      if (saved.closeMessage   != null) out.closeMessage   = saved.closeMessage;
-      if (saved.surveyEnabled  != null) out.surveyEnabled  = !!saved.surveyEnabled;
-      if (saved.surveyQuestion != null) out.surveyQuestion = saved.surveyQuestion;
+      if (saved.closeMessage    != null) out.closeMessage    = saved.closeMessage;
+      if (saved.surveyEnabled   != null) out.surveyEnabled   = !!saved.surveyEnabled;
+      if (saved.surveyQuestion  != null) out.surveyQuestion  = saved.surveyQuestion;
+      if (saved.waitingMessage  != null) out.waitingMessage  = saved.waitingMessage;
+      if (saved.reassignMinutes != null) out.reassignMinutes = parseInt(saved.reassignMinutes, 10) || 0;
     }
     return out;
   }
@@ -495,9 +587,11 @@
   function saveSettings(partial){
     var cur = settings();
     partial = partial || {};
-    if (partial.closeMessage   != null) cur.closeMessage   = partial.closeMessage;
-    if (partial.surveyEnabled  != null) cur.surveyEnabled  = !!partial.surveyEnabled;
-    if (partial.surveyQuestion != null) cur.surveyQuestion = partial.surveyQuestion;
+    if (partial.closeMessage    != null) cur.closeMessage    = partial.closeMessage;
+    if (partial.surveyEnabled   != null) cur.surveyEnabled   = !!partial.surveyEnabled;
+    if (partial.surveyQuestion  != null) cur.surveyQuestion  = partial.surveyQuestion;
+    if (partial.waitingMessage  != null) cur.waitingMessage  = partial.waitingMessage;
+    if (partial.reassignMinutes != null) cur.reassignMinutes = parseInt(partial.reassignMinutes, 10) || 0;
     writeJSON(K_SETTINGS, cur);
     emit();
     return cur;
@@ -658,8 +752,12 @@
     startConversation:  startConversation,
     sendMessage:        sendMessage,
     markRead:           markRead,
+    markOpened:         markOpened,
     setStatus:          setStatus,
     assign:             assign,
+    checkReassign:      checkReassign,
+    reassignSweep:      reassignSweep,
+    agents:             agents,
     deleteConversation: deleteConversation,
     /* أحداث */
     on:  on,
