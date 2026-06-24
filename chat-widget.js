@@ -26,7 +26,8 @@
     bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg>',
     send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
     dot: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>',
-    chev: '<svg class="otchat-chev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+    chev: '<svg class="otchat-chev-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
   };
 
   /* ---- safe access to the data layer (chat.js) ---- */
@@ -357,14 +358,151 @@
       list.appendChild(this.emptyState());
     }
     for (var i = 0; i < msgs.length; i++) {
-      if ((msgs[i].type || 'text') === 'system') continue;
+      var mt = msgs[i].type || 'text';
+      var isClose = mt === 'system' || (msgs[i].data && msgs[i].data.kind === 'close');
+      if (isClose) { list.appendChild(this.renderNotice(msgs[i])); continue; }
       list.appendChild(this.renderMsg(msgs[i]));
     }
     if (this._typing) list.appendChild(this.typingRow());
 
+    // CSAT survey card / result (shown once — see renderSurvey)
+    this.renderSurvey(conv, list);
+
     // open marks read
     if (this.open && conv) safe(function () { Chat().markRead(conv.id, 'user'); });
     this.scrollBottom();
+  };
+
+  /* ---------- closing / system notice (centered bubble) ---------- */
+  Widget.prototype.renderNotice = function (m) {
+    var row = document.createElement('div');
+    row.className = 'otchat-row is-notice';
+    var b = document.createElement('div');
+    b.className = 'otchat-notice';
+    b.textContent = m.text || '';
+    row.appendChild(b);
+    return row;
+  };
+
+  /* ---------- CSAT survey ---------- */
+  // Renders ONCE per conversation state:
+  //   conv.survey present            → static result (filled stars)
+  //   conv.surveyPending && !survey  → interactive card
+  //   neither                        → nothing
+  // After a local submit we keep showing the "thanks" state until the next
+  // rerender picks up conv.survey, so the interactive card never appears twice.
+  Widget.prototype.renderSurvey = function (conv, list) {
+    if (!conv) return;
+    var chat = Chat();
+
+    // local "thanks" state is scoped to one conversation only
+    if (this._surveyThanksFor && this._surveyThanksFor !== conv.id) {
+      this._surveyThanks = false; this._surveyThanksFor = null; this._surveyRating = 0;
+    }
+
+    if (conv.survey) {
+      this._surveyThanks = false; this._surveyThanksFor = null;
+      this._surveyRating = 0;
+      list.appendChild(this.surveyResult(conv.survey));
+      return;
+    }
+    if (this._surveyThanks) { list.appendChild(this.surveyThanksRow()); return; }
+    if (conv.surveyPending !== true) return;
+
+    var self = this;
+    var settings = (chat && typeof chat.settings === 'function')
+      ? safe(function () { return chat.settings(); }, {}) : {};
+    var question = (settings && settings.surveyQuestion) || 'كيف تقيّم خدمتنا؟';
+
+    var card = document.createElement('div');
+    card.className = 'otchat-survey';
+    card.innerHTML =
+      '<div class="otchat-survey-q">' + esc(question) + '</div>' +
+      '<div class="otchat-stars" role="radiogroup" aria-label="' + esc(question) + '"></div>' +
+      '<textarea class="otchat-survey-cm" rows="2" placeholder="تعليقك (اختياري)…" aria-label="تعليق"></textarea>' +
+      '<div class="otchat-survey-hint" aria-live="polite"></div>' +
+      '<button class="otchat-btn otchat-btn-primary otchat-survey-go" type="button">إرسال التقييم</button>';
+
+    var starsWrap = card.querySelector('.otchat-stars');
+    var hint = card.querySelector('.otchat-survey-hint');
+    var rating = this._surveyRating || 0;
+
+    function paint(n) {
+      var stars = starsWrap.querySelectorAll('.otchat-star');
+      for (var i = 0; i < stars.length; i++) {
+        stars[i].classList.toggle('is-on', (i + 1) <= n);
+      }
+    }
+    for (var s = 1; s <= 5; s++) {
+      (function (val) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'otchat-star';
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-label', val + ' من 5');
+        btn.setAttribute('aria-checked', 'false');
+        btn.innerHTML = SVG.star;
+        btn.addEventListener('mouseenter', function () { paint(val); });
+        btn.addEventListener('focus', function () { paint(val); });
+        btn.addEventListener('click', function () {
+          rating = val; self._surveyRating = val;
+          var all = starsWrap.querySelectorAll('.otchat-star');
+          for (var k = 0; k < all.length; k++) all[k].setAttribute('aria-checked', (k + 1) === val ? 'true' : 'false');
+          paint(val);
+          if (hint) hint.textContent = '';
+        });
+        starsWrap.appendChild(btn);
+      })(s);
+    }
+    starsWrap.addEventListener('mouseleave', function () { paint(rating); });
+    paint(rating);
+
+    card.querySelector('.otchat-survey-go').addEventListener('click', function () {
+      if (!rating) {
+        if (hint) hint.textContent = 'اختر عدد النجوم أولًا 🙏';
+        return;
+      }
+      var comment = (card.querySelector('.otchat-survey-cm').value || '').trim();
+      if (chat && typeof chat.submitSurvey === 'function') {
+        safe(function () { chat.submitSurvey(conv.id, { rating: rating, comment: comment }); });
+      }
+      self._surveyThanks = true;
+      self._surveyThanksFor = conv.id;
+      self._surveyRating = 0;
+      self.rerender();
+    });
+
+    list.appendChild(card);
+  };
+
+  Widget.prototype.surveyStarsHtml = function (rating) {
+    var html = '';
+    for (var i = 1; i <= 5; i++) {
+      html += '<span class="otchat-star is-static' + (i <= rating ? ' is-on' : '') + '">' + SVG.star + '</span>';
+    }
+    return html;
+  };
+
+  Widget.prototype.surveyResult = function (survey) {
+    var row = document.createElement('div');
+    row.className = 'otchat-row is-notice';
+    var box = document.createElement('div');
+    box.className = 'otchat-survey-done';
+    var r = Math.max(0, Math.min(5, parseInt(survey.rating, 10) || 0));
+    box.innerHTML = '<span class="otchat-survey-done-lbl">تم تقييمك:</span>' +
+      '<span class="otchat-stars is-result">' + this.surveyStarsHtml(r) + '</span>';
+    row.appendChild(box);
+    return row;
+  };
+
+  Widget.prototype.surveyThanksRow = function () {
+    var row = document.createElement('div');
+    row.className = 'otchat-row is-notice';
+    var box = document.createElement('div');
+    box.className = 'otchat-survey-done';
+    box.textContent = 'شكرًا لتقييمك ⭐';
+    row.appendChild(box);
+    return row;
   };
 
   Widget.prototype.emptyState = function () {

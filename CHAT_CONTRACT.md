@@ -182,3 +182,71 @@ alter publication supabase_realtime add table public.conversations, public.messa
 لو `SUPABASE_URL` + `SUPABASE_SERVICE_KEY` في البيئة ⇒ يكتب/يقرأ من نفس الجدولين (service_role) بدل `store.json`.
 
 ترتيب التحميل في كل صفحة: `cars.js` → `chat.js` → `supabase-sync.js` → `chat-widget.js`.
+
+---
+
+## 9) الإصدار v2 — رسالة الإغلاق + التقييم (CSAT) + تقسيم المحادثات على الموظفين
+
+### 9.0 الإعدادات (تتحكم من اللوحة)
+مفتاح `localStorage['ot_chat_settings']` بالشكل (مع قيم افتراضية لو غير موجود):
+```js
+{
+  closeMessage: 'تم إنهاء المحادثة. شكرًا لتواصلك مع One Trip 🌟 نتمنى أن نكون قدّمنا لك خدمة مميزة.',
+  surveyEnabled: true,
+  surveyQuestion: 'كيف تقيّم خدمتنا؟'
+}
+```
+
+### 9.1 chat.js — إضافات على `window.OneTrip.Chat` (المالك: إيجنت A)
+```js
+settings()                 // → ot_chat_settings مدموجة مع الافتراضي
+saveSettings(partial)      // دمج + حفظ + emit (اللوحة تستخدمها)
+
+// تعديل سلوك setStatus: عند التحويل لـ'closed' (ولو مش مقفولة قبل كده):
+//   1) يبعت رسالة إغلاق: sendMessage(convId,{from:'bot',type:'system',text:settings().closeMessage,data:{kind:'close'}})
+//   2) لو surveyEnabled && مفيش conv.survey: يضع conv.surveyPending=true (عشان الودجة تعرض التقييم)
+//   ثم emit. (مايكرّرش رسالة الإغلاق لو اتقفلت مرتين.)
+
+submitSurvey(convId,{rating,comment})  // rating 1..5 ; يحفظ على المحادثة وعلى قائمة عامة
+//   conv.survey = { rating, comment:comment||'', ts:Date.now(), agent:conv.assignedTo||null }
+//   conv.surveyPending = false ; ويضيف نسخة في ot_surveys (انظر تحت) ; idempotent (تقييم واحد لكل محادثة) ; emit
+surveys()                  // → ot_surveys (مصفوفة)
+surveyStats()              // → { overall:{count,avg}, perAgent:{ <agentKey>:{name,count,avg,counts:{1..5}} } }
+//   agentKey = conv.assignedTo (id الموظف) أو 'unassigned' ; الاسم من ot_users لو متاح
+```
+مفتاح `localStorage['ot_surveys']` عنصره:
+```js
+{ id, convId, rating, comment, ts, agent, agentName, channel, customer:(name/phone) }
+```
+**الرد الآلي:** `botReply` لازم يفضل صامت في 'pending'/'closed' (متطبّق بالفعل) — لا تغيّره.
+
+### 9.2 chat-widget.js / .css — واجهة التقييم (المالك: إيجنت B)
+- لو `currentConversation()` فيها `surveyPending===true` و`!survey`: اعرض **بطاقة تقييم** في مكان واضح (فوق/بدل صندوق الكتابة):
+  - عنوان = `settings().surveyQuestion` + **٥ نجوم** قابلة للضغط (1..5) + خانة تعليق اختيارية + زر "إرسال التقييم".
+  - عند الإرسال: `OneTrip.Chat.submitSurvey(conv.id,{rating,comment})` ثم اعرض "شكرًا لتقييمك ⭐".
+- رسالة الإغلاق (type:'system' أو data.kind:'close') تظهر كرسالة وسط/نظام مميّزة.
+- التقييم يظهر **مرة واحدة**؛ لو فيه survey بالفعل اعرض النجوم المختارة كنتيجة ثابتة. RTL، نفس هوية `.otchat-`.
+
+### 9.3 admin.html — اللوحة (المالك: إيجنت C — وحده يعدّل admin.html)
+1. **إعدادات الشات** (قسم/لوحة صغيرة داخل قسم المحادثات أو قسم جديد `settings`): تحرير `closeMessage` (textarea) + `surveyEnabled` (toggle) + `surveyQuestion` (input) → `OneTrip.Chat.saveSettings(...)` + toast.
+2. **زر إنهاء المحادثة**: موجود في غرفة المحادثة (`#rmClose`/select الحالة) — تأكّد إنه ينده `setStatus(id,'closed')` (اللي هيبعت رسالة الإغلاق + يفعّل التقييم تلقائيًا). أضف زر/عنصر واضح "إنهاء وإرسال التقييم".
+3. **قسم «التقييمات»** (nav جديد `data-sec="surveys"` + `#sec-surveys`): 
+   - بطاقات إجمالية: متوسط التقييم العام + العدد.
+   - **متوسط لكل موظف** (من `surveyStats().perAgent`): اسم الموظف + المتوسط + العدد + توزيع النجوم.
+   - جدول بكل التقييمات: النجوم + التعليق + العميل + **الموظف المسؤول** + الوقت.
+   - الأدمن يشوف الكل؛ الموظف يشوف تقييمات محادثاته فقط.
+4. **تقسيم المحادثات على الموظفين** (في `renderInbox`):
+   - **الموظف (role agent):** يشوف فقط المحادثات `assignedTo===currentUser.id` + تبويب «وارد جديد» للمحادثات غير المسنودة (`!assignedTo`) ليستلمها.
+   - عند رد الموظف على محادثة غير مسنودة ⇒ تُسنَد له تلقائيًا (`assign(convId,currentUser.id)`).
+   - زر «تسليم لي» (claim) على المحادثة غير المسنودة.
+   - **الأدمن:** يشوف الكل + فلتر/اختيار الموظف المسؤول (assign لأي موظف من قائمة `ot_users` بدور agent).
+   - خزّن `assignedTo` = **id الموظف** (مش الاسم) عشان يربط بـsurveyStats و`ot_users`.
+
+ملاحظة تكامل: `assignedTo` لازم يكون id الموظف في كل الأماكن (chat.js يخزّن ما يُمرَّر؛ اللوحة تمرّر id).
+
+### 9.4 ملكية ملفات v2 (ممنوع إيجنت يلمس ملف غيره)
+| الملف | المالك |
+|---|---|
+| `chat.js` | إيجنت A |
+| `chat-widget.js` + `chat-widget.css` | إيجنت B |
+| `admin.html` | إيجنت C |

@@ -24,6 +24,15 @@
   var K_WAOUTBOX = 'ot_wa_outbox';
   var K_BRANCHES = 'ot_branches';
   var K_LEADS    = 'ot_leads';
+  var K_SETTINGS = 'ot_chat_settings';
+  var K_SURVEYS  = 'ot_surveys';
+
+  /* إعدادات الشات الافتراضية (v2) — تُدمج فوقها قيم localStorage */
+  var DEFAULT_SETTINGS = {
+    closeMessage: 'تم إنهاء المحادثة. شكرًا لتواصلك مع One Trip 🌟 نتمنى أن نكون قدّمنا لك خدمة مميزة.',
+    surveyEnabled: true,
+    surveyQuestion: 'كيف تقيّم خدمتنا؟'
+  };
 
   /* فرع افتراضي عند غياب ot_branches */
   var DEFAULT_BRANCHES = [
@@ -258,8 +267,31 @@
     var arr = loadChats();
     var i = findIndex(arr, convId);
     if (i === -1) return;
-    arr[i].status = status;
-    arr[i].updatedAt = Date.now();
+    var conv = arr[i];
+    var wasClosed = (conv.status === 'closed');
+    conv.status = status;
+    conv.updatedAt = Date.now();
+
+    /* التحويل لـ'closed' (ولو لم تكن مقفولة قبل كده):
+       رسالة إغلاق + تفعيل التقييم. لا نكرّر لو كانت مقفولة بالفعل. */
+    if (status === 'closed' && !wasClosed) {
+      /* نضيف رسالة الإغلاق على نفس مسار الإلحاق الذي يستخدمه sendMessage
+         (إلحاق + عدّاد + updatedAt + طابور واتساب لو لزم) بدون emit مزدوج —
+         نحفظ ونبثّ مرة واحدة في نهاية setStatus. ملاحظة: from:'bot' فلا يقلب الحالة ولا يستدعي botReply. */
+      var s = settings();
+      var m = newMessage({ from:'bot', type:'system', text:s.closeMessage, data:{ kind:'close' } });
+      if (!Array.isArray(conv.messages)) conv.messages = [];
+      conv.messages.push(m);
+      conv.unreadUser = (conv.unreadUser || 0) + 1;   // bot ⇒ unreadUser++ (نفس قاعدة sendMessage)
+      conv.updatedAt = Date.now();
+      if (conv.channel === 'whatsapp') {
+        var viaWA = !!(m.data && m.data.viaWhatsApp);
+        if (!viaWA) enqueueOutbound(convId, m.text);
+      }
+      /* تفعيل بطاقة التقييم لو مفعّل ولا يوجد تقييم سابق */
+      if (s.surveyEnabled && !conv.survey) conv.surveyPending = true;
+    }
+
     saveChats(arr);
     emit();
   }
@@ -441,6 +473,115 @@
   }
 
   /* ------------------------------------------------------------
+     v2 — إعدادات الشات + التقييم (CSAT)
+     ------------------------------------------------------------ */
+  /* settings — قيم ot_chat_settings مدموجة فوق الافتراضي */
+  function settings(){
+    var saved = readJSON(K_SETTINGS, null);
+    var out = {
+      closeMessage:   DEFAULT_SETTINGS.closeMessage,
+      surveyEnabled:  DEFAULT_SETTINGS.surveyEnabled,
+      surveyQuestion: DEFAULT_SETTINGS.surveyQuestion
+    };
+    if (saved && typeof saved === 'object') {
+      if (saved.closeMessage   != null) out.closeMessage   = saved.closeMessage;
+      if (saved.surveyEnabled  != null) out.surveyEnabled  = !!saved.surveyEnabled;
+      if (saved.surveyQuestion != null) out.surveyQuestion = saved.surveyQuestion;
+    }
+    return out;
+  }
+
+  /* saveSettings — دمج فوق الحالي + حفظ + بثّ (تستخدمها اللوحة) */
+  function saveSettings(partial){
+    var cur = settings();
+    partial = partial || {};
+    if (partial.closeMessage   != null) cur.closeMessage   = partial.closeMessage;
+    if (partial.surveyEnabled  != null) cur.surveyEnabled  = !!partial.surveyEnabled;
+    if (partial.surveyQuestion != null) cur.surveyQuestion = partial.surveyQuestion;
+    writeJSON(K_SETTINGS, cur);
+    emit();
+    return cur;
+  }
+
+  function surveys(){
+    var arr = readJSON(K_SURVEYS, []);
+    return Array.isArray(arr) ? arr : [];
+  }
+
+  /* submitSurvey — تقييم واحد لكل محادثة (idempotent) */
+  function submitSurvey(convId, opts){
+    opts = opts || {};
+    var arr = loadChats();
+    var i = findIndex(arr, convId);
+    if (i === -1) return null;
+    var conv = arr[i];
+    if (conv.survey) return conv.survey;   // idempotent — موجود بالفعل، نتجاهل
+
+    var rating = parseInt(opts.rating, 10);
+    if (isNaN(rating)) rating = 0;
+    if (rating < 1) rating = 1;
+    if (rating > 5) rating = 5;            // clamp 1..5
+    var comment = opts.comment || '';
+    var ts = Date.now();
+    var agent = conv.assignedTo || null;
+
+    conv.survey = { rating:rating, comment:comment, ts:ts, agent:agent };
+    conv.surveyPending = false;
+    conv.updatedAt = ts;
+    saveChats(arr);
+
+    var list = surveys();
+    list.push({
+      id: 'sv_' + ts,
+      convId: convId,
+      rating: rating,
+      comment: comment,
+      ts: ts,
+      agent: agent,
+      agentName: '',
+      channel: conv.channel,
+      customer: (conv.name || conv.phone || 'زائر')
+    });
+    writeJSON(K_SURVEYS, list);
+
+    emit();
+    return conv.survey;
+  }
+
+  /* surveyStats — تجميع عام + لكل موظف */
+  function surveyStats(){
+    var list = surveys();
+    var overall = { count:0, avg:0 };
+    var perAgent = {};
+    var sum = 0;
+    for (var i = 0; i < list.length; i++){
+      var sv = list[i] || {};
+      var r = parseInt(sv.rating, 10);
+      if (isNaN(r)) continue;
+      overall.count++;
+      sum += r;
+
+      var key = sv.agent || 'unassigned';
+      if (!perAgent[key]) {
+        perAgent[key] = { name:(sv.agentName || key), count:0, avg:0, _sum:0, counts:{1:0,2:0,3:0,4:0,5:0} };
+      }
+      var a = perAgent[key];
+      if (sv.agentName) a.name = sv.agentName;
+      a.count++;
+      a._sum += r;
+      if (a.counts[r] != null) a.counts[r]++;
+    }
+    overall.avg = overall.count ? Math.round((sum / overall.count) * 10) / 10 : 0;
+    for (var k in perAgent){
+      if (!perAgent.hasOwnProperty(k)) continue;
+      var p = perAgent[k];
+      p.avg = p.count ? Math.round((p._sum / p.count) * 10) / 10 : 0;
+      delete p._sum;
+    }
+    return { overall:overall, perAgent:perAgent };
+  }
+
+  /* ------------------------------------------------------------
      جسر واتساب (client-side) — يستدعيه الباك-إند/البريدج
      ------------------------------------------------------------ */
   function waConfig(){
@@ -527,6 +668,12 @@
     quickServices:   quickServices,
     botReply:        botReply,
     runQuickService: runQuickService,
+    /* v2 — إعدادات + تقييم (CSAT) */
+    settings:        settings,
+    saveSettings:    saveSettings,
+    submitSurvey:    submitSurvey,
+    surveys:         surveys,
+    surveyStats:     surveyStats,
     /* جسر واتساب */
     WhatsApp: {
       config:         waConfig,
