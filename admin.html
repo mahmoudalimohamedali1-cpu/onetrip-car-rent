@@ -197,6 +197,9 @@
     <button class="nav-i" data-sec="cats"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> الفئات <span class="ct" id="ctCats">0</span></button>
     <button class="nav-i" data-sec="branches"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg> الفروع <span class="ct" id="ctBr">0</span></button>
     <button class="nav-i" data-sec="leads"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg> الطلبات <span class="ct" id="ctLeads">0</span></button>
+    <button class="nav-i" data-sec="chat"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-3a8 8 0 0 1 16 0v3"/><path d="M21 16v2a3 3 0 0 1-3 3h-3"/><rect x="1" y="14" width="4" height="6" rx="1.5"/><rect x="19" y="14" width="4" height="6" rx="1.5"/></svg> المحادثات <span class="ct" id="ctChat">0</span></button>
+    <button class="nav-i" data-sec="whatsapp"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.3A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 8.5c0 4 3 7 7 7"/></svg> واتساب بيزنس</button>
+    <button class="nav-i" data-sec="supabase"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg> مزامنة Supabase</button>
     <button class="nav-i" data-sec="bookings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h.01M12 14h.01M16 14h.01"/></svg> الحجوزات <span class="ct" id="ctBook">0</span></button>
     <button class="nav-i" data-sec="addons"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 22l-8-6.5v-9L12 2Z"/><path d="M12 22V12M20 6.5 12 12 4 6.5"/></svg> الإضافات <span class="ct" id="ctAddons">0</span></button>
     <button class="nav-i" data-sec="promos"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 3 8v8l6 6h8l6-6V8l-6-6H9Z"/><path d="M8.5 8.5h.01M15.5 15.5h.01M15 9l-6 6"/></svg> أكواد الخصم <span class="ct" id="ctPromos">0</span></button>
@@ -308,6 +311,68 @@
           <button class="btn btn-org" id="addPromo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة كود</button>
         </div>
         <div style="overflow:auto" id="promoTable"></div>
+      </div>
+    </section>
+
+    <!-- CHAT INBOX -->
+    <section class="sect" id="sec-chat">
+      <div class="panel" style="padding:0;overflow:hidden">
+        <div class="inbox">
+          <div class="inbox-list">
+            <div class="inbox-tools">
+              <input class="inbox-search" id="convSearch" placeholder="بحث بالاسم أو الجوال…">
+              <div class="ftabs" id="convTabs">
+                <button class="ftab on" data-f="all">الكل</button>
+                <button class="ftab" data-f="open">مفتوحة</button>
+                <button class="ftab" data-f="pending">بانتظار الرد</button>
+                <button class="ftab" data-f="closed">مغلقة</button>
+              </div>
+            </div>
+            <div id="convList" style="overflow:auto;flex:1"></div>
+          </div>
+          <div class="inbox-room" id="inboxRoom"><div class="room-empty">اختر محادثة من القائمة لعرضها والرد عليها.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHATSAPP SETTINGS -->
+    <section class="sect" id="sec-whatsapp">
+      <div class="panel" style="max-width:700px">
+        <div class="panel-h"><div><h2>واتساب بيزنس</h2><span class="sub">اربط رقم واتساب الأعمال عبر Meta Cloud API</span></div></div>
+        <div class="modal-b">
+          <div class="wa-hint">
+            ضع هذا الرابط في إعدادات Meta (Webhook):<br>
+            <code>https://YOUR-SERVER/whatsapp/webhook</code><br>
+            البريدج/السيرفر موجود في مجلد <code>whatsapp/</code> بالمشروع (راجع <b>whatsapp/README</b> لخطوات النشر).
+          </div>
+          <div class="f"><label>الحالة</label><label class="toggle"><input type="checkbox" id="wa-enabled"> تفعيل تكامل واتساب</label></div>
+          <div class="grid2">
+            <div class="f"><label>رقم واتساب الأعمال</label><input id="wa-phone" placeholder="+9665XXXXXXXX" dir="ltr"></div>
+            <div class="f"><label>Phone Number ID</label><input id="wa-pnid" placeholder="1234567890" dir="ltr"></div>
+          </div>
+          <div class="f"><label>Access Token</label><input id="wa-token" type="password" placeholder="EAAB…" dir="ltr"></div>
+          <div class="f"><label>Verify Token</label><input id="wa-verify" placeholder="onetrip-verify" dir="ltr"></div>
+          <button class="btn btn-pri" id="saveWa">حفظ الإعدادات</button>
+        </div>
+        <div class="panel-h" style="border-top:1px solid var(--line)"><div><h2 style="font-size:16px">صندوق الصادر (Outbox)</h2><span class="sub">رسائل بانتظار الإرسال عبر البريدج — للتشخيص</span></div></div>
+        <div class="modal-b" id="waOutbox"></div>
+      </div>
+    </section>
+
+    <!-- SUPABASE SYNC -->
+    <section class="sect" id="sec-supabase">
+      <div class="panel" style="max-width:700px">
+        <div class="panel-h"><div><h2>مزامنة Supabase</h2><span class="sub">تزامن المحادثات عبر كل الأجهزة (مش نفس المتصفح بس)</span></div><span id="sb-status"></span></div>
+        <div class="modal-b">
+          <div class="wa-hint">
+            للتفعيل: أنشئ مشروع Supabase ونفّذ <code>supabase/schema.sql</code>، ثم ضع الـURL والـanon key هنا.<br>
+            الخطوات بالتفصيل في <b>supabase/README</b>. <b>تنويه أمني:</b> سياسات الديمو مفتوحة — قيّدها قبل الإنتاج.
+          </div>
+          <div class="f"><label>الحالة</label><label class="toggle"><input type="checkbox" id="sb-enabled"> تفعيل المزامنة السحابية</label></div>
+          <div class="f"><label>Project URL</label><input id="sb-url" placeholder="https://xxxx.supabase.co" dir="ltr"></div>
+          <div class="f"><label>anon public key</label><input id="sb-key" type="password" placeholder="eyJhbGci…" dir="ltr"></div>
+          <button class="btn btn-pri" id="saveSb">حفظ الإعدادات</button>
+        </div>
       </div>
     </section>
 
