@@ -1,0 +1,278 @@
+/* ==========================================================================
+   One Trip — Public floating customer-service chat widget styles
+   Prefix: .otchat-   ·  RTL  ·  brand palette (CHAT_CONTRACT §7)
+   Owner: chat-widget.css (Agent B). Do not rename classes — used by chat-widget.js
+   ========================================================================== */
+
+.otchat-root{
+  /* brand palette */
+  --otc-blue:#1b2a7a;
+  --otc-blue-deep:#141d5c;
+  --otc-orange:#f5901e;
+  --otc-orange-soft:#f7a23e;
+  --otc-ink:#1a2140;
+  --otc-muted:#6b7290;
+  --otc-line:#e6e9f5;
+  --otc-bg:#ffffff;
+  --otc-bot:#f2f4fb;
+  --otc-online:#2ecc71;
+  --otc-shadow:0 18px 50px rgba(10,16,52,.30);
+
+  position:fixed;
+  inset:auto auto 22px 22px;            /* bottom-left for RTL */
+  z-index:2147483000;
+  font-family:'Tajawal',system-ui,-apple-system,sans-serif;
+  direction:rtl;
+  text-align:right;
+  -webkit-font-smoothing:antialiased;
+}
+.otchat-root *{box-sizing:border-box;}
+
+/* ---------- floating launcher ---------- */
+.otchat-launcher{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:62px;height:62px;border:0;cursor:pointer;
+  border-radius:50%;
+  color:#fff;
+  background:linear-gradient(140deg,#1b2a7a 0%,#141d5c 100%);
+  box-shadow:0 14px 34px rgba(20,29,92,.45);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s,filter .18s;
+}
+.otchat-launcher:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 20px 44px rgba(20,29,92,.55);}
+.otchat-launcher:active{transform:translateY(-1px) scale(.99);}
+.otchat-launcher svg{width:30px;height:30px;display:block;}
+.otchat-launcher .otchat-ic-close{display:none;}
+.otchat-root.is-open .otchat-launcher .otchat-ic-open{display:none;}
+.otchat-root.is-open .otchat-launcher .otchat-ic-close{display:block;}
+
+/* unread badge */
+.otchat-badge{
+  position:absolute;top:-4px;left:-4px;            /* left for RTL launcher */
+  min-width:22px;height:22px;padding:0 6px;
+  display:none;align-items:center;justify-content:center;
+  background:var(--otc-orange);color:#fff;
+  font-size:12px;font-weight:800;line-height:1;
+  border-radius:11px;border:2px solid #fff;
+  box-shadow:0 4px 10px rgba(245,144,30,.5);
+}
+.otchat-badge.is-show{display:flex;animation:otchat-pop .25s ease;}
+@keyframes otchat-pop{0%{transform:scale(.4);}60%{transform:scale(1.15);}100%{transform:scale(1);}}
+
+/* ---------- panel ---------- */
+.otchat-panel{
+  position:absolute;bottom:78px;left:0;
+  width:360px;max-width:calc(100vw - 36px);
+  height:560px;max-height:calc(100vh - 120px);
+  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--otc-bg);
+  border-radius:20px;
+  box-shadow:var(--otc-shadow);
+  transform:translateY(16px) scale(.96);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform-origin:bottom left;
+  transition:transform .26s cubic-bezier(.34,1.3,.5,1),opacity .22s ease,visibility .26s;
+}
+.otchat-root.is-open .otchat-panel{
+  transform:translateY(0) scale(1);
+  opacity:1;visibility:visible;pointer-events:auto;
+}
+
+/* ---------- header ---------- */
+.otchat-head{
+  position:relative;flex:0 0 auto;
+  display:flex;align-items:center;gap:12px;
+  padding:16px 18px;
+  color:#fff;
+  background:linear-gradient(135deg,#1b2a7a 0%,#141d5c 100%);
+}
+.otchat-head::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#fff 24px,#fff 30px);
+  opacity:.9;
+}
+.otchat-logo{
+  width:42px;height:42px;flex:0 0 auto;border-radius:11px;
+  background:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.otchat-logo img{width:100%;height:100%;object-fit:contain;padding:5px;}
+.otchat-head-txt{flex:1 1 auto;min-width:0;}
+.otchat-title{margin:0;font-size:16px;font-weight:800;line-height:1.25;}
+.otchat-status{
+  display:flex;align-items:center;gap:6px;margin-top:2px;
+  font-size:12.5px;font-weight:500;color:rgba(255,255,255,.82);
+}
+.otchat-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--otc-online);
+  box-shadow:0 0 0 0 rgba(46,204,113,.6);animation:otchat-pulse 2s infinite;
+}
+@keyframes otchat-pulse{0%{box-shadow:0 0 0 0 rgba(46,204,113,.55);}70%{box-shadow:0 0 0 6px rgba(46,204,113,0);}100%{box-shadow:0 0 0 0 rgba(46,204,113,0);}}
+.otchat-close{
+  flex:0 0 auto;width:32px;height:32px;border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:9px;color:#fff;background:rgba(255,255,255,.12);
+  transition:background .15s;
+}
+.otchat-close:hover{background:rgba(255,255,255,.24);}
+.otchat-close svg{width:16px;height:16px;}
+
+/* ---------- quick services ---------- */
+.otchat-quick{
+  flex:0 0 auto;padding:12px 14px 4px;
+  border-bottom:1px solid var(--otc-line);
+  background:#fafbff;
+}
+.otchat-quick-h{
+  margin:0 0 9px;font-size:12.5px;font-weight:800;color:var(--otc-blue);
+  display:flex;align-items:center;gap:6px;
+}
+.otchat-quick-h svg{width:15px;height:15px;color:var(--otc-orange);}
+.otchat-quick-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
+}
+.otchat-chip{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 11px;cursor:pointer;text-align:right;
+  border:1px solid var(--otc-line);border-radius:12px;
+  background:#fff;color:var(--otc-ink);
+  font-family:inherit;font-size:13px;font-weight:700;
+  transition:transform .12s,border-color .15s,box-shadow .15s,background .15s;
+}
+.otchat-chip:hover{
+  transform:translateY(-2px);border-color:var(--otc-orange);
+  box-shadow:0 8px 18px rgba(245,144,30,.18);
+}
+.otchat-chip:active{transform:translateY(0);}
+.otchat-chip-ic{
+  flex:0 0 auto;width:30px;height:30px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(27,42,122,.10),rgba(245,144,30,.14));
+  color:var(--otc-blue);
+}
+.otchat-chip-ic svg{width:17px;height:17px;display:block;}
+.otchat-chip-lbl{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ---------- message list ---------- */
+.otchat-list{
+  flex:1 1 auto;overflow-y:auto;padding:16px 14px;
+  display:flex;flex-direction:column;gap:10px;
+  background:
+    radial-gradient(120% 90% at 100% 0%,rgba(27,42,122,.04),transparent 60%),
+    #fff;
+  scroll-behavior:smooth;
+}
+.otchat-list::-webkit-scrollbar{width:7px;}
+.otchat-list::-webkit-scrollbar-thumb{background:#d6dbef;border-radius:7px;}
+
+.otchat-row{display:flex;flex-direction:column;max-width:85%;}
+.otchat-row.is-user{align-self:flex-start;align-items:flex-start;}   /* user → right side in RTL = flex-start */
+.otchat-row.is-agent{align-self:flex-end;align-items:flex-end;}
+.otchat-bubble{
+  padding:10px 13px;border-radius:16px;
+  font-size:13.5px;line-height:1.65;font-weight:500;
+  word-wrap:break-word;white-space:pre-wrap;
+  box-shadow:0 2px 6px rgba(20,29,92,.06);
+}
+.otchat-row.is-user .otchat-bubble{
+  background:linear-gradient(135deg,#1b2a7a,#141d5c);color:#fff;
+  border-bottom-right-radius:5px;
+}
+.otchat-row.is-agent .otchat-bubble{
+  background:var(--otc-bot);color:var(--otc-ink);
+  border-bottom-left-radius:5px;
+}
+.otchat-time{margin-top:4px;font-size:10.5px;color:var(--otc-muted);padding:0 4px;}
+
+/* card messages */
+.otchat-card{
+  width:100%;background:#fff;border:1px solid var(--otc-line);
+  border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(20,29,92,.07);
+}
+.otchat-card-title{
+  padding:9px 12px;font-size:12.5px;font-weight:800;color:var(--otc-blue);
+  background:#f2f4fb;border-bottom:1px solid var(--otc-line);
+}
+.otchat-card-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 12px;border-bottom:1px solid var(--otc-line);
+}
+.otchat-card-item:last-child{border-bottom:0;}
+.otchat-card-main{min-width:0;}
+.otchat-card-name{font-size:13px;font-weight:700;color:var(--otc-ink);}
+.otchat-card-sub{font-size:11.5px;color:var(--otc-muted);margin-top:1px;}
+.otchat-card-price{
+  flex:0 0 auto;font-size:13px;font-weight:800;color:var(--otc-orange);white-space:nowrap;
+}
+
+/* typing dots */
+.otchat-typing .otchat-bubble{display:flex;gap:4px;align-items:center;padding:13px 14px;}
+.otchat-typing .otchat-bubble i{
+  width:7px;height:7px;border-radius:50%;background:#9aa0bf;display:inline-block;
+  animation:otchat-blink 1.2s infinite both;
+}
+.otchat-typing .otchat-bubble i:nth-child(2){animation-delay:.2s;}
+.otchat-typing .otchat-bubble i:nth-child(3){animation-delay:.4s;}
+@keyframes otchat-blink{0%,80%,100%{opacity:.25;transform:translateY(0);}40%{opacity:1;transform:translateY(-3px);}}
+
+/* ---------- pre-chat ---------- */
+.otchat-prechat{
+  flex:0 0 auto;padding:14px;border-top:1px solid var(--otc-line);background:#fafbff;
+}
+.otchat-prechat p{margin:0 0 10px;font-size:12.5px;color:var(--otc-muted);font-weight:600;}
+.otchat-prechat input{
+  width:100%;margin-bottom:8px;padding:10px 12px;
+  border:1px solid var(--otc-line);border-radius:11px;
+  font-family:inherit;font-size:13px;color:var(--otc-ink);background:#fff;
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.otchat-prechat input:focus{border-color:var(--otc-blue);box-shadow:0 0 0 3px rgba(27,42,122,.12);}
+.otchat-prechat-btns{display:flex;gap:8px;}
+.otchat-btn{
+  flex:1 1 auto;padding:10px;border:0;cursor:pointer;border-radius:11px;
+  font-family:inherit;font-size:13px;font-weight:800;transition:filter .15s,background .15s;
+}
+.otchat-btn-primary{background:linear-gradient(180deg,#ffb04a,#f5901e);color:#1b2a7a;}
+.otchat-btn-primary:hover{filter:brightness(1.06);}
+.otchat-btn-ghost{flex:0 0 auto;background:transparent;color:var(--otc-muted);font-weight:700;}
+.otchat-btn-ghost:hover{color:var(--otc-blue);}
+
+/* ---------- composer ---------- */
+.otchat-composer{
+  flex:0 0 auto;display:flex;align-items:center;gap:9px;
+  padding:11px 12px;border-top:1px solid var(--otc-line);background:#fff;
+}
+.otchat-input{
+  flex:1 1 auto;min-width:0;resize:none;
+  padding:11px 14px;max-height:90px;
+  border:1px solid var(--otc-line);border-radius:22px;
+  font-family:inherit;font-size:13.5px;color:var(--otc-ink);background:#f7f8fd;
+  outline:none;transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.otchat-input:focus{border-color:var(--otc-blue);background:#fff;box-shadow:0 0 0 3px rgba(27,42,122,.10);}
+.otchat-send{
+  flex:0 0 auto;width:42px;height:42px;border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;
+  color:#1b2a7a;background:linear-gradient(180deg,#ffb04a,#f5901e);
+  box-shadow:0 6px 16px rgba(245,144,30,.4);
+  transition:transform .14s,filter .15s;
+}
+.otchat-send:hover{filter:brightness(1.06);transform:scale(1.05);}
+.otchat-send:active{transform:scale(.95);}
+.otchat-send:disabled{opacity:.5;cursor:default;filter:none;transform:none;}
+.otchat-send svg{width:19px;height:19px;transform:scaleX(-1);} /* point arrow leftward (send) in RTL */
+
+/* ---------- mobile ---------- */
+@media (max-width:480px){
+  .otchat-root{inset:auto auto 16px 16px;}
+  .otchat-panel{
+    position:fixed;inset:0;left:0;bottom:0;
+    width:100vw;max-width:100vw;height:100vh;max-height:100vh;
+    border-radius:0;transform-origin:center bottom;
+  }
+  .otchat-root.is-open .otchat-launcher{opacity:0;pointer-events:none;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .otchat-launcher,.otchat-panel,.otchat-chip,.otchat-send,.otchat-dot,.otchat-badge{transition:none;animation:none;}
+}

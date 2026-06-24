@@ -674,8 +674,7 @@
           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
         '</button>';
       card.querySelector('.car-book').addEventListener('click', function(){
-        console.log('احجز:', c.id, c.name);
-        scrollTo('#bookingWidget');
+        window.location.href = 'car.html?id=' + c.id;
       });
       track.appendChild(card);
     });
@@ -742,5 +741,9 @@
 })();
 </script>
 <script src="anim.js"></script>
+<link rel="stylesheet" href="chat-widget.css">
+<script src="chat.js"></script>
+<script src="supabase-sync.js"></script>
+<script src="chat-widget.js"></script>
 </body>
 </html>
