@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>أضف خدماتك — One Trip Car Rent</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="booking.css">
+</head>
+<body>
+
+<script src="cars.js?v=7"></script>
+<script src="booking-core.js?v=7"></script>
+<script>
+(function(){
+  'use strict';
+
+  var d = OTB.draft.get();
+  if(!d.carId){ location.replace('create-booking.html'); return; }
+
+  OTB.mountChrome({step:1, back:'car.html?id='+d.carId});
+
+  /* ---- icons ---- */
+  var ICONS={
+    cdw:      '<path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/>',
+    driver:   '<circle cx="12" cy="8" r="3.2"/><path d="M5 21v-1a6 6 0 0 1 12 0v1"/><line x1="19" y1="8" x2="22" y2="8"/><line x1="20.5" y1="6.5" x2="20.5" y2="9.5"/>',
+    gps:      '<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+    child:    '<circle cx="12" cy="6" r="2.4"/><path d="M9 21v-6l-3-2 2-3a4 4 0 0 1 8 0l2 3-3 2v6"/>',
+    unlimited:'<path d="M7 9a3 3 0 1 0 0 6c2 0 3-2 5-3s3-3 5-3a3 3 0 1 1 0 6c-2 0-3-2-5-3S9 9 7 9z"/>',
+    delivery: '<path d="M3 7h11v8H3zM14 10h4l3 3v2h-7zM6.5 18a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2zM17.5 18a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2z"/>',
+    def:      '<rect x="4" y="5" width="16" height="14" rx="3"/><line x1="4" y1="10" x2="20" y2="10"/>'
+  };
+  function svg(p){ return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
+  var CHECK='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  /* ---- selection state ---- */
+  var selected = (d.extras||[]).filter(function(s){ return s && s.id; }).map(function(s){ return {id:s.id, qty:s.qty||1}; });
+  function isSel(id){ for(var i=0;i<selected.length;i++) if(selected[i].id===id) return true; return false; }
+  function toggle(id){
+    for(var i=0;i<selected.length;i++) if(selected[i].id===id){ selected.splice(i,1); return; }
+    selected.push({id:id, qty:1});
+  }
+
+  /* ---- build the page ---- */
+  var wrap=document.createElement('div'); wrap.className='otb-wrap';
+  wrap.innerHTML=
+    '<div class="otb-grid">'+
+      '<div>'+
+        '<h1 class="otb-h1">أضف خدماتك</h1>'+
+        '<p class="otb-lead">اختر التأمين والإضافات التي تناسب رحلتك — كل شيء اختياري ويمكنك تخطّيه.</p>'+
+        '<div id="extrasList"></div>'+
+        '<div style="display:flex;gap:14px;margin-top:8px;">'+
+          '<button class="otb-btn otb-btn-pri" id="goNext" type="button">متابعة — بياناتك'+
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'+
+          '</button>'+
+          '<button class="otb-btn otb-btn-ghost" id="goSkip" type="button" style="width:auto;">تخطّي</button>'+
+        '</div>'+
+      '</div>'+
+      '<aside class="otb-summary">'+
+        '<div class="otb-sum-car"><img id="sumImg" src="" alt=""><div><b id="sumName"></b><span id="sumCat"></span></div></div>'+
+        '<div class="otb-sum-body" id="sumBody"></div>'+
+        '<div class="otb-total"><span class="l">الإجمالي (شامل الضريبة)</span><span class="t" id="sumTotal"></span></div>'+
+        '<div class="otb-note" id="sumNote"></div>'+
+      '</aside>'+
+    '</div>';
+  document.body.appendChild(wrap);
+
+  /* ---- render extras cards ---- */
+  var listEl=document.getElementById('extrasList');
+  listEl.innerHTML=OTB.extras().map(function(e){
+    var unit = e.unit==='day' ? '/يوم' : '/الحجز';
+    return '<div class="otb-extra'+(isSel(e.id)?' on':'')+'" data-id="'+e.id+'" role="button" tabindex="0">'+
+        '<span class="ck">'+CHECK+'</span>'+
+        '<span class="ico">'+svg(ICONS[e.id]||ICONS.def)+'</span>'+
+        '<span class="meta"><b>'+e.name+'</b><p>'+(e.desc||'')+'</p></span>'+
+        '<span class="pr">'+OTB.money(e.price)+' <small>'+unit+'</small></span>'+
+      '</div>';
+  }).join('');
+
+  /* ---- summary ---- */
+  function row(l,v,c){return '<div class="otb-row '+(c||'')+'"><span>'+l+'</span><span class="v">'+v+'</span></div>';}
+  function renderSummary(q){
+    document.getElementById('sumImg').src=q.car.image||'';
+    document.getElementById('sumName').textContent=q.car.name||'';
+    document.getElementById('sumCat').textContent=q.car.category||'';
+    var r=row('سعر التأجير ('+OTB.toAr(q.days)+' يوم)',OTB.money(q.base));
+    q.extraLines.forEach(function(l){ r+=row(l.name+(l.qty>1?' ×'+OTB.toAr(l.qty):''),OTB.money(l.amount)); });
+    if(q.discount>0) r+=row('الخصم','− '+OTB.money(q.discount),'disc');
+    r+=row('ضريبة القيمة المضافة (١٥٪)',OTB.money(q.vat));
+    document.getElementById('sumBody').innerHTML=r;
+    document.getElementById('sumTotal').innerHTML=OTB.money(q.total);
+    document.getElementById('sumNote').innerHTML='يشمل ضريبة القيمة المضافة ١٥٪ · مبلغ تأمين مسترد '+OTB.money(q.deposit);
+  }
+  function update(){
+    var q=OTB.quote({carId:d.carId, days:OTB.days(d.pickupAt,d.returnAt), extras:selected, promoCode:d.promo});
+    renderSummary(q);
+  }
+  update();
+
+  /* ---- interactions ---- */
+  function onToggle(card){
+    var id=card.getAttribute('data-id');
+    toggle(id);
+    card.classList.toggle('on', isSel(id));
+    update();
+  }
+  listEl.addEventListener('click',function(e){
+    var card=e.target.closest('.otb-extra'); if(!card) return;
+    onToggle(card);
+  });
+  listEl.addEventListener('keydown',function(e){
+    if(e.key!=='Enter' && e.key!==' ') return;
+    var card=e.target.closest('.otb-extra'); if(!card) return;
+    e.preventDefault(); onToggle(card);
+  });
+
+  document.getElementById('goNext').addEventListener('click',function(){
+    OTB.draft.set({extras:selected});
+    location.href='checkout.html';
+  });
+  document.getElementById('goSkip').addEventListener('click',function(){
+    OTB.draft.set({extras:[]});
+    location.href='checkout.html';
+  });
+})();
+</script>
+</body>
+</html>

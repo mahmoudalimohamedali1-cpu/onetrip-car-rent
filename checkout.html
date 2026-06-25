@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بياناتك — One Trip Car Rent</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="booking.css">
+</head>
+<body>
+
+<div class="otb-wrap">
+  <h1 class="otb-h1">بيانات المستأجر</h1>
+  <p class="otb-lead">أدخل بياناتك لإتمام الحجز — جميع المعلومات محفوظة بشكل آمن.</p>
+
+  <div class="otb-grid">
+    <div>
+      <!-- بيانات المستأجر -->
+      <div class="otb-panel">
+        <h2 class="line">بيانات المستأجر</h2>
+        <div class="otb-2">
+          <div class="otb-f">
+            <label for="fName">الاسم الكامل *</label>
+            <input id="fName" type="text" placeholder="مثال: محمد عبدالله">
+          </div>
+          <div class="otb-f">
+            <label for="fPhone">رقم الجوال *</label>
+            <input id="fPhone" type="tel" dir="ltr" inputmode="tel" placeholder="05xxxxxxxx">
+          </div>
+          <div class="otb-f">
+            <label for="fEmail">البريد الإلكتروني *</label>
+            <input id="fEmail" type="email" dir="ltr" placeholder="name@example.com">
+          </div>
+          <div class="otb-f">
+            <label for="fNid">رقم الهوية / الإقامة *</label>
+            <input id="fNid" type="text" dir="ltr" inputmode="numeric" maxlength="10" placeholder="١٠ أرقام">
+          </div>
+          <div class="otb-f">
+            <label for="fLicense">رقم رخصة القيادة *</label>
+            <input id="fLicense" type="text" dir="ltr" placeholder="رقم الرخصة">
+          </div>
+          <div class="otb-f">
+            <label for="fDob">تاريخ الميلاد</label>
+            <input id="fDob" type="date">
+          </div>
+          <div class="otb-f full">
+            <label for="fNotes">ملاحظات</label>
+            <textarea id="fNotes" rows="3" placeholder="أي طلبات خاصة (اختياري)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- كود الخصم -->
+      <div class="otb-panel">
+        <h2 class="line">كود الخصم</h2>
+        <div id="promoAlert"></div>
+        <div class="otb-2" style="align-items:end;">
+          <div class="otb-f" style="margin-bottom:0;">
+            <label for="fPromo">لديك كود خصم؟</label>
+            <input id="fPromo" type="text" dir="ltr" placeholder="مثال: ONETRIP10" style="text-transform:uppercase;">
+          </div>
+          <div class="otb-f" style="margin-bottom:0;">
+            <button id="applyBtn" type="button" class="otb-btn otb-btn-ghost sm">تطبيق</button>
+          </div>
+        </div>
+      </div>
+
+      <button id="goPay" type="button" class="otb-btn otb-btn-pri">الانتقال للدفع</button>
+    </div>
+
+    <!-- الشريط الجانبي -->
+    <aside class="otb-summary">
+      <div class="otb-sum-car"><img id="sumImg" src="" alt=""><div><b id="sumName"></b><span id="sumCat"></span></div></div>
+      <div class="otb-sum-body" id="sumBody"></div>
+      <div class="otb-total"><span class="l">الإجمالي (شامل الضريبة)</span><span class="t" id="sumTotal"></span></div>
+      <div class="otb-note" id="sumNote"></div>
+    </aside>
+  </div>
+</div>
+
+<script src="cars.js?v=7"></script>
+<script src="booking-core.js?v=7"></script>
+<script>
+(function(){
+  'use strict';
+
+  var d = OTB.draft.get();
+  if(!d.carId){ location.replace('create-booking.html'); return; }
+
+  OTB.mountChrome({step:2, back:'extras.html'});
+
+  var appliedCode = d.promo || null;
+
+  function currentQuote(){
+    return OTB.quote({
+      carId: d.carId,
+      days: OTB.days(d.pickupAt, d.returnAt),
+      extras: d.extras || [],
+      promoCode: appliedCode
+    });
+  }
+
+  function row(l,v,c){return '<div class="otb-row '+(c||'')+'"><span>'+l+'</span><span class="v">'+v+'</span></div>';}
+  function renderSummary(q){
+    document.getElementById('sumImg').src=q.car.image||'';
+    document.getElementById('sumName').textContent=q.car.name||'';
+    document.getElementById('sumCat').textContent=q.car.category||'';
+    var r=row('سعر التأجير ('+OTB.toAr(q.days)+' يوم)',OTB.money(q.base));
+    q.extraLines.forEach(function(l){ r+=row(l.name+(l.qty>1?' ×'+OTB.toAr(l.qty):''),OTB.money(l.amount)); });
+    if(q.discount>0) r+=row('الخصم','− '+OTB.money(q.discount),'disc');
+    r+=row('ضريبة القيمة المضافة (١٥٪)',OTB.money(q.vat));
+    document.getElementById('sumBody').innerHTML=r;
+    document.getElementById('sumTotal').innerHTML=OTB.money(q.total);
+    document.getElementById('sumNote').innerHTML='يشمل ضريبة القيمة المضافة ١٥٪ · مبلغ تأمين مسترد '+OTB.money(q.deposit);
+  }
+
+  function refresh(){ renderSummary(currentQuote()); }
+
+  /* prefill customer fields from existing draft */
+  var c = d.customer || {};
+  document.getElementById('fName').value    = c.name || '';
+  document.getElementById('fPhone').value   = c.phone || '';
+  document.getElementById('fEmail').value   = c.email || '';
+  document.getElementById('fNid').value     = c.nationalId || '';
+  document.getElementById('fLicense').value = c.license || '';
+  document.getElementById('fDob').value     = c.dob || '';
+  document.getElementById('fNotes').value   = c.notes || '';
+  if(appliedCode) document.getElementById('fPromo').value = appliedCode;
+
+  /* numeric-only guards */
+  document.getElementById('fNid').addEventListener('input',function(){
+    this.value=this.value.replace(/\D/g,'').slice(0,10);
+  });
+  document.getElementById('fPhone').addEventListener('input',function(){
+    this.value=this.value.replace(/[^\d]/g,'').slice(0,10);
+  });
+
+  /* apply promo */
+  var promoAlert=document.getElementById('promoAlert');
+  document.getElementById('applyBtn').addEventListener('click',function(){
+    var code=document.getElementById('fPromo').value.trim().toUpperCase();
+    if(!code){
+      appliedCode=null;
+      promoAlert.innerHTML='<div class="otb-alert warn">أدخل كود الخصم أولًا.</div>';
+      refresh();
+      return;
+    }
+    /* validate against the subtotal BEFORE any discount */
+    var sub=OTB.quote({carId:d.carId, days:OTB.days(d.pickupAt,d.returnAt), extras:d.extras||[]}).subtotal;
+    var res=OTB.validatePromo(code, sub);
+    if(res.ok){
+      appliedCode=res.code||code;
+      OTB.draft.set({promo:appliedCode});
+      promoAlert.innerHTML='<div class="otb-alert ok">'+(res.msg||'تم تطبيق الخصم')+' ('+OTB.money(res.discount)+')</div>';
+    } else {
+      appliedCode=null;
+      promoAlert.innerHTML='<div class="otb-alert err">'+(res.msg||'كود الخصم غير صالح')+'</div>';
+    }
+    refresh();
+  });
+
+  /* proceed to payment */
+  document.getElementById('goPay').addEventListener('click',function(){
+    var name    = document.getElementById('fName').value.trim();
+    var phone   = document.getElementById('fPhone').value.trim();
+    var email   = document.getElementById('fEmail').value.trim();
+    var nid     = document.getElementById('fNid').value.trim();
+    var license = document.getElementById('fLicense').value.trim();
+    var dob     = document.getElementById('fDob').value;
+    var notes   = document.getElementById('fNotes').value.trim();
+
+    var miss=[];
+    if(!name) miss.push('الاسم الكامل');
+    if(!phone) miss.push('رقم الجوال');
+    if(!email) miss.push('البريد الإلكتروني');
+    if(!nid) miss.push('رقم الهوية / الإقامة');
+    if(!license) miss.push('رقم رخصة القيادة');
+
+    if(miss.length){
+      promoAlert.scrollIntoView({behavior:'smooth',block:'center'});
+      alert('يرجى إكمال الحقول المطلوبة: '+miss.join('، '));
+      return;
+    }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+      promoAlert.scrollIntoView({behavior:'smooth',block:'center'});
+      alert('من فضلك أدخل بريدًا إلكترونيًا صحيحًا — سنرسل عليه تأكيد الحجز.');
+      return;
+    }
+
+    OTB.draft.set({
+      customer:{ name:name, phone:phone, email:email, nationalId:nid, license:license, dob:dob, notes:notes },
+      promo: appliedCode || null
+    });
+    location.href='payment.html';
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

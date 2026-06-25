@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>الدفع · One Trip Car Rent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="booking.css">
+  <style>
+    .pay-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:22px;}
+    .pay-tabs .otb-btn{flex-direction:column;gap:6px;padding:16px 10px;font-size:14.5px;}
+    .pay-tabs .otb-btn small{font-size:11.5px;font-weight:700;opacity:.8;}
+    @media (max-width:520px){ .pay-tabs{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <div class="otb-wrap">
+    <h1 class="otb-h1">الدفع</h1>
+    <p class="otb-lead">اختر طريقة الدفع وأكمل بيانات البطاقة لإتمام حجزك.</p>
+
+    <div class="otb-grid">
+      <div>
+        <div class="otb-panel">
+          <h2 class="line">طريقة الدفع</h2>
+
+          <div class="pay-tabs" id="payTabs">
+            <button type="button" class="otb-btn" data-method="mada">مدى<small>بطاقة مدى البنكية</small></button>
+            <button type="button" class="otb-btn" data-method="credit">بطاقة ائتمانية<small>Visa · Mastercard</small></button>
+            <button type="button" class="otb-btn" data-method="applepay">Apple&nbsp;Pay<small>الدفع السريع</small></button>
+          </div>
+
+          <div class="otb-alert warn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            نسخة تجريبية — لن يتم خصم أي مبلغ فعلي
+          </div>
+
+          <div id="cardForm">
+            <div class="otb-f full">
+              <label for="cardNumber">رقم البطاقة</label>
+              <input id="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="19">
+            </div>
+            <div class="otb-f full">
+              <label for="cardName">الاسم على البطاقة</label>
+              <input id="cardName" autocomplete="cc-name" placeholder="الاسم كما يظهر على البطاقة">
+            </div>
+            <div class="otb-2">
+              <div class="otb-f">
+                <label for="cardExp">تاريخ الانتهاء (MM/YY)</label>
+                <input id="cardExp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5">
+              </div>
+              <div class="otb-f">
+                <label for="cardCvv">رمز التحقق CVV</label>
+                <input id="cardCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="4">
+              </div>
+            </div>
+          </div>
+
+          <div class="otb-alert err" id="payErr" style="display:none"></div>
+
+          <button type="button" class="otb-btn otb-btn-org" id="payBtn">ادفع وأكّد الحجز</button>
+        </div>
+      </div>
+
+      <aside class="otb-summary">
+        <div class="otb-sum-car"><img id="sumImg" src="" alt=""><div><b id="sumName"></b><span id="sumCat"></span></div></div>
+        <div class="otb-sum-body" id="sumBody"></div>
+        <div class="otb-total"><span class="l">الإجمالي (شامل الضريبة)</span><span class="t" id="sumTotal"></span></div>
+        <div class="otb-note" id="sumNote"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- EmailJS: real confirmation-email delivery (no-op until keys set in emailjs-config.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="emailjs-config.js?v=7"></script>
+  <script src="cars.js?v=7"></script>
+  <script src="booking-core.js?v=7"></script>
+  <script>
+  (function(){
+    var d = OTB.draft.get();
+    if(!d.carId || !d.customer){ location.replace('create-booking.html'); return; }
+
+    OTB.mountChrome({step:3, back:'checkout.html'});
+
+    function buildQuote(){
+      return OTB.quote({
+        carId: d.carId,
+        days: OTB.days(d.pickupAt, d.returnAt),
+        extras: d.extras || [],
+        promoCode: d.promo
+      });
+    }
+
+    function row(l,v,c){return '<div class="otb-row '+(c||'')+'"><span>'+l+'</span><span class="v">'+v+'</span></div>';}
+    function renderSummary(q){
+      document.getElementById('sumImg').src=q.car.image||'';
+      document.getElementById('sumName').textContent=q.car.name||'';
+      document.getElementById('sumCat').textContent=q.car.category||'';
+      var r=row('سعر التأجير ('+OTB.toAr(q.days)+' يوم)',OTB.money(q.base));
+      q.extraLines.forEach(function(l){ r+=row(l.name+(l.qty>1?' ×'+OTB.toAr(l.qty):''),OTB.money(l.amount)); });
+      if(q.discount>0) r+=row('الخصم','− '+OTB.money(q.discount),'disc');
+      r+=row('ضريبة القيمة المضافة (١٥٪)',OTB.money(q.vat));
+      r+=row('مبلغ التأمين (مسترد)',OTB.money(q.deposit),'muted');
+      document.getElementById('sumBody').innerHTML=r;
+      document.getElementById('sumTotal').innerHTML=OTB.money(q.total);
+      document.getElementById('sumNote').innerHTML='يشمل ضريبة القيمة المضافة ١٥٪ · مبلغ تأمين مسترد '+OTB.money(q.deposit);
+    }
+
+    renderSummary(buildQuote());
+
+    /* ---- payment method tabs ---- */
+    var selectedMethod = 'mada';
+    var tabs = document.querySelectorAll('#payTabs button');
+    var cardForm = document.getElementById('cardForm');
+
+    function selectMethod(m){
+      selectedMethod = m;
+      for(var i=0;i<tabs.length;i++){
+        var on = tabs[i].getAttribute('data-method')===m;
+        tabs[i].className = on ? 'otb-btn otb-btn-org on' : 'otb-btn otb-btn-ghost';
+      }
+      cardForm.style.display = (m==='applepay') ? 'none' : '';
+    }
+    for(var i=0;i<tabs.length;i++){
+      (function(btn){ btn.addEventListener('click', function(){ selectMethod(btn.getAttribute('data-method')); }); })(tabs[i]);
+    }
+    selectMethod('mada');
+
+    /* ---- input formatting (demo) ---- */
+    var num = document.getElementById('cardNumber');
+    num.addEventListener('input', function(){
+      var v = num.value.replace(/\D/g,'').slice(0,16);
+      num.value = v.replace(/(.{4})/g,'$1 ').trim();
+    });
+    var exp = document.getElementById('cardExp');
+    exp.addEventListener('input', function(){
+      var v = exp.value.replace(/\D/g,'').slice(0,4);
+      exp.value = v.length>2 ? v.slice(0,2)+'/'+v.slice(2) : v;
+    });
+    var cvv = document.getElementById('cardCvv');
+    cvv.addEventListener('input', function(){ cvv.value = cvv.value.replace(/\D/g,'').slice(0,4); });
+
+    /* ---- confirm & pay ---- */
+    var errBox = document.getElementById('payErr');
+    function showErr(msg){ errBox.textContent = msg; errBox.style.display='flex'; }
+
+    document.getElementById('payBtn').addEventListener('click', function(){
+      errBox.style.display='none';
+      /* demo card validation (skipped for Apple Pay) — reject empty/invalid card */
+      if(selectedMethod !== 'applepay'){
+        var num=(document.getElementById('cardNumber').value||'').replace(/\D/g,'');
+        var exp=(document.getElementById('cardExp').value||'').trim();
+        var cvv=(document.getElementById('cardCvv').value||'').trim();
+        if(num.length<16){ showErr('من فضلك أدخل رقم بطاقة صحيح (١٦ رقمًا).'); return; }
+        var m=exp.match(/^(\d{2})\/(\d{2})$/);
+        if(!m || +m[1]<1 || +m[1]>12){ showErr('تاريخ انتهاء غير صحيح (MM/YY).'); return; }
+        if(new Date(2000+ +m[2], +m[1], 1) <= new Date()){ showErr('البطاقة منتهية الصلاحية.'); return; }
+        if(cvv.length<3){ showErr('رمز التحقق CVV غير صحيح.'); return; }
+      }
+      var b = OTB.createBooking(d, { method: selectedMethod, status: 'paid' });
+      if(b && b.error){
+        var msgs={ unavailable:'عذرًا، لم تعد هذه السيارة متاحة في الفترة المختارة. جرّب تواريخ أخرى.',
+          baddates:'تأكد أن تاريخ العودة بعد تاريخ الاستلام.',
+          save:'تعذّر حفظ الحجز على هذا المتصفح. فضلًا حاول مرة أخرى.' };
+        showErr(msgs[b.error] || 'تعذّر إتمام الحجز، يرجى المحاولة مرة أخرى.');
+        return;   /* keep the draft so the customer can retry */
+      }
+      if(!b || !b.reference){ showErr('تعذّر إتمام الحجز، يرجى المحاولة مرة أخرى.'); return; }
+      OTB.draft.clear();
+      location.href = 'confirmation.html?ref=' + b.reference;
+    });
+  })();
+  </script>
+</body>
+</html>
