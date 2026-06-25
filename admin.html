@@ -211,6 +211,7 @@
     <button class="nav-i" data-sec="news"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a1 1 0 0 1 1 1v13a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2V4z"/><path d="M19 9h1a1 1 0 0 1 1 1v8a2 2 0 0 1-2 2M8 8h6M8 12h6M8 16h4"/></svg> الأخبار <span class="ct" id="ctNews">0</span></button>
     <button class="nav-i" data-sec="surveys"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg> التقييمات</button>
     <button class="nav-i" data-sec="users"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> الموظفين</button>
+    <button class="nav-i" data-sec="customers"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 11h6"/></svg> العملاء <span class="ct" id="ctCustomers">0</span></button>
     <div class="side-foot">نسخة تجريبية (localStorage) — البيانات على هذا المتصفح فقط. تنتقل لـSupabase لاحقًا.</div>
   </aside>
 
@@ -428,6 +429,17 @@
       </div>
     </section>
 
+    <!-- CUSTOMERS -->
+    <section class="sect" id="sec-customers">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>العملاء</h2><span class="sub">حسابات العملاء المسجّلين على الموقع (ot_customers)</span></div>
+          <input id="custSearch" placeholder="بحث بالاسم أو الإيميل أو الجوال…" style="height:40px;border:1.5px solid var(--line);border-radius:11px;padding:0 13px;font-size:14px;font-weight:600;outline:none;background:#fcfdff;min-width:240px">
+        </div>
+        <div style="overflow:auto" id="customersTable"></div>
+      </div>
+    </section>
+
     <section class="sect" id="sec-news">
       <iframe src="news-admin.html?embed=1" title="إدارة الأخبار" style="width:100%;height:calc(100vh - 56px);border:0;border-radius:16px;background:#fff;box-shadow:0 10px 30px rgba(27,42,122,.08);"></iframe>
     </section>
@@ -569,11 +581,21 @@
   </div>
 </div>
 
+<!-- ===== CUSTOMER BOOKINGS MODAL ===== -->
+<div class="modal" id="custModal">
+  <div class="modal-card" style="max-width:680px">
+    <div class="modal-h"><h3 id="custModalTitle">حجوزات العميل</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b" id="custModalBody"></div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إغلاق</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="cars.js?v=7"></script>
 <script src="branch-map.js"></script>
 <script src="chat.js"></script>
+<script src="auth-core.js"></script>
 <script src="supabase-sync.js"></script>
 <script src="booking-core.js?v=7"></script>
 <script src="news-core.js"></script>
@@ -697,6 +719,56 @@
     $$('#usersTable [data-eu]').forEach(function(b){b.addEventListener('click',function(){openUser(b.getAttribute('data-eu'));});});
     $$('#usersTable [data-du]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف هذا الموظف؟')){ save(UK,users().filter(function(x){return x.id!==b.getAttribute('data-du');})); renderUsers(); toast('تم الحذف','ok'); } });});
   }
+  /* ---------- customers (accounts from auth-core / ot_customers) — admin only ---------- */
+  function custList(){ try{ var a=JSON.parse(localStorage.getItem('ot_customers')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function custBookingCount(cu){
+    if(!(window.OTB && OTB.bookings)) return null;
+    var p9=String(cu.phone||'').replace(/\D/g,'').slice(-9), em=String(cu.email||'').trim().toLowerCase();
+    try{
+      return OTB.bookings().filter(function(b){
+        var c=b.customer||{}, bp=String(c.phone||'').replace(/\D/g,'').slice(-9), be=String(c.email||'').trim().toLowerCase();
+        return (p9 && bp && p9===bp) || (em && be && em===be);
+      }).length;
+    }catch(e){ return null; }
+  }
+  function renderCustomers(){
+    var box=$('#customersTable'); if(!box) return;
+    if(!isAdmin()){ box.innerHTML='<div class="empty" style="padding:24px">هذا القسم للمدير فقط.</div>'; return; }
+    var q=($('#custSearch')&&$('#custSearch').value||'').trim().toLowerCase();
+    var all=custList();
+    if($('#ctCustomers')) $('#ctCustomers').textContent=toAr(all.length);
+    var list=all.filter(function(c){
+      if(!q) return true;
+      return [c.name,c.email,c.phone].some(function(v){ return String(v||'').toLowerCase().indexOf(q)>=0; });
+    });
+    if(!list.length){ box.innerHTML='<div class="empty" style="padding:40px">'+(q?'لا نتائج مطابقة للبحث.':'لا يوجد عملاء مسجّلون بعد')+'</div>'; return; }
+    var rows=list.map(function(c){
+      var n=custBookingCount(c), nb=(n==null)?'—':toAr(n);
+      var dt=c.createdAt?toAr(new Date(c.createdAt).toLocaleDateString('ar-EG')):'—';
+      var det=(n!=null&&n>0)?'<button class="iact" data-cust="'+esc(c.id||'')+'" title="عرض الحجوزات"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>':'';
+      return '<tr><td><b>'+esc(c.name||'—')+'</b></td>'+
+        '<td dir="ltr" style="text-align:right">'+esc(c.email||'—')+'</td>'+
+        '<td dir="ltr" style="text-align:right">'+esc(c.phone||'—')+'</td>'+
+        '<td>'+esc(c.city||'—')+'</td>'+
+        '<td><span class="pill blue">'+nb+'</span></td>'+
+        '<td style="color:#5a6488;font-size:13px;white-space:nowrap">'+dt+'</td>'+
+        '<td><div class="rowacts">'+det+'</div></td></tr>';
+    }).join('');
+    box.innerHTML='<table><thead><tr><th>الاسم</th><th>الإيميل</th><th>الجوال</th><th>المدينة</th><th>عدد الحجوزات</th><th>تاريخ التسجيل</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#customersTable [data-cust]').forEach(function(b){ b.addEventListener('click',function(){ showCustBookings(b.getAttribute('data-cust')); }); });
+  }
+  function showCustBookings(id){
+    var cu=custList().filter(function(x){return String(x.id)===String(id);})[0]; if(!cu) return;
+    if(!(window.OTB&&OTB.bookings)){ toast('وحدة الحجوزات غير محمّلة','err'); return; }
+    var p9=String(cu.phone||'').replace(/\D/g,'').slice(-9), em=String(cu.email||'').trim().toLowerCase();
+    var bks=[]; try{ bks=OTB.bookings().filter(function(b){ var c=b.customer||{}, bp=String(c.phone||'').replace(/\D/g,'').slice(-9), be=String(c.email||'').trim().toLowerCase(); return (p9&&bp&&p9===bp)||(em&&be&&em===be); }); }catch(e){}
+    var rows=bks.map(function(b){ var t=b.totals||{}; return '<tr><td dir="ltr" style="text-align:right">'+esc(b.reference||'—')+'</td><td>'+esc((b.car&&(b.car.name))||b.carName||'—')+'</td><td dir="ltr" style="text-align:right">'+esc((b.pickup&&b.pickup.date)||b.pickupDate||'—')+' ← '+esc((b.dropoff&&b.dropoff.date)||b.dropoffDate||'—')+'</td><td>'+esc(b.status||'—')+'</td><td class="price">'+toAr((t.total!=null?t.total:b.total)||0)+' ر.س</td></tr>'; }).join('');
+    $('#custModalTitle').textContent='حجوزات: '+(cu.name||cu.email||'');
+    $('#custModalBody').innerHTML = bks.length ? '<div style="overflow:auto"><table><thead><tr><th>المرجع</th><th>السيارة</th><th>الفترة</th><th>الحالة</th><th>الإجمالي</th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '<div class="empty" style="padding:30px">لا توجد حجوزات.</div>';
+    openModal('#custModal');
+  }
+  if($('#custSearch')) $('#custSearch').addEventListener('input',renderCustomers);
+
   function toggleRoleUI(){ var ag=$('#u-role').value==='agent'; var wrap=$('#u-perms-wrap'); if(wrap) wrap.style.display=ag?'':'none'; }
   function openUser(id){
     if(!isAdmin()) return;
@@ -724,7 +796,7 @@
   $('#resetBtn').addEventListener('click',function(){ if(confirm('استرجاع كل البيانات للوضع الافتراضي؟ (هيمسح تعديلاتك على هذا المتصفح)')){ [K.cars,K.cats,K.br,K.leads,K.intro].forEach(function(k){localStorage.removeItem(k);}); seed(); renderAll(); toast('تم الاسترجاع','ok'); } });
 
   /* ---------- nav ---------- */
-  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',emails:'الإيميلات',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',surveys:'التقييمات',users:'الموظفين'};
+  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',emails:'الإيميلات',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',surveys:'التقييمات',users:'الموظفين',customers:'العملاء'};
   $$('.nav-i').forEach(function(b){ b.addEventListener('click',function(){
     $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
@@ -733,12 +805,13 @@
     if(s==='whatsapp') renderWa();
     if(s==='surveys') renderSurveys();
     if(s==='users') renderUsers();
+    if(s==='customers') renderCustomers();
   });});
 
   /* ---------- renderers ---------- */
   /* عزل الأعطال: لو رندرر واحد رمى استثناء، ما يوقّفش باقي اللوحة (وخصوصًا قسم المحادثات) */
   function safeRender(fn){ try{ fn(); }catch(e){ if(window.console&&console.warn) console.warn('renderAll: تخطّي رندرر فشل —', e&&e.message); } }
-  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderEmails,renderIntro,renderChatBadge,renderSurveys,renderUsers].forEach(safeRender); }
+  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderEmails,renderIntro,renderChatBadge,renderSurveys,renderUsers,renderCustomers].forEach(safeRender); }
   function renderCounts(){
     $('#ctCars').textContent=toAr(DB.cars.all().length);
     $('#ctCats').textContent=toAr(DB.cats.all().length);
