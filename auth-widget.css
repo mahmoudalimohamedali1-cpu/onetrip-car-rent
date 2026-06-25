@@ -1,0 +1,366 @@
+/* ==========================================================================
+   One Trip — Customer account widget styles
+   Owner: auth-widget.css (Agent B) · RTL · brand palette · prefix .otauth-
+   Blue #1b2a7a / #141d5c · Orange #f5901e
+   ========================================================================== */
+.otauth-control,
+.otauth-overlay,
+.otauth-overlay * {
+  box-sizing: border-box;
+  font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+:root {
+  --otauth-blue: #1b2a7a;
+  --otauth-blue-d: #141d5c;
+  --otauth-orange: #f5901e;
+  --otauth-orange-d: #e07e10;
+  --otauth-field: #d8def0;
+  --otauth-ink: #1b2440;
+  --otauth-muted: #6b7088;
+  --otauth-danger: #c0392b;
+}
+
+/* ======================================================================
+   Header control
+   ====================================================================== */
+.otauth-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+/* floating fallback — TOP-RIGHT (chat launcher is bottom-left) */
+.otauth-control.otauth-floating {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2147483000;
+  background: rgba(20, 29, 92, .92);
+  backdrop-filter: blur(8px);
+  padding: 8px 10px;
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(8, 1, 64, .34);
+}
+
+/* logged-out buttons */
+.otauth-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14.5px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 11px;
+  padding: 10px 16px;
+  transition: filter .15s ease, transform .12s ease, background .15s ease, color .15s ease;
+}
+.otauth-btn:active { transform: scale(.97); }
+
+.otauth-btn-login {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, .55);
+}
+.otauth-btn-login:hover { background: rgba(255, 255, 255, .12); }
+.otauth-btn-login .otauth-btn-ic { width: 18px; height: 18px; display: inline-flex; }
+.otauth-btn-login .otauth-btn-ic svg { width: 18px; height: 18px; }
+
+.otauth-btn-signup {
+  background: var(--otauth-orange);
+  color: #1a0a00;
+  box-shadow: 0 10px 22px rgba(245, 144, 30, .34);
+}
+.otauth-btn-signup:hover { filter: brightness(1.07); transform: translateY(-1px); }
+
+/* logged-in account chip */
+.otauth-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #fff;
+  background: rgba(255, 255, 255, .12);
+  border: 1.5px solid rgba(255, 255, 255, .3);
+  border-radius: 999px;
+  padding: 7px 14px 7px 10px;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.otauth-account:hover { background: rgba(255, 255, 255, .2); }
+.otauth-avatar {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--otauth-orange);
+  color: #1a0a00;
+}
+.otauth-avatar svg { width: 17px; height: 17px; }
+.otauth-account-name { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.otauth-account-chev { width: 15px; height: 15px; display: inline-flex; transition: transform .18s ease; opacity: .85; }
+.otauth-account-chev svg { width: 15px; height: 15px; }
+.otauth-control.is-menu-open .otauth-account-chev { transform: rotate(180deg); }
+
+/* dropdown menu */
+.otauth-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  min-width: 232px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 24px 54px rgba(8, 1, 64, .3);
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px) scale(.98);
+  transform-origin: top left;
+  transition: opacity .16s ease, transform .16s ease, visibility .16s;
+  z-index: 60;
+}
+.otauth-control.otauth-floating .otauth-menu { left: auto; right: 0; transform-origin: top right; }
+.otauth-control.is-menu-open .otauth-menu {
+  opacity: 1; visibility: visible; transform: translateY(0) scale(1);
+}
+.otauth-menu-head {
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid #eef1fa;
+  margin-bottom: 6px;
+}
+.otauth-menu-name { font-weight: 800; font-size: 15px; color: var(--otauth-ink); }
+.otauth-menu-mail { font-weight: 600; font-size: 12.5px; color: var(--otauth-muted); margin-top: 3px; }
+.otauth-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  text-align: right;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--otauth-ink);
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .14s ease, color .14s ease;
+}
+.otauth-menu-item svg { width: 19px; height: 19px; flex: 0 0 auto; color: var(--otauth-blue); }
+.otauth-menu-item:hover { background: #f4f6fd; color: var(--otauth-blue); }
+.otauth-menu-logout { color: var(--otauth-danger); }
+.otauth-menu-logout svg { color: var(--otauth-danger); }
+.otauth-menu-logout:hover { background: #fdeceb; color: var(--otauth-danger); }
+
+/* ======================================================================
+   Modal
+   ====================================================================== */
+.otauth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(8, 1, 46, 0);
+  backdrop-filter: blur(0px);
+  transition: background .22s ease, backdrop-filter .22s ease;
+}
+.otauth-overlay[hidden] { display: none; }
+.otauth-overlay.is-open {
+  background: rgba(8, 1, 46, .62);
+  backdrop-filter: blur(4px);
+}
+
+.otauth-modal {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  max-height: calc(100vh - 44px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 22px;
+  padding: 30px 28px 26px;
+  box-shadow: 0 44px 110px rgba(8, 1, 64, .5);
+  transform: translateY(14px) scale(.97);
+  opacity: 0;
+  transition: transform .24s cubic-bezier(.2, .8, .25, 1), opacity .24s ease;
+}
+.otauth-overlay.is-open .otauth-modal { transform: translateY(0) scale(1); opacity: 1; }
+
+.otauth-modal-close {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none;
+  background: #f4f6fd;
+  color: var(--otauth-muted);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .14s ease, color .14s ease;
+}
+.otauth-modal-close svg { width: 18px; height: 18px; }
+.otauth-modal-close:hover { background: #e8ecfa; color: var(--otauth-blue); }
+
+.otauth-brand {
+  display: flex; align-items: center; gap: 9px;
+  font-weight: 900; font-size: 19px; color: var(--otauth-blue);
+  margin-bottom: 20px;
+}
+.otauth-brand-dot {
+  width: 11px; height: 11px; border-radius: 3px;
+  background: var(--otauth-orange); transform: rotate(45deg);
+}
+
+/* tabs */
+.otauth-tabs {
+  display: flex;
+  gap: 6px;
+  background: #eef1fa;
+  border-radius: 13px;
+  padding: 5px;
+  margin-bottom: 22px;
+}
+.otauth-tab {
+  flex: 1;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--otauth-muted);
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  padding: 11px 0;
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease, box-shadow .16s ease;
+}
+.otauth-tab.is-active {
+  background: #fff;
+  color: var(--otauth-blue);
+  box-shadow: 0 6px 16px rgba(27, 42, 122, .14);
+}
+
+/* forms */
+.otauth-form[hidden] { display: none; }
+.otauth-field { margin-bottom: 15px; }
+.otauth-label {
+  display: block;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--otauth-blue);
+  margin-bottom: 7px;
+}
+.otauth-opt { font-weight: 600; font-size: 12px; color: var(--otauth-muted); }
+.otauth-input {
+  width: 100%;
+  height: 50px;
+  border: 1.5px solid var(--otauth-field);
+  border-radius: 12px;
+  padding: 0 15px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--otauth-ink);
+  background: #fff;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.otauth-input::placeholder { color: #9aa0b4; font-weight: 500; }
+.otauth-input:focus {
+  border-color: var(--otauth-blue);
+  box-shadow: 0 0 0 3px rgba(27, 42, 122, .12);
+}
+.otauth-field.is-invalid .otauth-input {
+  border-color: var(--otauth-danger);
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, .1);
+}
+.otauth-err {
+  color: var(--otauth-danger);
+  font-weight: 700;
+  font-size: 12.5px;
+  margin-top: 6px;
+  min-height: 0;
+}
+.otauth-field.is-invalid .otauth-err { min-height: 16px; }
+
+.otauth-form-err {
+  color: var(--otauth-danger);
+  font-weight: 700;
+  font-size: 13.5px;
+  text-align: center;
+  margin: 2px 0 10px;
+  min-height: 0;
+}
+.otauth-form-err:not(:empty) {
+  background: #fdeceb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.otauth-submit {
+  width: 100%;
+  height: 52px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 16.5px;
+  color: #f3ecdb;
+  background: var(--otauth-blue);
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(27, 42, 122, .34);
+  transition: filter .15s ease, transform .12s ease, opacity .15s ease;
+}
+.otauth-submit:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.otauth-submit:active { transform: scale(.99); }
+.otauth-submit.is-busy { opacity: .7; cursor: progress; }
+.otauth-submit:disabled { cursor: not-allowed; }
+
+.otauth-switch {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--otauth-muted);
+}
+.otauth-link {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--otauth-orange-d);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.otauth-link:hover { text-decoration: underline; }
+
+/* ======================================================================
+   Mobile — near-fullscreen modal
+   ====================================================================== */
+@media (max-width: 480px) {
+  .otauth-overlay { padding: 0; align-items: stretch; }
+  .otauth-modal {
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    max-height: none;
+    border-radius: 0;
+    padding: 60px 22px 32px;
+  }
+  .otauth-overlay.is-open .otauth-modal { transform: none; }
+  .otauth-control.otauth-floating { top: 10px; right: 10px; padding: 6px 8px; }
+  .otauth-btn { padding: 9px 13px; font-size: 13.5px; }
+  .otauth-account-name { max-width: 90px; }
+}

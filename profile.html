@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ملفي الشخصي — One Trip Car Rent</title>
+<meta name="description" content="ملفك الشخصي في One Trip Car Rent — عدّل بياناتك، غيّر كلمة المرور، وتابع حجوزاتك.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="anim.css">
+<script>(function(d){d.documentElement.className+=' js-anim';window.__af=setTimeout(function(){d.documentElement.classList.remove('js-anim');},2000);})(document);</script>
+<style>
+  :root{
+    --accent:#f5901e;
+    --indigo:#2300d9;
+    --green:#1b2a7a;
+    --gold:#f5901e;
+    --gold-soft:#f7a23e;
+    --field-border:#d8def0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Tajawal',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    background:#f4f6fd;color:var(--green);
+  }
+  input{font-family:inherit;}
+  ::placeholder{color:#9aa0b4;}
+  a{text-decoration:none;}
+
+  /* ---------- header (matches index.html) ---------- */
+  .page-top{
+    position:relative;
+    background:radial-gradient(120% 130% at 80% 0%, #2a0fb0 0%, #16006e 45%, #0c0140 100%);
+    padding-bottom:64px;
+  }
+  .sadu-strip{
+    position:absolute;top:0;left:0;right:0;height:6px;z-index:40;opacity:.92;
+    background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#ffffff 24px,#ffffff 30px);
+  }
+  .site-header{
+    position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    gap:28px;padding:22px 48px 0;
+  }
+  .logo-badge{display:flex;align-items:center;}
+  .logo-badge img{height:74px;width:auto;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45));}
+
+  .main-nav{display:flex;align-items:center;gap:6px;flex:1;justify-content:center;}
+  .main-nav a{
+    color:rgba(255,255,255,.82);font-weight:500;font-size:16px;text-decoration:none;
+    padding:10px 16px;border-radius:10px;position:relative;transition:color .15s,background .15s;
+  }
+  .main-nav a:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .main-nav a.active{color:#fff;font-weight:700;}
+  .main-nav a.active .underline{
+    position:absolute;bottom:2px;right:16px;left:16px;height:3px;border-radius:3px;background:var(--accent);
+  }
+  .nav-dd{position:relative;display:inline-flex;}
+  .dd-caret{margin-right:3px;transition:transform .15s;}
+  .nav-dd:hover .dd-caret{transform:rotate(180deg);}
+  .dd-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:190px;background:#fff;border-radius:13px;box-shadow:0 20px 44px rgba(8,1,64,.3);padding:8px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.16s;z-index:60;}
+  .nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu{opacity:1;visibility:visible;transform:translateY(0);}
+  .dd-menu a{display:flex;align-items:center;gap:9px;color:#1b2440;font-weight:700;font-size:14.5px;padding:11px 14px;border-radius:9px;background:transparent;}
+  .dd-menu a:hover{background:#f4f6fd;color:#1b2a7a;}
+
+  .header-actions{display:flex;align-items:center;gap:18px;}
+  .login-link{
+    color:#fff;font-weight:600;font-size:15px;text-decoration:none;display:flex;align-items:center;
+    gap:8px;white-space:nowrap;transition:opacity .15s;
+  }
+  .login-link:hover{opacity:.85;}
+  .book-btn{
+    background:var(--accent);color:#1a0a00;font-weight:800;font-size:16px;text-decoration:none;
+    padding:13px 26px;border-radius:12px;box-shadow:0 12px 26px rgba(245,144,30,.38);
+    white-space:nowrap;display:flex;align-items:center;gap:9px;transition:filter .15s,transform .15s;
+  }
+  .book-btn:hover{filter:brightness(1.06);transform:translateY(-1px);}
+
+  /* ---------- page hero copy ---------- */
+  .profile-hero{
+    position:relative;z-index:20;max-width:1100px;margin:0 auto;padding:54px 48px 0;text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;padding:9px 18px;border-radius:999px;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
+    backdrop-filter:blur(6px);margin-bottom:20px;
+  }
+  .eyebrow .diamond{width:9px;height:9px;border-radius:2px;background:var(--accent);transform:rotate(45deg);}
+  .eyebrow span:last-child{color:#fff;font-weight:700;font-size:14.5px;letter-spacing:.2px;}
+  .profile-hero h1{color:#fff;font-weight:900;font-size:clamp(34px,4.4vw,56px);line-height:1.1;margin:0 0 12px;}
+  .profile-hero h1 em{color:var(--accent);font-style:normal;}
+  .profile-hero p{color:rgba(255,255,255,.85);font-weight:500;font-size:17px;margin:0;}
+
+  /* ---------- main content ---------- */
+  .wrap{max-width:1100px;margin:-32px auto 0;padding:0 48px 80px;position:relative;z-index:25;}
+
+  .card{
+    background:#fff;border:1px solid var(--field-border);border-radius:22px;
+    padding:30px 30px 28px;box-shadow:0 24px 54px rgba(20,28,80,.12);margin-bottom:26px;
+  }
+  .card-head{display:flex;align-items:center;gap:11px;margin:0 0 22px;}
+  .card-head .ico{
+    width:42px;height:42px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:#eef1fb;color:var(--green);
+  }
+  .card-head h2{margin:0;font-weight:900;font-size:21px;color:var(--green);}
+  .card-head .sub{font-size:13.5px;color:#7a82a0;font-weight:600;margin-top:2px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .fld{display:flex;flex-direction:column;gap:8px;}
+  .fld label{font-weight:800;font-size:14.5px;color:var(--green);}
+  .fld input{
+    border:1.5px solid var(--field-border);border-radius:13px;height:52px;padding:0 15px;
+    font-size:15.5px;font-weight:600;color:var(--green);background:#fff;outline:none;transition:border-color .15s;
+  }
+  .fld input:focus{border-color:var(--green);}
+
+  .row-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:22px;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;border:none;cursor:pointer;
+    font-family:inherit;font-weight:800;font-size:15.5px;padding:13px 28px;border-radius:13px;
+    transition:filter .15s,transform .12s,background .15s,color .15s;
+  }
+  .btn-primary{background:var(--green);color:#f3ecdb;box-shadow:0 12px 26px rgba(27,42,122,.28);}
+  .btn-primary:hover{filter:brightness(1.12);transform:translateY(-1px);}
+  .btn-accent{background:var(--accent);color:#1a0a00;box-shadow:0 12px 26px rgba(245,144,30,.32);}
+  .btn-accent:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .btn-ghost{background:#fff;color:var(--green);border:1.5px solid var(--field-border);}
+  .btn-ghost:hover{background:#f4f6fd;}
+  .btn-danger{background:#fff;color:#c0392b;border:1.5px solid #f0c7c1;}
+  .btn-danger:hover{background:#c0392b;color:#fff;border-color:#c0392b;}
+
+  .msg{font-weight:800;font-size:14.5px;margin:0;display:none;}
+  .msg.ok{color:#1f8a4c;display:block;}
+  .msg.err{color:#c0392b;display:block;}
+
+  /* ---------- bookings ---------- */
+  .sec-head{display:flex;align-items:center;gap:11px;margin:6px 0 18px;}
+  .sec-head .ico{
+    width:42px;height:42px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:#fff;color:var(--green);border:1px solid var(--field-border);
+  }
+  .sec-head h2{margin:0;font-weight:900;font-size:23px;color:var(--green);}
+
+  .bk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
+  .bk-card{
+    background:#fff;border:1px solid var(--field-border);border-radius:18px;overflow:hidden;
+    box-shadow:0 14px 34px rgba(20,28,80,.08);display:flex;flex-direction:column;
+  }
+  .bk-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:#18256b;color:#f3ecdb;}
+  .bk-ref{font-weight:900;font-size:15px;letter-spacing:.5px;}
+  .bk-status{font-weight:800;font-size:12.5px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.16);}
+  .bk-status.confirmed,.bk-status.paid{background:#1f8a4c;color:#fff;}
+  .bk-status.cancelled{background:#c0392b;color:#fff;}
+  .bk-status.pending{background:var(--gold);color:#1a0a00;}
+  .bk-body{padding:16px;display:flex;gap:14px;align-items:center;}
+  .bk-body img{width:88px;height:60px;object-fit:contain;flex:none;}
+  .bk-name{font-weight:900;font-size:17px;color:var(--green);margin:0 0 8px;}
+  .bk-meta{font-size:13.5px;color:#5a6488;font-weight:600;line-height:1.7;}
+  .bk-meta b{color:var(--green);}
+  .bk-foot{padding:0 16px 16px;font-weight:900;color:var(--green);font-size:15.5px;}
+
+  /* ---------- empty / login states ---------- */
+  .empty{
+    background:#fff;border:1.5px dashed var(--field-border);border-radius:18px;
+    padding:40px 24px;text-align:center;color:#7a82a0;font-weight:700;font-size:16px;
+  }
+  .empty a{color:var(--green);font-weight:900;text-decoration:underline;}
+
+  .login-card{
+    max-width:560px;margin:0 auto;background:#fff;border:1px solid var(--field-border);border-radius:22px;
+    padding:48px 36px;text-align:center;box-shadow:0 24px 54px rgba(20,28,80,.12);
+  }
+  .login-card .lc-ico{
+    width:74px;height:74px;border-radius:20px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;
+    background:#eef1fb;color:var(--green);
+  }
+  .login-card h2{margin:0 0 10px;font-weight:900;font-size:24px;color:var(--green);}
+  .login-card p{margin:0 0 26px;color:#5a6488;font-weight:500;font-size:16px;line-height:1.7;}
+
+  .convo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border:1px solid var(--field-border);border-radius:14px;margin-bottom:10px;}
+  .convo .ct{font-weight:800;color:var(--green);font-size:15px;}
+  .convo .cm{font-size:13.5px;color:#5a6488;font-weight:600;margin-top:3px;max-width:560px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .convo .cd{font-size:12.5px;color:#9aa0b4;font-weight:700;white-space:nowrap;}
+
+  /* ---------- footer (matches index.html) ---------- */
+  .site-footer{background:#141d5c;color:#e8e1cf;}
+  .footer-inner{
+    max-width:1240px;margin:0 auto;padding:54px 48px 34px;
+    display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start;
+  }
+  .footer-brand{max-width:420px;}
+  .footer-brand img{height:56px;width:auto;display:block;margin-bottom:16px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.4));}
+  .footer-brand p{margin:0;color:rgba(232,225,207,.78);font-weight:500;font-size:16px;line-height:1.7;}
+  .footer-contact{display:flex;flex-direction:column;gap:12px;}
+  .footer-contact a{color:#e8e1cf;text-decoration:none;font-weight:700;font-size:17px;}
+  .footer-contact a:hover{color:var(--gold);}
+  .footer-contact span{color:rgba(232,225,207,.6);font-weight:500;font-size:14px;}
+  .footer-legal{display:flex;flex-wrap:wrap;gap:9px 18px;max-width:1180px;margin:0 auto;padding:18px 48px 2px;justify-content:center;border-top:1px solid rgba(255,255,255,.12);}
+  .footer-legal a{color:rgba(232,225,207,.8);font-weight:600;font-size:14px;}
+  .footer-legal a:hover{color:var(--gold);}
+  .footer-bar{
+    border-top:1px solid rgba(201,168,104,.25);text-align:center;
+    padding:18px;color:rgba(232,225,207,.6);font-size:13.5px;font-weight:500;
+  }
+
+  @media (max-width:1024px){
+    .site-header{flex-wrap:wrap;gap:16px;padding:18px 24px 0;}
+    .main-nav{order:3;width:100%;justify-content:center;flex-wrap:wrap;}
+    .profile-hero{padding:40px 24px 0;}
+    .wrap{padding:0 24px 64px;}
+  }
+  @media (max-width:640px){
+    .grid2{grid-template-columns:1fr;}
+    .login-link span{display:none;}
+    .row-actions .btn{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="page-top">
+  <div class="sadu-strip"></div>
+
+  <!-- ===== HEADER (matches index.html) ===== -->
+  <header class="site-header">
+    <div class="logo-badge">
+      <a href="index.html"><img src="assets/onetrip-logo.png" alt="One Trip Car Rent"></a>
+    </div>
+
+    <nav class="main-nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="fleet.html">الأسطول</a>
+      <div class="nav-dd">
+        <a href="long-term.html">تأجير طويل الأجل<svg class="dd-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="dd-menu">
+          <a href="long-term.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg>أفراد</a>
+          <a href="corporate.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l7-4 7 4v14M3 21h18M7 10h.01M7 14h.01M13 10h.01M13 14h.01"/></svg>شركات</a>
+        </div>
+      </div>
+      <a href="news.html">أخبارنا</a>
+      <a href="contact.html">تواصل معنا</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="profile.html" class="login-link active">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>ملفي الشخصي</span>
+      </a>
+      <a href="create-booking.html" class="book-btn">
+        احجز الآن
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a0a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ===== HERO COPY ===== -->
+  <section class="profile-hero">
+    <div class="eyebrow"><span class="diamond"></span><span>حسابك في One Trip</span></div>
+    <h1>ملفي <em>الشخصي</em></h1>
+    <p>أدِر بياناتك وكلمة مرورك وتابع حجوزاتك في مكان واحد.</p>
+  </section>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main class="wrap" id="profileRoot"><!-- rendered by JS --></main>
+
+<!-- ===== FOOTER (matches index.html) ===== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/onetrip-logo.png" alt="One Trip Car Rent">
+      <p>منصّة تنقّل حديثة بهوية سعودية — تجربة لا تُقاس بالتوقّعات.</p>
+    </div>
+    <div class="footer-contact">
+      <a href="tel:+966500000000" dir="ltr">+966 50 000 0000</a>
+      <a href="mailto:info@onetrip.sa">info@onetrip.sa</a>
+      <span>متوفّر في جميع مناطق المملكة · خدمة سعودية ١٠٠٪</span>
+    </div>
+  </div>
+  <nav class="footer-legal">
+    <a href="about.html">من نحن</a>
+    <a href="terms.html">الشروط والأحكام</a>
+    <a href="rental-terms.html">شروط وأحكام التأجير</a>
+    <a href="privacy.html">سياسة الخصوصية</a>
+    <a href="cancellation.html">سياسة الإلغاء والتعديل</a>
+    <a href="cookies.html">سياسة ملفات تعريف الارتباط</a>
+  </nav>
+  <div class="footer-bar">© 2026 One Trip Car Rent — جميع الحقوق محفوظة</div>
+</footer>
+
+<!-- ===== SCRIPTS (contract §5 load order) ===== -->
+<link rel="stylesheet" href="auth-widget.css">
+<link rel="stylesheet" href="chat-widget.css">
+<script src="cars.js?v=7"></script>
+<script src="auth-core.js?v=1"></script>
+<script src="booking-core.js?v=7"></script>
+<script src="branch-map.js"></script>
+<script src="chat.js"></script>
+<script src="supabase-sync.js"></script>
+<script src="chat-widget.js"></script>
+<script src="auth-widget.js?v=1"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  var root = document.getElementById('profileRoot');
+  if (!root) return;
+
+  /* ---- helpers (guarded; never crash if a global is missing) ---- */
+  var Auth = (window.OneTrip && window.OneTrip.Auth) || null;
+
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  var ARMAP = {'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'};
+  function toAr(n){ return (n==null?'':String(n)).replace(/[0-9]/g,function(d){return ARMAP[d];}); }
+  function fmtDate(s){
+    if (!s) return '—';
+    try {
+      var d = new Date(s);
+      if (isNaN(d.getTime())) return esc(s);
+      return d.toLocaleDateString('ar-SA') + ' · ' + d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+    } catch(e){ return esc(s); }
+  }
+  function statusLabel(st){
+    switch(st){
+      case 'confirmed': return 'مؤكَّد';
+      case 'paid':      return 'مدفوع';
+      case 'pending':   return 'قيد الانتظار';
+      case 'cancelled': return 'ملغي';
+      default:          return st ? esc(st) : 'مؤكَّد';
+    }
+  }
+
+  function safeArr(fn){ try { var r = fn(); return Array.isArray(r) ? r : []; } catch(e){ return []; } }
+
+  /* ============================================================
+     LOGGED-OUT VIEW
+     ============================================================ */
+  function renderLoggedOut(){
+    root.innerHTML =
+      '<div class="login-card">' +
+        '<div class="lc-ico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>' +
+        '<h2>سجّل الدخول لعرض ملفك</h2>' +
+        '<p>للوصول إلى بياناتك وحجوزاتك، الرجاء تسجيل الدخول أو إنشاء حساب جديد.</p>' +
+        '<button class="btn btn-primary" id="btnLogin" type="button">تسجيل الدخول</button>' +
+      '</div>';
+    var b = document.getElementById('btnLogin');
+    if (b) b.addEventListener('click', function(){
+      if (window.OneTrip && window.OneTrip.AuthWidget && typeof window.OneTrip.AuthWidget.open === 'function'){
+        window.OneTrip.AuthWidget.open('login');
+      } else {
+        alert('نظام الحساب غير متاح حاليًا. حدّث الصفحة وحاول مرة أخرى.');
+      }
+    });
+  }
+
+  /* ============================================================
+     LOGGED-IN VIEW
+     ============================================================ */
+  function bookingsHtml(){
+    var list = safeArr(function(){ return Auth.bookings(); });
+    if (!list.length){
+      return '<div class="empty">لا توجد حجوزات بعد · <a href="create-booking.html">احجز سيارتك الآن</a></div>';
+    }
+    var out = '<div class="bk-grid">';
+    list.forEach(function(b){
+      b = b || {};
+      var ref   = b.reference || b.ref || '—';
+      var name  = b.carName || (b.car && b.car.name) || 'سيارة';
+      var img   = b.carImage || (b.car && b.car.image) || '';
+      var st    = (b.status || 'confirmed');
+      var total = (b.total != null) ? (toAr(b.total) + ' ريال') : '';
+      out +=
+        '<article class="bk-card">' +
+          '<div class="bk-top">' +
+            '<span class="bk-ref">' + esc(ref) + '</span>' +
+            '<span class="bk-status ' + esc(st) + '">' + statusLabel(st) + '</span>' +
+          '</div>' +
+          '<div class="bk-body">' +
+            (img ? '<img src="' + esc(img) + '" alt="' + esc(name) + '">' : '') +
+            '<div>' +
+              '<h3 class="bk-name">' + esc(name) + '</h3>' +
+              '<div class="bk-meta">' +
+                '<div><b>الاستلام:</b> ' + fmtDate(b.pickupAt) + (b.pickup ? ' — ' + esc(b.pickup) : '') + '</div>' +
+                '<div><b>التسليم:</b> ' + fmtDate(b.returnAt) + (b.dropoff ? ' — ' + esc(b.dropoff) : '') + '</div>' +
+                (b.days != null ? '<div><b>المدة:</b> ' + toAr(b.days) + ' يوم</div>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          (total ? '<div class="bk-foot">الإجمالي: ' + total + '</div>' : '') +
+        '</article>';
+    });
+    out += '</div>';
+    return out;
+  }
+
+  function conversationsHtml(){
+    var list = safeArr(function(){ return Auth.conversations(); });
+    if (!list.length) return '';   /* optional section — hide when empty */
+    var out =
+      '<div class="sec-head" style="margin-top:34px;">' +
+        '<div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>' +
+        '<h2>محادثاتي (' + toAr(list.length) + ')</h2>' +
+      '</div>';
+    list.forEach(function(c){
+      c = c || {};
+      var msgs = Array.isArray(c.messages) ? c.messages : [];
+      var last = msgs.length ? msgs[msgs.length - 1] : null;
+      var lastText = last ? (last.text || last.body || last.message || '') : (c.lastMessage || '');
+      var when = (last && (last.at || last.ts || last.time)) || c.updatedAt || c.createdAt;
+      out +=
+        '<div class="convo">' +
+          '<div>' +
+            '<div class="ct">' + esc(c.name || c.title || 'محادثة') + '</div>' +
+            (lastText ? '<div class="cm">' + esc(lastText) + '</div>' : '') +
+          '</div>' +
+          (when ? '<div class="cd">' + fmtDate(when) + '</div>' : '') +
+        '</div>';
+    });
+    return out;
+  }
+
+  function renderLoggedIn(){
+    var c = {};
+    try { c = Auth.current() || {}; } catch(e){ c = {}; }
+
+    root.innerHTML =
+      /* ---- بطاقة بياناتي ---- */
+      '<section class="card">' +
+        '<div class="card-head">' +
+          '<div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>' +
+          '<div><h2>بياناتي</h2><div class="sub">عدّل اسمك وبيانات التواصل</div></div>' +
+        '</div>' +
+        '<div class="grid2">' +
+          '<div class="fld"><label for="pName">الاسم</label><input id="pName" type="text" value="' + esc(c.name) + '" placeholder="الاسم الكامل"></div>' +
+          '<div class="fld"><label for="pEmail">البريد الإلكتروني</label><input id="pEmail" type="email" dir="ltr" value="' + esc(c.email) + '" placeholder="you@email.com"></div>' +
+          '<div class="fld"><label for="pPhone">الجوال</label><input id="pPhone" type="tel" dir="ltr" value="' + esc(c.phone) + '" placeholder="05xxxxxxxx"></div>' +
+          '<div class="fld"><label for="pCity">المدينة</label><input id="pCity" type="text" value="' + esc(c.city) + '" placeholder="مثال: الرياض"></div>' +
+        '</div>' +
+        '<div class="row-actions">' +
+          '<button class="btn btn-primary" id="btnSave" type="button">حفظ التعديلات</button>' +
+          '<p class="msg" id="msgSave"></p>' +
+        '</div>' +
+      '</section>' +
+
+      /* ---- بطاقة تغيير كلمة المرور ---- */
+      '<section class="card">' +
+        '<div class="card-head">' +
+          '<div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>' +
+          '<div><h2>تغيير كلمة المرور</h2><div class="sub">6 أحرف على الأقل</div></div>' +
+        '</div>' +
+        '<div class="grid2">' +
+          '<div class="fld"><label for="pCur">كلمة المرور الحالية</label><input id="pCur" type="password" placeholder="••••••"></div>' +
+          '<div class="fld"><label for="pNew">كلمة المرور الجديدة</label><input id="pNew" type="password" placeholder="••••••"></div>' +
+        '</div>' +
+        '<div class="row-actions">' +
+          '<button class="btn btn-accent" id="btnPass" type="button">تحديث كلمة المرور</button>' +
+          '<p class="msg" id="msgPass"></p>' +
+        '</div>' +
+      '</section>' +
+
+      /* ---- حجوزاتي ---- */
+      '<section id="bookings" style="scroll-margin-top:90px;">' +
+        '<div class="sec-head">' +
+          '<div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>' +
+          '<h2>حجوزاتي</h2>' +
+        '</div>' +
+        bookingsHtml() +
+      '</section>' +
+
+      /* ---- محادثاتي (اختياري) ---- */
+      conversationsHtml() +
+
+      /* ---- الإجراءات ---- */
+      '<div class="row-actions" style="margin-top:34px;">' +
+        '<button class="btn btn-ghost" id="btnLogout" type="button">تسجيل الخروج</button>' +
+        '<button class="btn btn-danger" id="btnDelete" type="button">حذف الحساب</button>' +
+      '</div>';
+
+    wireLoggedIn();
+  }
+
+  /* ---- show inline feedback ---- */
+  function showMsg(el, ok, text){
+    if (!el) return;
+    el.className = 'msg ' + (ok ? 'ok' : 'err');
+    el.textContent = text;
+  }
+
+  function wireLoggedIn(){
+    var btnSave = document.getElementById('btnSave');
+    if (btnSave) btnSave.addEventListener('click', function(){
+      var msg = document.getElementById('msgSave');
+      if (!Auth || typeof Auth.update !== 'function'){ showMsg(msg, false, 'النظام غير متاح.'); return; }
+      var r = Auth.update({
+        name:  (document.getElementById('pName')||{}).value || '',
+        email: (document.getElementById('pEmail')||{}).value || '',
+        phone: (document.getElementById('pPhone')||{}).value || '',
+        city:  (document.getElementById('pCity')||{}).value || ''
+      }) || {};
+      if (r.ok) showMsg(msg, true, 'تم حفظ بياناتك بنجاح.');
+      else showMsg(msg, false, r.error || 'تعذّر حفظ البيانات.');
+    });
+
+    var btnPass = document.getElementById('btnPass');
+    if (btnPass) btnPass.addEventListener('click', function(){
+      var msg = document.getElementById('msgPass');
+      if (!Auth || typeof Auth.changePassword !== 'function'){ showMsg(msg, false, 'النظام غير متاح.'); return; }
+      var cur = (document.getElementById('pCur')||{}).value || '';
+      var nw  = (document.getElementById('pNew')||{}).value || '';
+      var r = Auth.changePassword(cur, nw) || {};
+      if (r.ok){
+        showMsg(msg, true, 'تم تغيير كلمة المرور بنجاح.');
+        var ce = document.getElementById('pCur'), ne = document.getElementById('pNew');
+        if (ce) ce.value = ''; if (ne) ne.value = '';
+      } else showMsg(msg, false, r.error || 'تعذّر تغيير كلمة المرور.');
+    });
+
+    var btnLogout = document.getElementById('btnLogout');
+    if (btnLogout) btnLogout.addEventListener('click', function(){
+      try { if (Auth && Auth.logout) Auth.logout(); } catch(e){}
+      try { window.location.reload(); } catch(e){}
+    });
+
+    var btnDelete = document.getElementById('btnDelete');
+    if (btnDelete) btnDelete.addEventListener('click', function(){
+      if (!window.confirm('هل أنت متأكد من حذف حسابك نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+      try { if (Auth && Auth.deleteAccount) Auth.deleteAccount(); } catch(e){}
+      try { window.location.reload(); } catch(e){}
+    });
+  }
+
+  /* ============================================================
+     RENDER + deep-link + change subscription
+     ============================================================ */
+  function render(){
+    var loggedIn = false;
+    try { loggedIn = !!(Auth && Auth.isLoggedIn && Auth.isLoggedIn()); } catch(e){ loggedIn = false; }
+    if (loggedIn) renderLoggedIn(); else renderLoggedOut();
+    maybeScrollToBookings();
+  }
+
+  function maybeScrollToBookings(){
+    if (window.location.hash !== '#bookings') return;
+    var el = document.getElementById('bookings');
+    if (el){
+      try { el.scrollIntoView({ behavior:'smooth', block:'start' }); } catch(e){ el.scrollIntoView(); }
+    }
+  }
+
+  /* re-render on auth change (guarded) */
+  try {
+    if (Auth && typeof Auth.on === 'function') Auth.on('change', render);
+  } catch(e){}
+
+  /* if Auth isn't ready yet (script order/race), retry briefly */
+  if (!Auth){
+    var tries = 0;
+    var iv = setInterval(function(){
+      Auth = (window.OneTrip && window.OneTrip.Auth) || null;
+      tries++;
+      if (Auth){
+        clearInterval(iv);
+        try { if (typeof Auth.on === 'function') Auth.on('change', render); } catch(e){}
+        render();
+      } else if (tries > 40){ clearInterval(iv); render(); }
+    }, 50);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

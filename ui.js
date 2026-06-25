@@ -69,7 +69,7 @@
       + '<span class="tab-divider"></span>'
       + '<button class="tab" data-tab="4">'
         + '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="18" y2="10.5"/><line x1="18" y1="20" x2="6" y2="10.5"/><path d="M12 10c-1.7-1.1-2.3-2.9-1.7-4.7.9.7 1.4 1.6 1.7 2.7.3-1.1.8-2 1.7-2.7.6 1.8 0 3.6-1.7 4.7Z" fill="currentColor" stroke="none"/></svg>'
-        + 'بلو ليموزين'
+        + 'ون تريب ليموزين'
       + '</button>'
     + '</div>';
   }
