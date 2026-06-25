@@ -79,6 +79,57 @@
       'loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen title="موقع الفرع"></iframe>';
   }
 
+  function findBranchByName(name){
+    if (!name) return null;
+    var bs = readBranches();
+    for (var i = 0; i < bs.length; i++){ if ((bs[i].name || '') === name) return bs[i]; }
+    return null;
+  }
+
+  /* ربط تلقائي بكارت ودجة البحث: لما العميل يختار فرعًا في القائمة
+     (موقع الاستلام/التسليم/فرع الاشتراك...) تظهر خريطة جوجل أسفل الكارت.
+     لا يلمس ui.js — يعمل على أي صفحة فيها الودجة. */
+  function wireWidgetCard(card){
+    if (!card || card.__otMapWired) return;
+    var selects = card.querySelectorAll('select[data-role="pickup"],select[data-role="dropoff"],select[data-role="branch"]');
+    if (!selects.length) return;
+    card.__otMapWired = true;
+
+    var slot = document.createElement('div');
+    slot.className = 'otb-branch-map';
+    slot.style.cssText = 'margin-top:14px;display:none';
+    if (card.parentNode) card.parentNode.insertBefore(slot, card.nextSibling);
+
+    function showFor(name){
+      var b = findBranchByName(name);
+      if (!name || !b || !hasLocation(b)){ slot.style.display = 'none'; slot.innerHTML = ''; return; }
+      slot.style.display = '';
+      slot.innerHTML =
+        '<div style="font-weight:800;color:#1b2a7a;margin:0 0 8px;font-size:15px">📍 موقع ' + (b.name || 'الفرع') + ' على الخريطة</div>' +
+        embedHTML(b, { height:260, style:'width:100%;height:260px;border:0;border-radius:14px;display:block;box-shadow:0 10px 26px rgba(20,29,92,.14)' }) +
+        '<a href="' + linkURL(b) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-weight:800;color:#1b2a7a;text-decoration:none">فتح في خرائط جوجل ↗</a>';
+    }
+    for (var i = 0; i < selects.length; i++){
+      selects[i].addEventListener('change', function(){ showFor(this.value); });
+    }
+  }
+
+  function autoWire(){
+    var cards = document.querySelectorAll('.form-card');
+    for (var i = 0; i < cards.length; i++) wireWidgetCard(cards[i]);
+  }
+
+  /* الودجة تُركّب بعد سكربت الصفحة، فنحاول عدة مرات لحين ظهورها */
+  function startAutoWire(){
+    var tries = 0;
+    autoWire();
+    var t = setInterval(function(){ tries++; autoWire(); if (tries > 24) clearInterval(t); }, 250);
+  }
+  try {
+    if (document.readyState !== 'loading') startAutoWire();
+    else document.addEventListener('DOMContentLoaded', startAutoWire);
+  } catch(e){}
+
   window.OneTrip = window.OneTrip || {};
   window.OneTrip.BranchMap = {
     branches:    readBranches,
@@ -87,6 +138,8 @@
     hasLocation: hasLocation,
     embedURL:    embedURL,
     linkURL:     linkURL,
-    embedHTML:   embedHTML
+    embedHTML:   embedHTML,
+    findByName:  findBranchByName,
+    autoWire:    autoWire
   };
 })();
