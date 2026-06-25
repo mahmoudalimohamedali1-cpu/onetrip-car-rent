@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تأكيد الحجز — One Trip Car Rent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="booking.css">
+<style>
+  /* ---- success hero ---- */
+  .otb-success{text-align:center;padding:38px 28px 30px;}
+  .otb-success .ring{width:92px;height:92px;border-radius:50%;background:#e7f7ee;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 14px 34px rgba(19,138,82,.22);}
+  .otb-success .ring svg{width:48px;height:48px;color:var(--ok);}
+  .otb-success h1{margin:0 0 8px;font-size:clamp(24px,3vw,32px);font-weight:900;color:var(--blue);}
+  .otb-success p{margin:0 0 20px;color:var(--muted);font-size:15.5px;}
+  .otb-refbox{display:inline-flex;flex-direction:column;align-items:center;gap:4px;background:#f4f7ff;border:1.5px dashed #c2cbef;border-radius:16px;padding:14px 34px;}
+  .otb-refbox .lbl{font-size:13px;font-weight:800;color:var(--muted);}
+  .otb-refbox .ref{font-size:30px;font-weight:900;color:var(--blue);letter-spacing:2px;font-variant-numeric:tabular-nums;}
+
+  /* ---- details car block ---- */
+  .otb-dcar{display:flex;align-items:center;gap:16px;padding-bottom:16px;margin-bottom:6px;border-bottom:1px solid var(--line);}
+  .otb-dcar img{width:120px;height:78px;object-fit:contain;flex:0 0 auto;}
+  .otb-dcar b{font-size:19px;font-weight:900;color:var(--ink);display:block;}
+  .otb-dcar span{font-size:13.5px;color:var(--orange);font-weight:800;}
+
+  /* ---- details grid ---- */
+  .otb-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;}
+  .otb-dgrid .it .k{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:3px;display:flex;align-items:center;gap:7px;}
+  .otb-dgrid .it .k svg{color:var(--blue);}
+  .otb-dgrid .it .val{font-size:15.5px;font-weight:800;color:var(--ink);}
+
+  /* ---- invoice ---- */
+  .otb-inv .otb-row{padding:10px 0;border-bottom:1px dashed var(--line);}
+  .otb-inv .otb-row:last-of-type{border-bottom:none;}
+  .otb-inv .otb-row.disc .v{color:var(--ok);}
+  .otb-inv .otb-row.dep .v{color:var(--orange);}
+  .otb-inv .inv-total{display:flex;align-items:baseline;justify-content:space-between;margin-top:14px;padding-top:16px;border-top:2px solid var(--line);}
+  .otb-inv .inv-total .l{font-weight:900;color:var(--ink);font-size:16.5px;}
+  .otb-inv .inv-total .t{font-weight:900;color:var(--blue);font-size:28px;}
+
+  .otb-cust{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;}
+  .otb-cust .it .k{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:3px;}
+  .otb-cust .it .val{font-size:15.5px;font-weight:800;color:var(--ink);}
+
+  .otb-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
+  @media (max-width:600px){
+    .otb-dgrid,.otb-cust,.otb-actions{grid-template-columns:1fr;}
+    .otb-dcar img{width:96px;height:62px;}
+  }
+</style>
+</head>
+<body>
+
+<main class="otb-wrap" id="page"><!-- injected --></main>
+
+<script src="cars.js?v=7"></script>
+<script src="booking-core.js?v=7"></script>
+<script>
+(function(){
+  'use strict';
+
+  OTB.mountChrome({step:4});
+
+  var page=document.getElementById('page');
+
+  function qs(name){
+    var m=new RegExp('[?&]'+name+'=([^&]*)').exec(location.search);
+    return m?decodeURIComponent(m[1]):'';
+  }
+
+  var ref=qs('ref');
+  var b=OTB.bookings().filter(function(x){return x.reference===ref;})[0]||null;
+
+  if(!b){
+    page.innerHTML=
+      '<div class="otb-alert err">'+
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12" y2="16.5"/></svg>'+
+        'لم نتمكّن من العثور على هذا الحجز. تأكّد من الرابط أو رقم الحجز.'+
+      '</div>'+
+      '<a class="otb-btn otb-btn-pri sm" href="index.html">العودة للرئيسية</a>';
+    return;
+  }
+
+  /* ---- icons ---- */
+  var IC={
+    pin:'<path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/>',
+    cal:'<rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/>',
+    clk:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>'
+  };
+  function ic(p){return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+
+  function fmtDate(s){
+    if(!s) return '—';
+    var d=new Date(s);
+    try{ return d.toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+    catch(e){ return OTB.toAr(s); }
+  }
+  function fmtTime(s){
+    if(!s) return '';
+    var d=new Date(s);
+    var h=d.getHours(), m=d.getMinutes();
+    var am = h<12 ? 'صباحًا' : 'مساءً';
+    var h12 = h%12; if(h12===0) h12=12;
+    var mm = (m<10?'0':'')+m;
+    return OTB.toAr(h12)+':'+OTB.toAr(mm)+' '+am;
+  }
+
+  var car=OTB.car(b.carId)||{};
+  var carImage=car.image||b.carImage||'';
+  var carName=car.name||b.carName||'';
+  var carCat=car.category||'';
+
+  var days=OTB.days(b.pickupAt,b.returnAt);
+  var t=b.totals||{};
+
+  /* email delivery status (honest: only claim 'sent' when really sent via EmailJS) */
+  var em = (OTB.emailFor && b.reference) ? OTB.emailFor(b.reference) : null;
+  var emailSent = !!(em && em.status==='sent');
+  var custEmail = (b.customer&&b.customer.email)||'';
+
+  function row(l,v,c){return '<div class="otb-row '+(c||'')+'"><span>'+l+'</span><span class="v">'+v+'</span></div>';}
+
+  /* ---- invoice extra lines: use the amounts frozen at booking time (totals.extraLines);
+     fall back to re-deriving only for older bookings that lack them ---- */
+  var extraRows='';
+  if(t.extraLines && t.extraLines.length){
+    t.extraLines.forEach(function(l){
+      extraRows += row((l.name||'')+((l.qty>1)?(' ×'+OTB.toAr(l.qty)):''), OTB.money(l.amount||0));
+    });
+  } else {
+    (b.extras||[]).forEach(function(sel){
+      var e=OTB.extra(sel.id); if(!e) return; var qty=sel.qty||1;
+      var amt = e.unit==='day' ? e.price*days*qty : e.price*qty;
+      extraRows += row(e.name+(qty>1?' ×'+OTB.toAr(qty):''), OTB.money(amt));
+    });
+  }
+
+  var disc = (t.discount>0) ? row('الخصم','− '+OTB.money(t.discount),'disc') : '';
+
+  page.innerHTML=
+    /* success hero */
+    '<div class="otb-panel otb-success">'+
+      '<div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'+
+      '<h1>تم تأكيد حجزك!</h1>'+
+      '<p>'+(emailSent&&custEmail ? ('أرسلنا تأكيد الحجز إلى بريدك: <b style="direction:ltr;display:inline-block">'+custEmail+'</b><br>') : (custEmail ? ('بريدك لتأكيد الحجز: <b style="direction:ltr;display:inline-block">'+custEmail+'</b><br>') : ''))+'احتفظ برقم الحجز لإدارته لاحقًا.</p>'+
+      '<div class="otb-refbox"><span class="lbl">رقم الحجز</span><span class="ref">'+b.reference+'</span></div>'+
+    '</div>'+
+
+    /* booking details */
+    '<div class="otb-panel">'+
+      '<h2 class="line">تفاصيل الحجز</h2>'+
+      '<div class="otb-dcar">'+
+        (carImage?'<img src="'+carImage+'" alt="'+carName+'">':'')+
+        '<div><b>'+carName+'</b><span>'+carCat+'</span></div>'+
+      '</div>'+
+      '<div class="otb-dgrid">'+
+        '<div class="it"><div class="k">'+ic(IC.pin)+'فرع الاستلام</div><div class="val">'+(b.pickup||'—')+'</div></div>'+
+        '<div class="it"><div class="k">'+ic(IC.pin)+'فرع التسليم</div><div class="val">'+(b.dropoff||b.pickup||'—')+'</div></div>'+
+        '<div class="it"><div class="k">'+ic(IC.cal)+'تاريخ ووقت الاستلام</div><div class="val">'+fmtDate(b.pickupAt)+' · '+fmtTime(b.pickupAt)+'</div></div>'+
+        '<div class="it"><div class="k">'+ic(IC.cal)+'تاريخ ووقت التسليم</div><div class="val">'+fmtDate(b.returnAt)+' · '+fmtTime(b.returnAt)+'</div></div>'+
+        '<div class="it"><div class="k">'+ic(IC.clk)+'مدّة الإيجار</div><div class="val">'+OTB.toAr(days)+' '+(days===1?'يوم':'أيام')+'</div></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* invoice */
+    '<div class="otb-panel otb-inv">'+
+      '<h2 class="line">ملخص الفاتورة</h2>'+
+      row('سعر التأجير ('+OTB.toAr(days)+' '+(days===1?'يوم':'أيام')+')', OTB.money(t.base||0))+
+      extraRows+
+      disc+
+      row('ضريبة القيمة المضافة (١٥٪)', OTB.money(t.vat||0))+
+      '<div class="inv-total"><span class="l">الإجمالي المدفوع</span><span class="t">'+OTB.money(t.total||0)+'</span></div>'+
+      row('+ مبلغ تأمين مسترد (لا يُحتسب ضمن الإجمالي)', OTB.money(t.deposit||0),'dep')+
+    '</div>'+
+
+    /* customer */
+    '<div class="otb-panel">'+
+      '<h2 class="line">بيانات العميل</h2>'+
+      '<div class="otb-cust">'+
+        '<div class="it"><div class="k">الاسم</div><div class="val">'+((b.customer&&b.customer.name)||'—')+'</div></div>'+
+        '<div class="it"><div class="k">رقم الجوال</div><div class="val">'+OTB.toAr((b.customer&&b.customer.phone)||'—')+'</div></div>'+
+        '<div class="it"><div class="k">البريد الإلكتروني</div><div class="val" style="direction:ltr;text-align:right">'+((b.customer&&b.customer.email)||'—')+'</div></div>'+
+      '</div>'+
+    '</div>'+
+
+    /* actions */
+    '<div class="otb-actions">'+
+      '<a class="otb-btn otb-btn-pri" href="manage-booking.html">إدارة الحجز</a>'+
+      '<a class="otb-btn otb-btn-ghost" href="index.html">حجز جديد</a>'+
+    '</div>';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+/* ============================================================
+   One Trip — shared BOOKING FLOW styles (booking.css)
+   Used by: car.html, extras.html, checkout.html, payment.html,
+   confirmation.html, manage-booking.html
+   Brand: blue #1b2a7a / orange #f5901e, Tajawal, RTL.
+   ============================================================ */
+:root{
+  --blue:#1b2a7a; --indigo:#2300d9; --orange:#f5901e; --orange-soft:#f7a23e;
+  --ink:#1b2440; --muted:#5a6488; --line:#e6e9f4; --cream:#f4f6fd; --bg:#eef1fa;
+  --ok:#138a52; --red:#c0392b; --field:#dfe4f3;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;} html,body{margin:0;padding:0;}
+body{font-family:'Tajawal',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:var(--bg);}
+a{color:inherit;text-decoration:none;} img{display:block;}
+input,select,textarea,button{font-family:inherit;}
+::placeholder{color:#9aa0b4;}
+
+/* ---- chrome (header + stepper) ---- */
+.otb-sadu{height:6px;background:repeating-linear-gradient(135deg,#2300d9 0,#2300d9 12px,#f5901e 12px,#f5901e 24px,#fff 24px,#fff 30px);opacity:.95;}
+.otb-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 40px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;}
+.otb-logo img{height:58px;width:auto;}
+.otb-secure{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:13.5px;color:var(--ok);background:#e7f7ee;padding:7px 14px;border-radius:999px;}
+.otb-back{font-weight:800;font-size:14.5px;color:var(--blue);}
+.otb-back:hover{color:var(--orange);}
+.otb-stepper-wrap{background:#fff;border-bottom:1px solid var(--line);padding:16px 40px;}
+.otb-stepper{display:flex;align-items:center;justify-content:center;max-width:760px;margin:0 auto;gap:0;}
+.otb-step{display:flex;align-items:center;gap:9px;}
+.otb-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;background:#e7eaf6;color:#9aa3c8;flex:0 0 auto;transition:.2s;}
+.otb-slbl{font-weight:700;font-size:13.5px;color:#9aa3c8;white-space:nowrap;}
+.otb-step.now .otb-dot{background:var(--orange);color:#1a0a00;box-shadow:0 6px 14px rgba(245,144,30,.4);}
+.otb-step.now .otb-slbl{color:var(--blue);}
+.otb-step.done .otb-dot{background:var(--blue);color:#fff;}
+.otb-step.done .otb-slbl{color:var(--blue);}
+.otb-line{flex:1;height:3px;min-width:18px;background:#e7eaf6;margin:0 10px;border-radius:3px;}
+.otb-line.done{background:var(--blue);}
+
+/* ---- layout ---- */
+.otb-wrap{max-width:1180px;margin:0 auto;padding:30px 40px 70px;}
+.otb-grid{display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start;}
+.otb-h1{font-size:clamp(24px,3vw,34px);font-weight:900;color:var(--blue);margin:0 0 6px;}
+.otb-lead{color:var(--muted);font-size:16px;margin:0 0 22px;}
+
+/* ---- panels / cards ---- */
+.otb-panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 16px 40px rgba(27,42,122,.07);padding:26px 28px;margin-bottom:20px;}
+.otb-panel h2{margin:0 0 16px;font-size:19px;font-weight:900;color:var(--blue);}
+.otb-panel h2.line{position:relative;padding-right:15px;}
+.otb-panel h2.line::before{content:"";position:absolute;right:0;top:3px;bottom:3px;width:5px;border-radius:3px;background:var(--orange);}
+
+/* ---- summary sidebar ---- */
+.otb-summary{position:sticky;top:96px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 22px 50px rgba(27,42,122,.1);overflow:hidden;}
+.otb-sum-car{display:flex;align-items:center;gap:14px;padding:18px 20px;background:linear-gradient(135deg,#f7f9ff,#fff);border-bottom:1px solid var(--line);}
+.otb-sum-car img{width:96px;height:62px;object-fit:contain;}
+.otb-sum-car b{font-size:16px;font-weight:900;color:var(--ink);display:block;}
+.otb-sum-car span{font-size:13px;color:var(--orange);font-weight:800;}
+.otb-sum-body{padding:18px 20px;}
+.otb-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;font-size:14.5px;color:#41495f;}
+.otb-row .v{font-weight:800;color:var(--ink);}
+.otb-row.muted{color:var(--muted);font-size:13.5px;}
+.otb-row.disc .v{color:var(--ok);}
+.otb-sep{height:1px;background:var(--line);margin:10px 0;}
+.otb-total{display:flex;align-items:baseline;justify-content:space-between;padding:14px 20px;background:#f4f7ff;border-top:1px solid var(--line);}
+.otb-total .l{font-weight:800;color:var(--ink);font-size:15px;}
+.otb-total .t{font-weight:900;color:var(--blue);font-size:24px;}
+.otb-total .t small{font-size:14px;color:var(--orange);font-weight:800;}
+.otb-note{font-size:12px;color:#98a0bd;padding:0 20px 16px;}
+
+/* ---- buttons ---- */
+.otb-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;border-radius:13px;font-weight:800;font-size:16.5px;padding:15px 28px;cursor:pointer;transition:.15s;width:100%;}
+.otb-btn-pri{background:var(--blue);color:#eef1ff;box-shadow:0 16px 30px rgba(27,42,122,.32);}
+.otb-btn-pri:hover{filter:brightness(1.12);transform:translateY(-1px);}
+.otb-btn-org{background:var(--orange);color:#1a0a00;box-shadow:0 16px 30px rgba(245,144,30,.34);}
+.otb-btn-org:hover{filter:brightness(1.06);transform:translateY(-1px);}
+.otb-btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink);box-shadow:none;}
+.otb-btn-ghost:hover{background:var(--cream);color:var(--blue);}
+.otb-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;filter:none;}
+.otb-btn.sm{width:auto;font-size:14.5px;padding:11px 20px;}
+
+/* ---- form fields ---- */
+.otb-f{margin-bottom:15px;} .otb-f.full{grid-column:1/-1;}
+.otb-f label{display:block;font-weight:800;font-size:13.5px;margin-bottom:7px;color:var(--ink);}
+.otb-f input,.otb-f select,.otb-f textarea{width:100%;height:52px;border:1.5px solid var(--field);border-radius:12px;padding:0 14px;font-size:15px;font-weight:600;color:var(--ink);outline:none;background:#fcfdff;text-align:right;}
+.otb-f textarea{height:auto;padding:12px 14px;line-height:1.6;resize:vertical;}
+.otb-f input:focus,.otb-f select:focus,.otb-f textarea:focus{border-color:var(--blue);background:#fff;}
+.otb-f .hint{font-size:12px;color:#98a0bd;margin-top:5px;}
+.otb-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.otb-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ---- extra/insurance rows + spec chips (used by car/extras pages) ---- */
+.otb-extra{display:flex;align-items:center;gap:14px;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px;cursor:pointer;transition:.15s;background:#fff;}
+.otb-extra:hover{border-color:#c9d0ef;}
+.otb-extra.on{border-color:var(--orange);background:#fff8ef;box-shadow:0 8px 20px rgba(245,144,30,.12);}
+.otb-extra .ck{width:24px;height:24px;border-radius:7px;border:2px solid #cbd2ec;display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:#fff;}
+.otb-extra.on .ck{background:var(--orange);border-color:var(--orange);}
+.otb-extra .ico{width:44px;height:44px;border-radius:11px;background:#eef2ff;color:var(--blue);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.otb-extra .meta{flex:1;}
+.otb-extra .meta b{font-size:15.5px;font-weight:800;color:var(--ink);}
+.otb-extra .meta p{margin:2px 0 0;font-size:13px;color:var(--muted);}
+.otb-extra .pr{font-weight:900;color:var(--blue);white-space:nowrap;font-size:15px;}
+.otb-extra .pr small{color:var(--orange);font-size:12px;font-weight:800;}
+
+.otb-specs{display:flex;flex-wrap:wrap;gap:10px 16px;}
+.otb-spec{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);font-weight:700;}
+.otb-spec svg{color:var(--blue);}
+.otb-chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--orange);background:#fff5ea;padding:5px 12px;border-radius:999px;}
+
+/* ---- alerts ---- */
+.otb-alert{display:flex;align-items:center;gap:10px;border-radius:12px;padding:12px 16px;font-weight:700;font-size:14px;margin-bottom:16px;}
+.otb-alert.ok{background:#e7f7ee;color:#0f7a47;}
+.otb-alert.warn{background:#fff3e0;color:#b5740f;}
+.otb-alert.err{background:#fdecea;color:var(--red);}
+
+/* ---- responsive ---- */
+@media (max-width:920px){
+  .otb-grid{grid-template-columns:1fr;}
+  .otb-summary{position:static;}
+  .otb-head,.otb-stepper-wrap,.otb-wrap{padding-left:18px;padding-right:18px;}
+  .otb-slbl{display:none;}
+  .otb-2,.otb-3{grid-template-columns:1fr;}
+}

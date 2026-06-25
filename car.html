@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تفاصيل السيارة — One Trip Car Rent</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="booking.css">
+<style>
+  .car-hero{display:flex;align-items:center;justify-content:center;height:280px;background:linear-gradient(135deg,#f7f9ff,#fff);border-radius:16px;margin-bottom:20px;padding:18px;}
+  .car-hero img{max-height:100%;max-width:100%;width:auto;object-fit:contain;}
+  .car-head-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .car-badge-org{display:inline-flex;align-items:center;font-size:12.5px;font-weight:800;color:#fff;background:var(--orange);padding:5px 12px;border-radius:8px;}
+  .otb-specs.big{padding-top:18px;margin-top:18px;border-top:1px solid var(--line);gap:14px 22px;}
+</style>
+</head>
+<body>
+
+<main class="otb-wrap" id="app"><!-- injected --></main>
+
+<script src="cars.js?v=7"></script>
+<script src="booking-core.js?v=7"></script>
+<script>
+(function(){
+  'use strict';
+
+  OTB.mountChrome({step:0, back:'create-booking.html'});
+
+  /* ---- read id from URL ---- */
+  function qp(k){ try{ return new URLSearchParams(location.search).get(k); }catch(e){ return null; } }
+  var id = qp('id');
+  var c  = id ? OTB.car(id) : null;
+  var app = document.getElementById('app');
+
+  if(!c){
+    app.innerHTML =
+      '<div class="otb-panel" style="text-align:center;padding:48px 28px;">'+
+        '<h2 style="justify-content:center;">السيارة غير موجودة</h2>'+
+        '<p class="otb-lead" style="margin-bottom:22px;">لم نتمكّن من العثور على السيارة المطلوبة. تصفّح أسطولنا واختر سيارة أخرى.</p>'+
+        '<a class="otb-btn otb-btn-org" style="max-width:260px;margin:0 auto;" href="create-booking.html">تصفّح الأسطول</a>'+
+      '</div>';
+    return;
+  }
+
+  /* ---- date helpers ---- */
+  function pad(n){ return (n<10?'0':'')+n; }
+  function fmtLocal(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()); }
+  function defaultPickup(){ var d=new Date(); d.setHours(10,0,0,0); return fmtLocal(d); }
+  function defaultReturn(){ var d=new Date(); d.setDate(d.getDate()+3); d.setHours(10,0,0,0); return fmtLocal(d); }
+
+  var draft = OTB.draft.get() || {};
+  var branches = OTB.branches();
+
+  /* ---- spec icons ---- */
+  var IC={
+    cal:'<rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/>',
+    seat:'<path d="M5 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5M4 11h13a2 2 0 0 1 2 2v5h-2M4 11v7M7 18h8"/>',
+    bag:'<rect x="6" y="8" width="12" height="12" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+    door:'<path d="M14 3H7a2 2 0 0 0-2 2v16h11V3zM14 3l5 4v14"/>',
+    ac:'<path d="M12 3v18M5 7l14 10M19 7L5 17"/>'
+  };
+  function sp(p){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  /* ---- branch <option> list ---- */
+  function branchOptions(selName){
+    return branches.map(function(b){
+      var on = (b.name===selName) ? ' selected' : '';
+      return '<option value="'+esc(b.name)+'"'+on+'>'+esc(b.name)+' — '+esc(b.city)+'</option>';
+    }).join('');
+  }
+
+  var defPickName = (branches[0]&&branches[0].name)||'';
+  var pickupVal = draft.pickup || defPickName;
+  var dropVal   = draft.dropoff || defPickName;
+  var pickupAtVal = draft.pickupAt || defaultPickup();
+  var returnAtVal = draft.returnAt || defaultReturn();
+
+  /* ---- build page ---- */
+  app.innerHTML =
+    '<div class="otb-grid">'+
+      '<div>'+
+        '<div class="otb-panel">'+
+          '<div class="car-hero"><img src="'+esc(c.image)+'" alt="'+esc(c.name)+'"></div>'+
+          '<div class="car-head-row">'+
+            '<h1 class="otb-h1" style="margin:0;">'+esc(c.name)+'</h1>'+
+            '<span class="otb-chip">'+sp(IC.gear)+esc(c.category)+'</span>'+
+            (c.badge?'<span class="car-badge-org">'+esc(c.badge)+'</span>':'')+
+          '</div>'+
+          '<div class="otb-specs big">'+
+            '<span class="otb-spec">'+sp(IC.cal)+'موديل '+OTB.toAr(c.year)+'</span>'+
+            '<span class="otb-spec">'+sp(IC.seat)+OTB.toAr(c.seats)+' مقاعد</span>'+
+            '<span class="otb-spec">'+sp(IC.bag)+OTB.toAr(c.bags)+' حقيبة</span>'+
+            '<span class="otb-spec">'+sp(IC.gear)+esc(c.gear)+'</span>'+
+            '<span class="otb-spec">'+sp(IC.door)+OTB.toAr(c.doors)+' أبواب</span>'+
+            '<span class="otb-spec">'+sp(IC.ac)+(c.ac?'مكيّف':'بدون تكييف')+'</span>'+
+          '</div>'+
+        '</div>'+
+
+        '<div class="otb-panel">'+
+          '<h2 class="line">تفاصيل الإيجار</h2>'+
+          '<div class="otb-2">'+
+            '<div class="otb-f"><label>فرع الاستلام</label><select id="pickupBranch">'+branchOptions(pickupVal)+'</select></div>'+
+            '<div class="otb-f"><label>فرع التسليم</label><select id="dropoffBranch">'+branchOptions(dropVal)+'</select></div>'+
+          '</div>'+
+          '<div class="otb-2">'+
+            '<div class="otb-f"><label>تاريخ ووقت الاستلام</label><input type="datetime-local" id="pickupAt" value="'+esc(pickupAtVal)+'"></div>'+
+            '<div class="otb-f"><label>تاريخ ووقت التسليم</label><input type="datetime-local" id="returnAt" value="'+esc(returnAtVal)+'"></div>'+
+          '</div>'+
+          '<div id="availSlot"></div>'+
+          '<button class="otb-btn otb-btn-org" id="goBtn" type="button">متابعة — اختيار الإضافات'+
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'+
+          '</button>'+
+        '</div>'+
+      '</div>'+
+
+      '<aside class="otb-summary">'+
+        '<div class="otb-sum-car"><img id="sumImg" src="" alt=""><div><b id="sumName"></b><span id="sumCat"></span></div></div>'+
+        '<div class="otb-sum-body" id="sumBody"></div>'+
+        '<div class="otb-total"><span class="l">الإجمالي (شامل الضريبة)</span><span class="t" id="sumTotal"></span></div>'+
+        '<div class="otb-note" id="sumNote"></div>'+
+      '</aside>'+
+    '</div>';
+
+  /* ---- summary renderer (per contract) ---- */
+  function row(l,v,c){return '<div class="otb-row '+(c||'')+'"><span>'+l+'</span><span class="v">'+v+'</span></div>';}
+  function renderSummary(q){
+    document.getElementById('sumImg').src=q.car.image||'';
+    document.getElementById('sumName').textContent=q.car.name||'';
+    document.getElementById('sumCat').textContent=q.car.category||'';
+    var r=row('سعر التأجير ('+OTB.toAr(q.days)+' يوم)',OTB.money(q.base));
+    q.extraLines.forEach(function(l){ r+=row(l.name+(l.qty>1?' ×'+OTB.toAr(l.qty):''),OTB.money(l.amount)); });
+    if(q.discount>0) r+=row('الخصم','− '+OTB.money(q.discount),'disc');
+    r+=row('ضريبة القيمة المضافة (١٥٪)',OTB.money(q.vat));
+    document.getElementById('sumBody').innerHTML=r;
+    document.getElementById('sumTotal').innerHTML=OTB.money(q.total);
+    document.getElementById('sumNote').innerHTML='يشمل ضريبة القيمة المضافة ١٥٪ · مبلغ تأمين مسترد '+OTB.money(q.deposit);
+  }
+
+  /* ---- elements ---- */
+  var elPickB = document.getElementById('pickupBranch');
+  var elDropB = document.getElementById('dropoffBranch');
+  var elPickAt= document.getElementById('pickupAt');
+  var elRetAt = document.getElementById('returnAt');
+  var elAvail = document.getElementById('availSlot');
+  var elGo    = document.getElementById('goBtn');
+
+  function refresh(){
+    var pickupAt = elPickAt.value;
+    var returnAt = elRetAt.value;
+    var days = OTB.days(pickupAt, returnAt);
+    var q = OTB.quote({ carId:id, days:days, extras:(draft.extras||[]), promoCode:draft.promo });
+    renderSummary(q);
+
+    /* invalid date range — block before checking availability */
+    if(pickupAt && returnAt && new Date(returnAt) <= new Date(pickupAt)){
+      elAvail.innerHTML =
+        '<div class="otb-alert warn">'+
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'+
+          'تاريخ التسليم لازم يكون بعد تاريخ الاستلام'+
+        '</div>';
+      elGo.disabled = true;
+      return;
+    }
+
+    var ok = OTB.isAvailable(id, pickupAt, returnAt);
+    if(!ok){
+      elAvail.innerHTML =
+        '<div class="otb-alert warn">'+
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'+
+          'السيارة غير متاحة في هذه الفترة'+
+        '</div>';
+      elGo.disabled = true;
+    } else {
+      elAvail.innerHTML = '';
+      elGo.disabled = false;
+    }
+  }
+
+  elPickAt.addEventListener('change', refresh);
+  elRetAt.addEventListener('change', refresh);
+  elPickAt.addEventListener('input', refresh);
+  elRetAt.addEventListener('input', refresh);
+
+  elGo.addEventListener('click', function(){
+    if(elGo.disabled) return;
+    OTB.draft.set({
+      carId: id,
+      pickup: elPickB.value,
+      dropoff: elDropB.value,
+      pickupAt: elPickAt.value,
+      returnAt: elRetAt.value
+    });
+    location.href = 'extras.html';
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

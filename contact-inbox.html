@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صندوق رسائل تواصل معنا — One Trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1b2a7a;
+    --orange:#f5901e;
+    --ink:#1b2440;
+    --muted:#5a6488;
+    --line:#e4e8f5;
+    --cream:#f4f6fd;
+    --white:#ffffff;
+    --shadow:0 6px 22px rgba(27,42,122,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Tajawal',system-ui,Arial,sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:22px 16px 64px;}
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    background:var(--blue);
+    background:linear-gradient(135deg,#1b2a7a,#27358f);
+    color:#fff;
+    border-radius:18px;
+    padding:20px 22px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .topbar h1{font-size:1.35rem;margin:0 0 4px;font-weight:800;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .topbar .sub{font-size:.82rem;opacity:.8;margin:0;}
+  .badge-unread{
+    background:var(--orange);
+    color:#3a2400;
+    font-weight:800;
+    font-size:.82rem;
+    border-radius:999px;
+    padding:3px 11px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .badge-unread.zero{background:rgba(255,255,255,.18);color:#fff;}
+  .biz{
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:14px;
+    padding:11px 14px;
+    font-size:.8rem;
+    min-width:230px;
+  }
+  .biz .biz-title{font-weight:700;opacity:.85;margin-bottom:5px;font-size:.74rem;letter-spacing:.3px;}
+  .biz .biz-row{display:flex;justify-content:space-between;gap:10px;padding:1px 0;}
+  .biz .biz-row span:first-child{opacity:.7;}
+  .biz .biz-row span:last-child{font-weight:600;direction:ltr;}
+
+  /* ---------- TOOLBAR ---------- */
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:12px 14px;
+    margin-top:16px;
+    box-shadow:var(--shadow);
+  }
+  .toolbar .search{
+    flex:1 1 220px;
+    display:flex;align-items:center;gap:8px;
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:8px 12px;
+  }
+  .toolbar .search input{
+    border:0;background:transparent;outline:none;flex:1;
+    font-family:inherit;font-size:.92rem;color:var(--ink);
+  }
+  .toolbar .search svg{flex:none;}
+  .seg{display:inline-flex;background:var(--cream);border:1px solid var(--line);border-radius:11px;padding:3px;}
+  .seg button{
+    border:0;background:transparent;cursor:pointer;
+    font-family:inherit;font-size:.85rem;font-weight:600;color:var(--muted);
+    padding:6px 14px;border-radius:8px;transition:.15s;
+  }
+  .seg button.active{background:var(--blue);color:#fff;}
+  .btn{
+    border:0;cursor:pointer;font-family:inherit;font-weight:700;font-size:.85rem;
+    padding:9px 15px;border-radius:11px;transition:.15s;display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn-ghost{background:var(--cream);color:var(--blue);border:1px solid var(--line);}
+  .btn-ghost:hover{background:#eaeefb;}
+  .btn-danger{background:#fff;color:#c0392b;border:1px solid #f3d2cd;}
+  .btn-danger:hover{background:#fdecea;}
+  .btn-dev{background:#fff4e6;color:#a85c00;border:1px solid #f6dcb6;}
+  .btn-dev:hover{background:#ffedd6;}
+
+  /* ---------- LIST ---------- */
+  .count-line{font-size:.8rem;color:var(--muted);margin:18px 2px 8px;}
+  .card{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-bottom:14px;
+    box-shadow:var(--shadow);
+    border-right:4px solid transparent;
+  }
+  .card.unread{
+    border-right:4px solid var(--orange);
+    background:#fffcf6;
+  }
+  .card .head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+  .card .name{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .dot-new{
+    width:8px;height:8px;border-radius:50%;background:var(--orange);flex:none;
+    box-shadow:0 0 0 4px rgba(245,144,30,.18);
+  }
+  .tag-new{
+    font-size:.7rem;font-weight:800;color:#a85c00;background:#fff0db;
+    border:1px solid #f6dcb6;border-radius:999px;padding:1px 9px;
+  }
+  .subject{
+    font-size:.78rem;font-weight:700;color:var(--blue);
+    background:var(--cream);border:1px solid var(--line);
+    border-radius:999px;padding:3px 11px;
+  }
+  .date{font-size:.78rem;color:var(--muted);}
+  .contacts{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0 8px;font-size:.85rem;color:var(--muted);}
+  .contacts .ci{display:inline-flex;align-items:center;gap:6px;}
+  .contacts .ci span{direction:ltr;}
+  .msg{
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:11px 14px;
+    font-size:.95rem;
+    color:var(--ink);
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;}
+  .act{
+    border:0;cursor:pointer;font-family:inherit;font-weight:700;font-size:.82rem;
+    padding:8px 13px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+    transition:.15s;line-height:1;
+  }
+  .act-wa{background:#e9f9ef;color:#137a3b;border:1px solid #c5edd3;}
+  .act-wa:hover{background:#dcf4e6;}
+  .act-mail{background:#eaf0ff;color:var(--blue);border:1px solid #d3deff;}
+  .act-mail:hover{background:#dde7ff;}
+  .act-read{background:var(--cream);color:var(--muted);border:1px solid var(--line);}
+  .act-read:hover{background:#eaeefb;color:var(--blue);}
+  .act-del{background:#fff;color:#c0392b;border:1px solid #f3d2cd;margin-inline-start:auto;}
+  .act-del:hover{background:#fdecea;}
+  .act.disabled{opacity:.45;cursor:not-allowed;pointer-events:none;filter:grayscale(.3);}
+
+  /* ---------- EMPTY ---------- */
+  .empty{
+    text-align:center;
+    padding:54px 20px;
+    background:var(--white);
+    border:1px dashed var(--line);
+    border-radius:16px;
+    color:var(--muted);
+  }
+  .empty .ico{font-size:2.6rem;margin-bottom:10px;}
+  .empty .t{font-weight:800;color:var(--ink);font-size:1.05rem;margin-bottom:4px;}
+  .empty .s{font-size:.88rem;}
+
+  @media(max-width:560px){
+    .topbar{flex-direction:column;align-items:stretch;}
+    .biz{min-width:0;}
+    .act-del{margin-inline-start:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div>
+      <h1>
+        صندوق رسائل تواصل معنا
+        <span id="unreadBadge" class="badge-unread zero">٠ غير مقروءة</span>
+      </h1>
+      <p class="sub">صندوق محلي — الرسائل محفوظة على هذا الجهاز فقط.</p>
+    </div>
+    <div class="biz" id="bizPanel">
+      <div class="biz-title">الرد باسم</div>
+      <div class="biz-row"><span>الاسم</span><span id="bizName">—</span></div>
+      <div class="biz-row"><span>واتساب</span><span id="bizWa">—</span></div>
+      <div class="biz-row"><span>الإيميل</span><span id="bizMail">—</span></div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <label class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5a6488" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="search" id="searchInput" placeholder="ابحث بالاسم أو الإيميل أو الموضوع أو النص…" autocomplete="off">
+    </label>
+    <div class="seg" id="filterSeg">
+      <button data-filter="all" class="active">الكل</button>
+      <button data-filter="unread">غير المقروءة</button>
+    </div>
+    <button class="btn btn-ghost" id="refreshBtn">↻ تحديث</button>
+    <button class="btn btn-dev" id="demoBtn">＋ رسالة تجريبية</button>
+    <button class="btn btn-danger" id="clearBtn">🗑 مسح الكل</button>
+  </div>
+
+  <div class="count-line" id="countLine"></div>
+
+  <!-- LIST -->
+  <div id="list"></div>
+
+</div>
+
+<script src="contact-core.js"></script>
+<script>
+(function(){
+  'use strict';
+  var C = window.OneTripContact;
+
+  var state = { search:'', filter:'all' };
+
+  var listEl   = document.getElementById('list');
+  var countEl  = document.getElementById('countLine');
+  var badgeEl  = document.getElementById('unreadBadge');
+
+  /* ---- safe escaping ---- */
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  /* ---- business panel ---- */
+  (function fillBiz(){
+    var b = (C && C.BUSINESS) || {};
+    document.getElementById('bizName').textContent = b.name || '—';
+    document.getElementById('bizWa').textContent   = b.whatsapp || '—';
+    document.getElementById('bizMail').textContent = b.email || '—';
+  })();
+
+  function updateBadge(){
+    var n = C.unreadCount();
+    badgeEl.textContent = n + ' غير مقروءة';
+    badgeEl.classList.toggle('zero', n === 0);
+  }
+
+  function matches(rec){
+    if(state.filter === 'unread' && rec.read) return false;
+    var q = state.search.trim().toLowerCase();
+    if(!q) return true;
+    return [rec.name, rec.email, rec.subject, rec.message]
+      .some(function(f){ return String(f||'').toLowerCase().indexOf(q) !== -1; });
+  }
+
+  function cardHTML(rec){
+    var unread = !rec.read;
+    var hasPhone = !!String(rec.phone||'').trim();
+    var hasMail  = !!String(rec.email||'').trim();
+
+    var waHref   = hasPhone ? esc(C.waReplyCustomer(rec))   : '#';
+    var mailHref = hasMail  ? esc(C.mailReplyCustomer(rec)) : '#';
+
+    return ''
+    + '<div class="card '+(unread?'unread':'')+'" data-id="'+esc(rec.id)+'">'
+    +   '<div class="head">'
+    +     '<div class="name">'
+    +       (unread ? '<span class="dot-new" title="جديد"></span>' : '')
+    +       esc(rec.name || 'بدون اسم')
+    +       (unread ? '<span class="tag-new">جديد</span>' : '')
+    +     '</div>'
+    +     '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">'
+    +       (rec.subject ? '<span class="subject">'+esc(rec.subject)+'</span>' : '')
+    +       '<span class="date">'+esc(rec.date)+'</span>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="contacts">'
+    +     '<span class="ci">✉️ <span>'+esc(rec.email || '—')+'</span></span>'
+    +     '<span class="ci">📞 <span>'+esc(rec.phone || '—')+'</span></span>'
+    +   '</div>'
+    +   '<div class="msg">'+esc(rec.message || '—')+'</div>'
+    +   '<div class="actions">'
+    +     '<a class="act act-wa'+(hasPhone?'':' disabled')+'" '
+    +        (hasPhone?'href="'+waHref+'" target="_blank" rel="noopener" data-reply="1"':'aria-disabled="true"')+'>💬 رد واتساب</a>'
+    +     '<a class="act act-mail'+(hasMail?'':' disabled')+'" '
+    +        (hasMail?'href="'+mailHref+'" data-reply="1"':'aria-disabled="true"')+'>✉️ رد بالإيميل</a>'
+    +     '<button class="act act-read" data-action="toggle">'+(rec.read?'وضع كغير مقروء':'تعليم كمقروء')+'</button>'
+    +     '<button class="act act-del" data-action="delete">حذف</button>'
+    +   '</div>'
+    + '</div>';
+  }
+
+  function render(){
+    updateBadge();
+    var all = C.load().slice().sort(function(a,b){ return (b.ts||0) - (a.ts||0); });
+    var rows = all.filter(matches);
+
+    if(!all.length){
+      countEl.textContent = '';
+      listEl.innerHTML = emptyHTML('لا توجد رسائل بعد', 'ستظهر هنا رسائل نموذج «تواصل معنا» فور وصولها.');
+      return;
+    }
+    if(!rows.length){
+      countEl.textContent = 'إجمالي الرسائل: ' + all.length;
+      listEl.innerHTML = emptyHTML('لا توجد نتائج مطابقة', 'جرّب تعديل البحث أو الفلتر.');
+      return;
+    }
+    countEl.textContent = 'عرض ' + rows.length + ' من ' + all.length + ' رسالة';
+    listEl.innerHTML = rows.map(cardHTML).join('');
+  }
+
+  function emptyHTML(t, s){
+    return '<div class="empty"><div class="ico">📭</div><div class="t">'+esc(t)+'</div><div class="s">'+esc(s)+'</div></div>';
+  }
+
+  /* ---- event delegation on the list ---- */
+  listEl.addEventListener('click', function(e){
+    var card = e.target.closest('.card');
+    if(!card) return;
+    var id = card.getAttribute('data-id');
+
+    // reply links → mark read then re-render (let default navigation happen)
+    var reply = e.target.closest('[data-reply]');
+    if(reply){ C.markRead(id, true); setTimeout(render, 0); return; }
+
+    var btn = e.target.closest('[data-action]');
+    if(!btn) return;
+    var action = btn.getAttribute('data-action');
+
+    if(action === 'toggle'){
+      var rec = C.load().filter(function(m){ return m.id === id; })[0];
+      C.markRead(id, rec ? !rec.read : true);
+      render();
+    } else if(action === 'delete'){
+      C.remove(id);
+      render();
+    }
+  });
+
+  /* ---- toolbar wiring ---- */
+  document.getElementById('searchInput').addEventListener('input', function(e){
+    state.search = e.target.value; render();
+  });
+  document.getElementById('filterSeg').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-filter]'); if(!b) return;
+    state.filter = b.getAttribute('data-filter');
+    [].forEach.call(this.querySelectorAll('button'), function(x){ x.classList.toggle('active', x === b); });
+    render();
+  });
+  document.getElementById('refreshBtn').addEventListener('click', render);
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    if(!C.load().length){ return; }
+    if(confirm('سيتم حذف جميع الرسائل من هذا الجهاز نهائيًا. متابعة؟')){ C.clearAll(); render(); }
+  });
+
+  /* ---- dev: add sample message ---- */
+  var samples = [
+    {name:'سارة العتيبي', email:'sara@example.com', phone:'0551234567', subject:'استفسار عن سيارة', message:'هل تتوفر سيارة عائلية لمدة أسبوع نهاية الشهر؟ وما السعر اليومي؟'},
+    {name:'خالد المطيري', email:'khaled@example.com', phone:'0509876543', subject:'تأجير شهري', message:'أرغب بتأجير سيارة لمدة شهر كامل، أريد معرفة العروض المتاحة.'},
+    {name:'منى السبيعي', email:'mona@example.com', phone:'', subject:'شكر وتقدير', message:'شكرًا على الخدمة الممتازة، كانت تجربة رائعة!'},
+    {name:'فهد الدوسري', email:'', phone:'0561112233', subject:'تعديل حجز', message:'أحتاج تعديل موعد الاستلام ليوم الخميس بدلًا من الأربعاء.'}
+  ];
+  var si = 0;
+  document.getElementById('demoBtn').addEventListener('click', function(){
+    C.add(samples[si % samples.length]); si++;
+    render();
+  });
+
+  document.addEventListener('DOMContentLoaded', render);
+  if(document.readyState !== 'loading'){ render(); }
+})();
+</script>
+</body>
+</html>

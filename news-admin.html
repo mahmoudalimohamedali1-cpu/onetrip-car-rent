@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة تحكم الأخبار — One Trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add('embed');</script>
+<style>
+  :root{
+    --blue:#1b2a7a; --indigo:#2300d9; --orange:#f5901e;
+    --ink:#1b2440; --muted:#5a6488; --line:#e4e8f5; --cream:#f4f6fd;
+    --white:#fff; --radius:16px; --shadow:0 10px 30px rgba(27,42,122,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Tajawal',system-ui,Arial,sans-serif;
+    background:var(--cream); color:var(--ink);
+    -webkit-font-smoothing:antialiased; line-height:1.6;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:0;background:none}
+  img{display:block;max-width:100%}
+
+  /* embedded inside the admin dashboard (?embed=1) — hide standalone chrome */
+  html.embed .topbar{display:none;}
+  html.embed,html.embed body{background:transparent;}
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    background:linear-gradient(110deg,var(--blue),var(--indigo));
+    color:#fff; padding:18px 26px; box-shadow:var(--shadow);
+    position:sticky; top:0; z-index:20;
+  }
+  .topbar-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;max-width:1240px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .logo{
+    width:42px;height:42px;border-radius:12px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--orange),#ffb45e);
+    display:grid;place-items:center;font-weight:900;color:#1b2440;font-size:20px;
+  }
+  .brand h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.2px}
+  .brand small{display:block;font-weight:500;opacity:.78;font-size:12px}
+  .topbar .spacer{flex:1}
+  .btn-view{
+    background:rgba(255,255,255,.14);color:#fff;padding:9px 16px;border-radius:999px;
+    font-weight:700;font-size:14px;border:1px solid rgba(255,255,255,.25);transition:.18s;
+  }
+  .btn-view:hover{background:rgba(255,255,255,.26)}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;max-width:1240px;margin:14px auto 0}
+  .chip{
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+    border-radius:12px;padding:8px 14px;display:flex;flex-direction:column;line-height:1.2;
+  }
+  .chip b{font-size:20px;font-weight:900}
+  .chip span{font-size:12px;opacity:.82;font-weight:500}
+
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:1240px;margin:24px auto;padding:0 26px 60px}
+
+  /* ---------- TOOLBAR ---------- */
+  .toolbar{
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+    margin-bottom:22px;
+  }
+  .toolbar .grow{flex:1;min-width:200px}
+  .field{
+    width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;
+    font-family:inherit;font-size:15px;color:var(--ink);background:var(--cream);transition:.18s;
+  }
+  .field:focus{outline:none;border-color:var(--indigo);background:#fff;box-shadow:0 0 0 3px rgba(35,0,217,.1)}
+  select.field{min-width:170px;cursor:pointer}
+  .btn{
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:14px;transition:.18s;
+    display:inline-flex;align-items:center;gap:6px;white-space:nowrap;border:1px solid transparent;
+  }
+  .btn-primary{background:linear-gradient(120deg,var(--indigo),var(--blue));color:#fff;box-shadow:0 6px 16px rgba(35,0,217,.25)}
+  .btn-primary:hover{filter:brightness(1.08)}
+  .btn-ghost{background:var(--cream);color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{background:#eef1fb}
+  .btn-danger{background:#fff;color:#c2273a;border-color:#f3c9cf}
+  .btn-danger:hover{background:#fdeef0}
+
+  /* ---------- CARDS LIST ---------- */
+  .list{display:flex;flex-direction:column;gap:14px}
+  .card{
+    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:14px;display:flex;gap:16px;align-items:center;
+  }
+  .thumb{
+    width:120px;height:84px;border-radius:12px;flex:0 0 auto;object-fit:cover;
+    background:var(--cream);border:1px solid var(--line);
+  }
+  .thumb-ph{
+    width:120px;height:84px;border-radius:12px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--blue),var(--indigo) 60%,var(--orange));
+    display:grid;place-items:center;color:#fff;font-weight:900;font-size:26px;
+  }
+  .card-main{flex:1;min-width:0}
+  .card-title{font-size:17px;font-weight:800;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .card-title .star{color:var(--orange);font-size:16px}
+  .card-excerpt{color:var(--muted);font-size:13.5px;margin:0 0 8px;
+    display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted)}
+  .badge{
+    background:rgba(35,0,217,.08);color:var(--indigo);border:1px solid rgba(35,0,217,.16);
+    border-radius:999px;padding:3px 11px;font-weight:700;font-size:12px;
+  }
+  .pill{border-radius:999px;padding:3px 11px;font-weight:700;font-size:12px}
+  .pill.pub{background:#e6f7ee;color:#157a45;border:1px solid #b9e7cd}
+  .pill.draft{background:#fdf0e3;color:#a6651a;border:1px solid #f4d6b0}
+  .meta .dot{opacity:.5}
+  .card-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto}
+  .act{
+    padding:7px 12px;border-radius:10px;font-weight:700;font-size:12.5px;
+    border:1px solid var(--line);background:var(--cream);color:var(--ink);transition:.15s;
+  }
+  .act:hover{background:#eef1fb}
+  .act.edit{color:var(--indigo)}
+  .act.del{color:#c2273a;border-color:#f3c9cf;background:#fff}
+  .act.del:hover{background:#fdeef0}
+
+  /* ---------- EMPTY STATE ---------- */
+  .empty{
+    background:var(--white);border:1px dashed var(--line);border-radius:var(--radius);
+    padding:54px 24px;text-align:center;color:var(--muted);
+  }
+  .empty .ico{font-size:46px;margin-bottom:10px}
+  .empty h3{color:var(--ink);margin:0 0 6px;font-size:19px}
+
+  /* ---------- MODAL EDITOR ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(27,36,64,.55);backdrop-filter:blur(3px);
+    display:none;align-items:flex-start;justify-content:center;z-index:50;
+    padding:30px 16px;overflow-y:auto;
+  }
+  .overlay.open{display:flex}
+  .modal{
+    background:var(--white);border-radius:20px;box-shadow:0 30px 70px rgba(27,42,122,.35);
+    width:100%;max-width:720px;overflow:hidden;animation:pop .18s ease;
+  }
+  @keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal-head{
+    background:linear-gradient(110deg,var(--blue),var(--indigo));color:#fff;
+    padding:18px 22px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .modal-head h2{margin:0;font-size:19px;font-weight:800}
+  .modal-head .x{color:#fff;font-size:26px;line-height:1;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14)}
+  .modal-head .x:hover{background:rgba(255,255,255,.28)}
+  .modal-body{padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .modal-body .full{grid-column:1 / -1}
+  label.lab{display:block;font-weight:700;font-size:13.5px;margin-bottom:6px;color:var(--ink)}
+  label.lab .req{color:#c2273a}
+  textarea.field{resize:vertical;min-height:80px;line-height:1.7}
+  textarea.body{min-height:150px}
+  .checks{display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+  .chk{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;cursor:pointer}
+  .chk input{width:18px;height:18px;accent-color:var(--indigo);cursor:pointer}
+  .preview-wrap{display:flex;gap:12px;align-items:center}
+  .preview{
+    width:130px;height:88px;border-radius:12px;border:1px solid var(--line);
+    object-fit:cover;background:var(--cream);flex:0 0 auto;
+  }
+  .preview-ph{
+    width:130px;height:88px;border-radius:12px;border:1px dashed var(--line);
+    display:grid;place-items:center;color:var(--muted);font-size:12px;text-align:center;
+    background:var(--cream);flex:0 0 auto;padding:6px;
+  }
+  .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  .err{color:#c2273a;font-size:12.5px;font-weight:700;margin-top:6px;display:none}
+  .err.show{display:block}
+  .modal-foot{
+    padding:16px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;
+    background:var(--cream);
+  }
+  @media(max-width:640px){
+    .modal-body{grid-template-columns:1fr}
+    .card{flex-direction:column;align-items:stretch}
+    .thumb,.thumb-ph{width:100%;height:150px}
+    .card-actions{justify-content:flex-start}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <div class="logo">1T</div>
+        <div>
+          <h1>لوحة تحكم الأخبار</h1>
+          <small>إدارة مقالات «أخبارنا» — One Trip</small>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <a class="btn-view" href="news.html">← عرض المدونة</a>
+    </div>
+    <div class="chips" id="statChips">
+      <div class="chip"><b id="statTotal">0</b><span>إجمالي المقالات</span></div>
+      <div class="chip"><b id="statPub">0</b><span>المنشورة</span></div>
+      <div class="chip"><b id="statDraft">0</b><span>المسودّات</span></div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- ============ TOOLBAR ============ -->
+    <div class="toolbar">
+      <div class="grow">
+        <input id="search" class="field" type="search" placeholder="🔍 ابحث بالعنوان أو التصنيف أو الكاتب…">
+      </div>
+      <select id="catFilter" class="field"><option value="">كل التصنيفات</option></select>
+      <button class="btn btn-primary" id="btnNew">＋ مقال جديد</button>
+      <button class="btn btn-ghost" id="btnReset">استعادة الافتراضي</button>
+      <button class="btn btn-danger" id="btnClear">مسح الكل</button>
+    </div>
+
+    <!-- ============ LIST ============ -->
+    <div class="list" id="list"></div>
+
+  </div>
+
+  <!-- ============ EDITOR MODAL ============ -->
+  <div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="modalTitle">مقال جديد</h2>
+        <button class="x" id="btnX" aria-label="إغلاق">×</button>
+      </div>
+      <form id="editForm">
+        <div class="modal-body">
+          <input type="hidden" id="fId">
+
+          <div class="full">
+            <label class="lab" for="fTitle">العنوان <span class="req">*</span></label>
+            <input id="fTitle" class="field" type="text" placeholder="اكتب عنوان المقال">
+            <div class="err" id="errTitle">العنوان مطلوب.</div>
+          </div>
+
+          <div>
+            <label class="lab" for="fCategory">التصنيف</label>
+            <select id="fCategory" class="field"></select>
+          </div>
+          <div>
+            <label class="lab" for="fAuthor">الكاتب</label>
+            <input id="fAuthor" class="field" type="text" placeholder="فريق One Trip">
+          </div>
+
+          <div>
+            <label class="lab" for="fDate">التاريخ</label>
+            <input id="fDate" class="field" type="date">
+          </div>
+          <div>
+            <label class="lab" for="fCover">رابط صورة الغلاف</label>
+            <input id="fCover" class="field" type="text" placeholder="assets/onetrip-car.png أو https://…">
+            <div class="hint">يمكن أن يكون مسارًا داخل الموقع أو رابطًا كاملًا.</div>
+          </div>
+
+          <div class="full">
+            <label class="lab">معاينة الغلاف</label>
+            <div class="preview-wrap">
+              <img class="preview" id="coverPreview" alt="" style="display:none">
+              <div class="preview-ph" id="coverPh">لا توجد صورة</div>
+            </div>
+          </div>
+
+          <div class="full">
+            <label class="lab" for="fExcerpt">المقتطف</label>
+            <textarea id="fExcerpt" class="field" placeholder="ملخّص قصير يظهر في قائمة المدونة…"></textarea>
+          </div>
+
+          <div class="full">
+            <label class="lab" for="fBody">المحتوى</label>
+            <textarea id="fBody" class="field body" placeholder="النص الكامل للمقال…"></textarea>
+          </div>
+
+          <div class="full checks">
+            <label class="chk"><input type="checkbox" id="fFeatured"> مميّز ⭐</label>
+            <label class="chk"><input type="checkbox" id="fPublished" checked> منشور</label>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" id="btnCancel">إلغاء</button>
+          <button type="submit" class="btn btn-primary">💾 حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="news-core.js"></script>
+  <script>
+  (function(){
+    'use strict';
+    var N = window.OneTripNews;
+
+    /* ---- helpers ---- */
+    function esc(s){
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    var $ = function(id){ return document.getElementById(id); };
+    function byDateDesc(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); }
+
+    /* ---- elements ---- */
+    var listEl   = $('list');
+    var searchEl = $('search');
+    var catEl    = $('catFilter');
+    var overlay  = $('overlay');
+
+    /* ---- populate category dropdowns ---- */
+    (function(){
+      var cats = N.CATEGORIES || [];
+      cats.forEach(function(c){
+        var o1 = document.createElement('option'); o1.value = c; o1.textContent = c; catEl.appendChild(o1);
+        var o2 = document.createElement('option'); o2.value = c; o2.textContent = c; $('fCategory').appendChild(o2);
+      });
+    })();
+
+    /* ---- stats ---- */
+    function renderStats(all){
+      var pub = all.filter(function(p){ return p.published !== false; }).length;
+      $('statTotal').textContent = all.length;
+      $('statPub').textContent   = pub;
+      $('statDraft').textContent = all.length - pub;
+    }
+
+    /* ---- list rendering ---- */
+    function render(){
+      var all = N.load();
+      renderStats(all);
+
+      var q   = (searchEl.value || '').trim().toLowerCase();
+      var cat = catEl.value || '';
+
+      var rows = all.slice().sort(byDateDesc).filter(function(p){
+        if(cat && p.category !== cat) return false;
+        if(q){
+          var hay = ((p.title||'') + ' ' + (p.category||'') + ' ' + (p.author||'')).toLowerCase();
+          if(hay.indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+
+      if(rows.length === 0){
+        var emptyMsg = all.length === 0
+          ? 'لا توجد مقالات بعد. ابدأ بإضافة مقال جديد أو استعد القائمة الافتراضية.'
+          : 'لا توجد نتائج مطابقة لبحثك. جرّب كلمات أخرى أو غيّر التصنيف.';
+        listEl.innerHTML =
+          '<div class="empty"><div class="ico">📰</div>' +
+          '<h3>' + (all.length === 0 ? 'لا توجد مقالات' : 'لا توجد نتائج') + '</h3>' +
+          '<p>' + esc(emptyMsg) + '</p></div>';
+        return;
+      }
+
+      var html = rows.map(function(p){
+        var cover = p.cover || '';
+        var thumb = cover
+          ? '<img class="thumb" src="' + esc(cover) + '" alt="" ' +
+            'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\';">' +
+            '<div class="thumb-ph" style="display:none">1T</div>'
+          : '<div class="thumb-ph">1T</div>';
+
+        var pub = p.published !== false;
+        var pill = pub
+          ? '<span class="pill pub">منشور</span>'
+          : '<span class="pill draft">مسودّة</span>';
+        var star = p.featured ? '<span class="star" title="مميّز">★</span>' : '';
+
+        return '<div class="card" data-id="' + esc(p.id) + '">' +
+          thumb +
+          '<div class="card-main">' +
+            '<h3 class="card-title">' + esc(p.title || 'بدون عنوان') + ' ' + star + '</h3>' +
+            (p.excerpt ? '<p class="card-excerpt">' + esc(p.excerpt) + '</p>' : '') +
+            '<div class="meta">' +
+              '<span class="badge">' + esc(p.category || '—') + '</span>' +
+              pill +
+              '<span class="dot">•</span>' +
+              '<span>✍ ' + esc(p.author || '—') + '</span>' +
+              '<span class="dot">•</span>' +
+              '<span>📅 ' + esc(N.formatDate(p.date) || p.date || '') + '</span>' +
+              '<span class="dot">•</span>' +
+              '<span>⏱ ' + N.readingMinutes(p) + ' د قراءة</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="card-actions">' +
+            '<button class="act edit" data-act="edit">تعديل</button>' +
+            '<button class="act" data-act="pub">' + (pub ? 'إخفاء' : 'نشر') + '</button>' +
+            '<button class="act" data-act="feat">' + (p.featured ? 'إلغاء التمييز' : 'تمييز') + '</button>' +
+            '<button class="act del" data-act="del">حذف</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      listEl.innerHTML = html;
+    }
+
+    /* ---- list event delegation ---- */
+    listEl.addEventListener('click', function(e){
+      var btn = e.target.closest('button[data-act]');
+      if(!btn) return;
+      var card = e.target.closest('.card');
+      if(!card) return;
+      var id = card.getAttribute('data-id');
+      var act = btn.getAttribute('data-act');
+      var post = N.load().filter(function(p){ return p.id === id; })[0];
+      if(!post) return;
+
+      if(act === 'edit'){ openEditor(post); }
+      else if(act === 'pub'){ N.update(id, { published: !(post.published !== false) }); render(); }
+      else if(act === 'feat'){ N.update(id, { featured: !post.featured }); render(); }
+      else if(act === 'del'){
+        if(confirm('حذف المقال «' + (post.title || '') + '»؟ لا يمكن التراجع.')){ N.remove(id); render(); }
+      }
+    });
+
+    /* ---- toolbar ---- */
+    searchEl.addEventListener('input', render);
+    catEl.addEventListener('change', render);
+    $('btnNew').addEventListener('click', function(){ openEditor(null); });
+    $('btnReset').addEventListener('click', function(){
+      if(confirm('استعادة المقالات الافتراضية؟ سيتم استبدال القائمة الحالية بالكامل.')){ N.resetSeed(); render(); }
+    });
+    $('btnClear').addEventListener('click', function(){
+      if(confirm('مسح كل المقالات نهائيًا؟ لا يمكن التراجع.')){ N.clearAll(); render(); }
+    });
+
+    /* ---- editor modal ---- */
+    function openEditor(post){
+      $('modalTitle').textContent = post ? 'تعديل المقال' : 'مقال جديد';
+      $('fId').value       = post ? post.id : '';
+      $('fTitle').value    = post ? (post.title || '') : '';
+      $('fCategory').value = post ? (post.category || (N.CATEGORIES[0]||'')) : (N.CATEGORIES[0]||'');
+      $('fAuthor').value   = post ? (post.author || '') : '';
+      $('fDate').value     = post ? (post.date || '') : new Date().toISOString().slice(0,10);
+      $('fCover').value    = post ? (post.cover || '') : '';
+      $('fExcerpt').value  = post ? (post.excerpt || '') : '';
+      $('fBody').value     = post ? (post.body || '') : '';
+      $('fFeatured').checked  = post ? !!post.featured : false;
+      $('fPublished').checked = post ? (post.published !== false) : true;
+      $('errTitle').classList.remove('show');
+      updatePreview();
+      overlay.classList.add('open');
+      $('fTitle').focus();
+    }
+    function closeEditor(){ overlay.classList.remove('open'); }
+
+    $('btnX').addEventListener('click', closeEditor);
+    $('btnCancel').addEventListener('click', closeEditor);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) closeEditor(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeEditor(); });
+
+    /* ---- live cover preview ---- */
+    function updatePreview(){
+      var url = ($('fCover').value || '').trim();
+      var img = $('coverPreview'), ph = $('coverPh');
+      if(!url){ img.style.display = 'none'; ph.style.display = 'grid'; ph.textContent = 'لا توجد صورة'; return; }
+      img.onerror = function(){ img.style.display = 'none'; ph.style.display = 'grid'; ph.textContent = 'تعذّر تحميل الصورة'; };
+      img.onload  = function(){ img.style.display = 'block'; ph.style.display = 'none'; };
+      img.src = url;
+    }
+    $('fCover').addEventListener('input', updatePreview);
+
+    /* ---- save ---- */
+    $('editForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var title = ($('fTitle').value || '').trim();
+      if(!title){
+        $('errTitle').classList.add('show');
+        $('fTitle').focus();
+        return;
+      }
+      var data = {
+        title:    title,
+        category: $('fCategory').value,
+        author:   ($('fAuthor').value || '').trim(),
+        date:     $('fDate').value,
+        cover:    ($('fCover').value || '').trim(),
+        excerpt:  ($('fExcerpt').value || '').trim(),
+        body:     ($('fBody').value || '').trim(),
+        featured: $('fFeatured').checked,
+        published:$('fPublished').checked
+      };
+      var id = $('fId').value;
+      if(id){ N.update(id, data); } else { N.add(data); }
+      closeEditor();
+      render();
+    });
+
+    /* ---- boot ---- */
+    document.addEventListener('DOMContentLoaded', render);
+    if(document.readyState !== 'loading') render();
+  })();
+  </script>
+</body>
+</html>
