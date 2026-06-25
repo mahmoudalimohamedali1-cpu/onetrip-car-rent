@@ -207,6 +207,7 @@
     <button class="nav-i" data-sec="bookings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h.01M12 14h.01M16 14h.01"/></svg> الحجوزات <span class="ct" id="ctBook">0</span></button>
     <button class="nav-i" data-sec="addons"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 22l-8-6.5v-9L12 2Z"/><path d="M12 22V12M20 6.5 12 12 4 6.5"/></svg> الإضافات <span class="ct" id="ctAddons">0</span></button>
     <button class="nav-i" data-sec="promos"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 3 8v8l6 6h8l6-6V8l-6-6H9Z"/><path d="M8.5 8.5h.01M15.5 15.5h.01M15 9l-6 6"/></svg> أكواد الخصم <span class="ct" id="ctPromos">0</span></button>
+    <button class="nav-i" data-sec="emails"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> الإيميلات <span class="ct" id="ctEmails">0</span></button>
     <button class="nav-i" data-sec="intro"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg> واجهة الرئيسية</button>
     <button class="nav-i" data-sec="surveys"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg> التقييمات</button>
     <button class="nav-i" data-sec="users"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> الموظفين</button>
@@ -319,6 +320,21 @@
           <button class="btn btn-org" id="addPromo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة كود</button>
         </div>
         <div style="overflow:auto" id="promoTable"></div>
+      </div>
+    </section>
+
+    <!-- EMAILS (otb_emails) -->
+    <section class="sect" id="sec-emails">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>الإيميلات المرسلة</h2><span class="sub">تأكيدات الحجز — يتولّد إيميل تلقائيًا مع كل حجز</span></div>
+        </div>
+        <div class="wa-hint" style="margin:0 20px 0">
+          المُرسِل: <code>carrent@onetrip.sa</code> · الحالة الحالية: <b>محاكاة</b> (يُسجَّل ولا يُرسَل فعليًا).
+          لتفعيل الإرسال الحقيقي من هذا البريد: اربطه بخدمة EmailJS (تدعم SMTP المخصّص) وحدِّد
+          <code>window.OTB_EMAILJS = {serviceId, templateId, publicKey}</code> — وقتها تتحوّل الحالة إلى «أُرسل».
+        </div>
+        <div style="overflow:auto" id="emailTable"></div>
       </div>
     </section>
 
@@ -494,6 +510,12 @@
         <div class="f"><label>الهاتف</label><input id="b-phone" placeholder="9200 32104"></div>
       </div>
       <div class="f"><label>العنوان</label><input id="b-address" placeholder="شارع العليا - بجوار برج المملكة"></div>
+      <div class="f"><label>رابط جوجل مابس (الصق الرابط — تُستخرج الإحداثيات تلقائيًا)</label><input id="b-maplink" placeholder="https://maps.google.com/…  أو  24.7136, 46.6753" dir="ltr"></div>
+      <div class="grid2">
+        <div class="f"><label>خط العرض (Latitude)</label><input id="b-lat" type="text" placeholder="24.7136" dir="ltr"></div>
+        <div class="f"><label>خط الطول (Longitude)</label><input id="b-lng" type="text" placeholder="46.6753" dir="ltr"></div>
+      </div>
+      <div id="b-mapPreview" style="margin-top:4px"></div>
     </div>
     <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveBr">حفظ الفرع</button></div>
   </div>
@@ -562,10 +584,11 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="cars.js?v=5"></script>
+<script src="cars.js?v=7"></script>
+<script src="branch-map.js"></script>
 <script src="chat.js"></script>
 <script src="supabase-sync.js"></script>
-<script src="booking-core.js?v=5"></script>
+<script src="booking-core.js?v=7"></script>
 <script>
 (function(){
   'use strict';
@@ -703,7 +726,7 @@
   $('#resetBtn').addEventListener('click',function(){ if(confirm('استرجاع كل البيانات للوضع الافتراضي؟ (هيمسح تعديلاتك على هذا المتصفح)')){ [K.cars,K.cats,K.br,K.leads,K.intro].forEach(function(k){localStorage.removeItem(k);}); seed(); renderAll(); toast('تم الاسترجاع','ok'); } });
 
   /* ---------- nav ---------- */
-  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',supabase:'مزامنة Supabase',surveys:'التقييمات',users:'الموظفين'};
+  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',emails:'الإيميلات',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',supabase:'مزامنة Supabase',surveys:'التقييمات',users:'الموظفين'};
   $$('.nav-i').forEach(function(b){ b.addEventListener('click',function(){
     $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
@@ -718,7 +741,7 @@
   /* ---------- renderers ---------- */
   /* عزل الأعطال: لو رندرر واحد رمى استثناء، ما يوقّفش باقي اللوحة (وخصوصًا قسم المحادثات) */
   function safeRender(fn){ try{ fn(); }catch(e){ if(window.console&&console.warn) console.warn('renderAll: تخطّي رندرر فشل —', e&&e.message); } }
-  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderIntro,renderChatBadge,renderSurveys,renderUsers].forEach(safeRender); }
+  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderEmails,renderIntro,renderChatBadge,renderSurveys,renderUsers].forEach(safeRender); }
   function renderCounts(){
     $('#ctCars').textContent=toAr(DB.cars.all().length);
     $('#ctCats').textContent=toAr(DB.cats.all().length);
@@ -730,6 +753,7 @@
     $('#ctBook').textContent=toAr(confirmed);
     $('#ctAddons').textContent=toAr(addonStore().length);
     $('#ctPromos').textContent=toAr(promoStore().length);
+    if($('#ctEmails')) $('#ctEmails').textContent=toAr((window.OTB&&OTB.emails)?OTB.emails().length:0);
     renderChatBadge();
   }
   function statCard(ic,n,label){ return '<div class="stat"><div class="ic">'+ic+'</div><b>'+toAr(n)+'</b><span>'+label+'</span></div>'; }
@@ -854,6 +878,27 @@
       var ref=b.getAttribute('data-bcancel');
       if(confirm('إلغاء الحجز '+ref+'؟')){ OTB.cancelBooking(ref); renderAll(); toast('تم إلغاء الحجز','ok'); }
     });});
+  }
+
+  /* ========== EMAILS (otb_emails — booking confirmations) ========== */
+  function renderEmails(){
+    var el=$('#emailTable');
+    if(!el) return;
+    if(!window.OTB||!OTB.emails){ el.innerHTML='<div class="empty">محرّك الحجز غير محمّل.</div>'; return; }
+    var list=OTB.emails().slice().reverse();
+    if(!list.length){ el.innerHTML='<div class="empty">لا توجد إيميلات بعد — يتولّد تأكيد تلقائيًا مع كل حجز.</div>'; return; }
+    var ST={sent:['أُرسل','green'],simulated:['محاكاة','orange'],'no-email':['بدون بريد','gray'],error:['خطأ','gray']};
+    var rows=list.map(function(m){
+      var st=ST[m.status]||ST.simulated;
+      return '<tr>'+
+        '<td style="white-space:nowrap;color:#5a6488;font-size:13px">'+(m.createdAt?shortDT(m.createdAt):'—')+'</td>'+
+        '<td dir="ltr" style="text-align:right">'+esc(m.to||'—')+'</td>'+
+        '<td>'+esc(m.subject||'')+'</td>'+
+        '<td><span class="pill '+st[1]+'">'+st[0]+'</span></td>'+
+        '<td><details><summary style="cursor:pointer;color:#1b2a7a;font-weight:800">عرض المحتوى</summary><pre style="white-space:pre-wrap;font-family:inherit;background:#f7f8fd;border:1px solid #e6e9f4;border-radius:10px;padding:12px;margin:8px 0 0;font-size:13px;line-height:1.7;color:#1b2440">'+esc(m.body||'')+'</pre></details></td>'+
+      '</tr>';
+    }).join('');
+    el.innerHTML='<table><thead><tr><th>الوقت</th><th>المُستلِم</th><th>الموضوع</th><th>الحالة</th><th>المحتوى</th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
 
   /* ========== ADD-ONS (localStorage otb_extras) ========== */
@@ -988,11 +1033,35 @@
   });
 
   /* ---------- branch modal ---------- */
+  function brMapPreview(){
+    var box=$('#b-mapPreview'); if(!box) return;
+    var lat=$('#b-lat').value.trim(), lng=$('#b-lng').value.trim();
+    var b={ name:$('#b-name').value.trim(), city:$('#b-city').value.trim(), address:$('#b-address').value.trim(), lat:lat, lng:lng };
+    var BM=window.OneTrip&&window.OneTrip.BranchMap;
+    if(BM && BM.hasLatLng(b)){ box.innerHTML=BM.embedHTML(b,{height:160}); }
+    else { box.innerHTML='<div style="color:#98a0bd;font-size:12.5px;padding:6px 2px">الصق رابط جوجل مابس أو أدخِل الإحداثيات لمعاينة الموقع.</div>'; }
+  }
   function openBr(id){ var c=id?DB.br.all().find(function(x){return x.id===id;}):null; $('#brModalTitle').textContent=c?'تعديل فرع':'إضافة فرع';
-    $('#b-id').value=c?c.id:''; $('#b-name').value=c?c.name:''; $('#b-city').value=c?c.city:''; $('#b-phone').value=c?c.phone:''; $('#b-address').value=c?c.address:''; openModal('#brModal'); }
+    $('#b-id').value=c?c.id:''; $('#b-name').value=c?c.name:''; $('#b-city').value=c?(c.city||''):''; $('#b-phone').value=c?(c.phone||''):''; $('#b-address').value=c?(c.address||''):'';
+    $('#b-lat').value=c&&c.lat!=null?c.lat:''; $('#b-lng').value=c&&c.lng!=null?c.lng:''; $('#b-maplink').value='';
+    brMapPreview(); openModal('#brModal'); }
+  /* لصق رابط جوجل مابس → استخراج الإحداثيات تلقائيًا + معاينة */
+  if($('#b-maplink')) $('#b-maplink').addEventListener('input',function(){
+    var BM=window.OneTrip&&window.OneTrip.BranchMap; if(!BM) return;
+    var ll=BM.parseLatLng(this.value);
+    if(ll){ $('#b-lat').value=ll.lat; $('#b-lng').value=ll.lng; brMapPreview(); }
+  });
+  if($('#b-lat')) $('#b-lat').addEventListener('input',brMapPreview);
+  if($('#b-lng')) $('#b-lng').addEventListener('input',brMapPreview);
   $('#addBr').addEventListener('click',function(){openBr(null);});
   $('#saveBr').addEventListener('click',function(){ var name=$('#b-name').value.trim(); if(!name){toast('اكتب اسم الفرع','err');return;}
-    DB.br.put({id:$('#b-id').value||('br_'+Date.now()),name:name,city:$('#b-city').value.trim(),address:$('#b-address').value.trim(),phone:$('#b-phone').value.trim()}); closeModal(); renderAll(); toast('تم حفظ الفرع ✓','ok'); });
+    var BM=window.OneTrip&&window.OneTrip.BranchMap;
+    var lat=$('#b-lat').value.trim(), lng=$('#b-lng').value.trim();
+    /* لو فيه رابط ملصوق ولم تُملأ الإحداثيات، نحاول استخراجها منه */
+    if((!lat||!lng) && BM){ var ll=BM.parseLatLng($('#b-maplink').value); if(ll){ lat=ll.lat; lng=ll.lng; } }
+    var rec={id:$('#b-id').value||('br_'+Date.now()),name:name,city:$('#b-city').value.trim(),address:$('#b-address').value.trim(),phone:$('#b-phone').value.trim()};
+    if(lat!==''&&lng!==''&&!isNaN(parseFloat(lat))&&!isNaN(parseFloat(lng))){ rec.lat=parseFloat(lat); rec.lng=parseFloat(lng); }
+    DB.br.put(rec); closeModal(); renderAll(); toast('تم حفظ الفرع ✓','ok'); });
 
   /* ---------- modal helpers ---------- */
   function openModal(s){$(s).classList.add('on');}

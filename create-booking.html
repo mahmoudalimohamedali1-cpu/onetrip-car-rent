@@ -175,6 +175,7 @@
         </div>
       </div>
       <a href="index.html#bookingWidget">الاشتراك الشهري</a>
+      <a href="news.html">أخبارنا</a>
     </nav>
     <div class="header-actions">
       <a href="#" class="login-link">
@@ -246,26 +247,15 @@
   </div>
 </footer>
 
-<script src="cars.js"></script>
-<script src="ui.js"></script>
+<script src="cars.js?v=7"></script>
+<script src="booking-core.js?v=7"></script>
+<script src="ui.js?v=7"></script>
 <script>
 (function(){
   'use strict';
 
-  /* mount the shared search widget, then wire its interactions */
+  /* mount the shared, self-wiring search widget (ui.js) */
   OneTrip.mountBookingWidget('#bookingWidget');
-
-  /* ---- booking widget interactions (same behaviour as homepage) ---- */
-  var tabBar=document.getElementById('tabBar');
-  if(tabBar) tabBar.addEventListener('click',function(e){
-    var b=e.target.closest('.tab'); if(!b)return;
-    tabBar.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
-    b.classList.add('active');
-  });
-  var rState=false, rT=document.getElementById('returnToggle'), rC=document.getElementById('returnCheckbox');
-  if(rT&&rC) rT.addEventListener('click',function(e){e.preventDefault();rState=!rState;rC.classList.toggle('checked',rState);});
-  var sb=document.getElementById('searchBtn');
-  if(sb) sb.addEventListener('click',function(){ document.getElementById('results').scrollIntoView({behavior:'smooth'}); });
 
   /* ===========================================================
      CARS DATA — from the shared catalog (cars.js). Daily pricing.
@@ -348,6 +338,7 @@
 </script>
 <script src="anim.js"></script>
 <link rel="stylesheet" href="chat-widget.css">
+<script src="branch-map.js"></script>
 <script src="chat.js"></script>
 <script src="supabase-sync.js"></script>
 <script src="chat-widget.js"></script>

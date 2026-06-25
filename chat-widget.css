@@ -214,6 +214,17 @@
 .otchat-card-price{
   flex:0 0 auto;font-size:13px;font-weight:800;color:var(--otc-orange);white-space:nowrap;
 }
+/* زر وخريطة الفرع داخل الكارت */
+.otchat-map-btn{
+  margin-top:6px;display:inline-flex;align-items:center;gap:5px;cursor:pointer;
+  border:1px solid var(--otc-line);background:#fff;color:var(--otc-blue);
+  font-family:inherit;font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:999px;
+}
+.otchat-map-btn:hover{border-color:var(--otc-orange);color:var(--otc-orange);}
+.otchat-map-slot{margin:6px 0 2px;}
+.otchat-map-slot iframe{width:100%;height:170px;border:0;border-radius:12px;display:block;box-shadow:0 4px 14px rgba(20,29,92,.12);}
+.otchat-map-link{display:inline-block;margin-top:5px;font-size:11.5px;font-weight:800;color:var(--otc-blue);text-decoration:none;}
+.otchat-map-link:hover{color:var(--otc-orange);}
 
 /* ---------- closing / system notice (centered) ---------- */
 .otchat-row.is-notice{align-self:center;align-items:center;max-width:94%;}
