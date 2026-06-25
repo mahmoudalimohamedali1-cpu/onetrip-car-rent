@@ -1,0 +1,35 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15550123456",
+              "phone_number_id": "1234567890"
+            },
+            "contacts": [
+              {
+                "profile": { "name": "محمد علي" },
+                "wa_id": "201234567890"
+              }
+            ],
+            "messages": [
+              {
+                "from": "201234567890",
+                "id": "wamid.HBgMMjAxMjM0NTY3ODkwFQIAEhggREVBREJFRUY=",
+                "timestamp": "1719240000",
+                "type": "text",
+                "text": { "body": "السلام عليكم، أريد استئجار سيارة" }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

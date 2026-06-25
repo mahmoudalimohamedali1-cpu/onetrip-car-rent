@@ -327,7 +327,7 @@
       + '</article>';
     }).join('');
     grid.querySelectorAll('.car .btn-blue:not([disabled])').forEach(function(btn){
-      btn.addEventListener('click',function(){ console.log('احجز:', btn.closest('.car').dataset.id); });
+      btn.addEventListener('click',function(){ window.location.href='car.html?id='+btn.closest('.car').dataset.id; });
     });
     if(window.__animScan) window.__animScan();
   }
@@ -347,5 +347,9 @@
 })();
 </script>
 <script src="anim.js"></script>
+<link rel="stylesheet" href="chat-widget.css">
+<script src="chat.js"></script>
+<script src="supabase-sync.js"></script>
+<script src="chat-widget.js"></script>
 </body>
 </html>

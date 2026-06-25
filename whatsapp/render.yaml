@@ -1,0 +1,23 @@
+# Render Blueprint — One Trip WhatsApp bridge
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: one-trip-whatsapp-bridge
+    runtime: node
+    rootDir: whatsapp
+    plan: free
+    buildCommand: "" # لا توجد تبعيات
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: WA_VERIFY_TOKEN
+        sync: false
+      - key: WA_TOKEN
+        sync: false
+      - key: WA_PHONE_NUMBER_ID
+        sync: false
+      # اختياري: وضع Supabase (اتركهما فارغين لاستخدام store.json)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false

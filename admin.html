@@ -42,6 +42,9 @@
   .nav-i.active{background:linear-gradient(90deg,var(--orange),#ffa83a);color:#1a0a00;}
   .nav-i .ct{margin-right:auto;font-size:12px;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:1px 8px;font-weight:800;}
   .nav-i.active .ct{background:rgba(0,0,0,.18);color:#1a0a00;}
+  /* تنبيه بصري: بادج المحادثات ينبض عند وصول رسالة جديدة */
+  @keyframes ot-badge-pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,144,30,.55);}50%{box-shadow:0 0 0 7px rgba(245,144,30,0);}}
+  .nav-i .ct.has-new{background:var(--orange)!important;color:#1a0a00!important;animation:ot-badge-pulse 1.15s infinite;}
   .side-foot{margin-top:auto;font-size:11.5px;color:#7e87b8;padding:10px 8px 0;line-height:1.6;}
 
   .main{grid-area:main;padding:26px;overflow:auto;}
@@ -110,10 +113,67 @@
   .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast.ok{background:var(--ok);} .toast.err{background:var(--red);}
 
+  /* ---- chat inbox (two-pane) ---- */
+  .inbox{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 26px - 65px);min-height:480px;}
+  .inbox-list{border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0;background:#fff;}
+  .inbox-tools{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px;}
+  .inbox-search{height:40px;border:1.5px solid var(--line);border-radius:11px;padding:0 12px;font-size:14px;font-weight:600;outline:none;background:#fcfdff;}
+  .inbox-search:focus{border-color:var(--blue);background:#fff;}
+  .ftabs{display:flex;gap:6px;flex-wrap:wrap;}
+  .ftab{border:1px solid var(--line);background:#fff;color:var(--muted);font-weight:800;font-size:12.5px;padding:6px 11px;border-radius:999px;}
+  .ftab.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .conv-scroll{overflow:auto;flex:1;}
+  .conv{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:1px solid #f0f2fa;cursor:pointer;}
+  .conv:hover{background:#fcfdff;} .conv.sel{background:#eef2ff;}
+  .conv .av{width:40px;height:40px;border-radius:50%;flex:0 0 auto;background:linear-gradient(135deg,#eaf0ff,#fff2e3);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;position:relative;}
+  .conv .av .dot{position:absolute;bottom:0;left:0;width:11px;height:11px;border-radius:50%;border:2px solid #fff;}
+  .dot.open{background:var(--ok);} .dot.pending{background:var(--orange);} .dot.closed{background:#9aa0b4;}
+  .conv .mid{flex:1;min-width:0;}
+  .conv .top{display:flex;align-items:center;gap:6px;justify-content:space-between;}
+  .conv .nm{font-weight:800;font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .conv .tm{font-size:11px;color:#98a0bd;white-space:nowrap;}
+  .conv .snip{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+  .conv .meta{display:flex;align-items:center;gap:6px;margin-top:4px;}
+  .ch-badge{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;background:#e9edff;color:var(--blue);}
+  .ch-badge.wa{background:#e2f7ec;color:#138a52;}
+  .unread{margin-right:auto;background:var(--orange);color:#1a0a00;font-weight:900;font-size:11px;border-radius:999px;padding:1px 7px;}
+  .inbox-room{display:flex;flex-direction:column;min-width:0;background:#f7f8fd;}
+  .room-h{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);background:#fff;flex-wrap:wrap;}
+  .room-h .ri{flex:1;min-width:0;}
+  .room-h .nm{font-weight:900;font-size:16px;color:var(--blue);}
+  .room-h .ph{font-size:12.5px;color:var(--muted);font-weight:700;}
+  .room-h select,.room-h input{height:38px;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;font-size:13px;font-weight:700;background:#fcfdff;outline:none;color:var(--ink);}
+  .room-h select:focus,.room-h input:focus{border-color:var(--blue);}
+  .thread{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:10px;}
+  .bub{max-width:74%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.55;font-weight:600;word-wrap:break-word;box-shadow:0 2px 6px rgba(27,42,122,.05);}
+  .bub .bt{display:block;font-size:10.5px;color:#98a0bd;margin-top:4px;font-weight:700;}
+  .bub.user{align-self:flex-start;background:#fff;border:1px solid var(--line);color:var(--ink);border-top-right-radius:4px;}
+  .bub.agent{align-self:flex-end;background:var(--blue);color:#fff;border-top-left-radius:4px;}
+  .bub.agent .bt{color:#c5cdf5;}
+  .bub.bot{align-self:flex-end;background:#fff3e2;border:1px solid #f6d9af;color:#7a4b08;border-top-left-radius:4px;}
+  .bub.bot .bt{color:#bb8b3e;}
+  .bub.card{background:#fff;border:1px solid var(--line);color:var(--ink);align-self:flex-end;}
+  .bub.card .cd-row{display:flex;justify-content:space-between;gap:14px;padding:4px 0;border-bottom:1px dashed var(--line);}
+  .bub.card .cd-row:last-child{border-bottom:none;}
+  .bub.card .cd-row b{color:var(--blue);}
+  .quicks{display:flex;gap:7px;flex-wrap:wrap;padding:10px 14px 0;}
+  .qchip{border:1px solid var(--line);background:#fff;color:var(--blue);font-weight:800;font-size:12.5px;padding:6px 11px;border-radius:999px;}
+  .qchip:hover{background:var(--cream);}
+  .composer{display:flex;gap:10px;align-items:flex-end;padding:12px 14px;border-top:1px solid var(--line);background:#fff;}
+  .composer textarea{flex:1;min-height:46px;max-height:130px;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;font-weight:600;line-height:1.5;resize:none;outline:none;background:#fcfdff;color:var(--ink);}
+  .composer textarea:focus{border-color:var(--blue);background:#fff;}
+  .sendb{width:46px;height:46px;border-radius:12px;border:none;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 8px 18px rgba(27,42,122,.25);}
+  .sendb:hover{filter:brightness(1.12);}
+  .room-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700;text-align:center;padding:30px;}
+  .wa-hint{background:#fafbff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--muted);font-weight:600;line-height:1.7;margin-bottom:16px;}
+  .wa-hint code{background:#eef2ff;color:var(--blue);padding:2px 7px;border-radius:6px;font-weight:800;direction:ltr;display:inline-block;}
+
   @media (max-width:820px){
     .app.on{grid-template-columns:1fr;grid-template-areas:"top" "main";}
     .side{display:none;}
     .grid2,.grid3{grid-template-columns:1fr;}
+    .inbox{grid-template-columns:1fr;height:auto;}
+    .inbox-list{border-left:none;border-bottom:1px solid var(--line);max-height:340px;}
   }
 </style>
 </head>
@@ -125,9 +185,10 @@
     <img src="assets/onetrip-logo.png" alt="One Trip">
     <h1>لوحة التحكم</h1>
     <p>سجّل الدخول لإدارة الأسطول والمحتوى</p>
-    <input id="pass" type="password" placeholder="كلمة المرور" autocomplete="off">
+    <input id="user" type="text" placeholder="اسم المستخدم" autocomplete="username" style="margin-bottom:10px">
+    <input id="pass" type="password" placeholder="كلمة المرور" autocomplete="current-password">
     <button class="btn btn-pri" style="width:100%;justify-content:center" id="loginBtn">دخول</button>
-    <div class="hint">نسخة تجريبية — كلمة المرور: <b>onetrip</b> (المصادقة الحقيقية تيجي مع Supabase)</div>
+    <div class="hint">المدير: <b>admin</b> / <b>onetrip</b> — والموظفين بحسابات تنشئها من قسم «الموظفين».</div>
   </div>
 </div>
 
@@ -140,13 +201,23 @@
     <button class="nav-i" data-sec="cats"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> الفئات <span class="ct" id="ctCats">0</span></button>
     <button class="nav-i" data-sec="branches"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg> الفروع <span class="ct" id="ctBr">0</span></button>
     <button class="nav-i" data-sec="leads"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg> الطلبات <span class="ct" id="ctLeads">0</span></button>
+    <button class="nav-i" data-sec="chat"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-3a8 8 0 0 1 16 0v3"/><path d="M21 16v2a3 3 0 0 1-3 3h-3"/><rect x="1" y="14" width="4" height="6" rx="1.5"/><rect x="19" y="14" width="4" height="6" rx="1.5"/></svg> المحادثات <span class="ct" id="ctChat">0</span></button>
+    <button class="nav-i" data-sec="whatsapp"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.3A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 8.5c0 4 3 7 7 7"/></svg> واتساب بيزنس</button>
+    <button class="nav-i" data-sec="supabase"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg> مزامنة Supabase</button>
+    <button class="nav-i" data-sec="bookings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h.01M12 14h.01M16 14h.01"/></svg> الحجوزات <span class="ct" id="ctBook">0</span></button>
+    <button class="nav-i" data-sec="addons"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 22l-8-6.5v-9L12 2Z"/><path d="M12 22V12M20 6.5 12 12 4 6.5"/></svg> الإضافات <span class="ct" id="ctAddons">0</span></button>
+    <button class="nav-i" data-sec="promos"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 3 8v8l6 6h8l6-6V8l-6-6H9Z"/><path d="M8.5 8.5h.01M15.5 15.5h.01M15 9l-6 6"/></svg> أكواد الخصم <span class="ct" id="ctPromos">0</span></button>
     <button class="nav-i" data-sec="intro"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg> واجهة الرئيسية</button>
+    <button class="nav-i" data-sec="surveys"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg> التقييمات</button>
+    <button class="nav-i" data-sec="users"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> الموظفين</button>
     <div class="side-foot">نسخة تجريبية (localStorage) — البيانات على هذا المتصفح فقط. تنتقل لـSupabase لاحقًا.</div>
   </aside>
 
   <header class="topbar">
     <div class="pg" id="pgTitle">لوحة التحكم</div>
     <div class="acts">
+      <span class="tbtn" id="whoami" style="cursor:default;background:#eef2ff;color:#1b2a7a;font-weight:800"></span>
+      <button class="tbtn" id="soundToggle" title="تشغيل/إيقاف صوت تنبيه الرسائل الجديدة"></button>
       <a class="tbtn" href="index.html" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M21 3l-9 9M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg> معاينة الموقع</a>
       <button class="tbtn danger" id="resetBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg> استرجاع الافتراضي</button>
       <button class="tbtn" id="logoutBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg> خروج</button>
@@ -220,6 +291,144 @@
         </div>
       </div>
     </section>
+
+    <!-- BOOKINGS -->
+    <section class="sect" id="sec-bookings">
+      <div class="panel">
+        <div class="panel-h"><div><h2>الحجوزات</h2><span class="sub">الحجوزات المؤكّدة عبر مسار الحجز على الموقع</span></div></div>
+        <div style="overflow:auto" id="bookTable"></div>
+      </div>
+    </section>
+
+    <!-- ADDONS -->
+    <section class="sect" id="sec-addons">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>الإضافات</h2><span class="sub">خدمات وتأمينات تظهر في خطوة الإضافات بمسار الحجز</span></div>
+          <button class="btn btn-org" id="addAddon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة عنصر</button>
+        </div>
+        <div style="overflow:auto" id="addonTable"></div>
+      </div>
+    </section>
+
+    <!-- PROMOS -->
+    <section class="sect" id="sec-promos">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>أكواد الخصم</h2><span class="sub">أكواد خصم تُطبّق في ملخّص الحجز</span></div>
+          <button class="btn btn-org" id="addPromo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة كود</button>
+        </div>
+        <div style="overflow:auto" id="promoTable"></div>
+      </div>
+    </section>
+
+    <!-- CHAT INBOX -->
+    <section class="sect" id="sec-chat">
+      <details class="panel" id="chatSettingsBox" style="margin-bottom:14px">
+        <summary style="list-style:none;cursor:pointer;padding:14px 20px;display:flex;align-items:center;gap:10px;font-weight:900;color:var(--blue);font-size:15px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          إعدادات الشات (رسالة الإغلاق + التقييم)
+        </summary>
+        <div class="modal-b" style="border-top:1px solid var(--line)">
+          <div class="f"><label>رسالة الانتظار (تُرسل للعميل طالما لم يفتح الموظف المحادثة)</label><textarea id="cs-waiting" rows="2"></textarea></div>
+          <div class="f"><label>رسالة الإغلاق (تُرسل تلقائيًا عند إنهاء المحادثة)</label><textarea id="cs-close" rows="2"></textarea></div>
+          <div class="grid2">
+            <div class="f"><label>تحويل المحادثة لموظف آخر بعد (دقائق) إذا لم تُفتح</label><input id="cs-reassign" type="number" min="0" placeholder="٣ — صفر لإيقاف التحويل" dir="ltr"></div>
+            <div class="f"><label>سؤال التقييم</label><input id="cs-question" placeholder="كيف تقيّم خدمتنا؟"></div>
+          </div>
+          <div class="f"><label>تفعيل التقييم (CSAT)</label><label class="toggle"><input type="checkbox" id="cs-survey"> اطلب تقييم العميل بعد الإغلاق</label></div>
+          <button class="btn btn-pri" id="cs-save">حفظ الإعدادات</button>
+        </div>
+      </details>
+      <div class="panel" style="padding:0;overflow:hidden">
+        <div class="inbox">
+          <div class="inbox-list">
+            <div class="inbox-tools">
+              <input class="inbox-search" id="convSearch" placeholder="بحث بالاسم أو الجوال…">
+              <div class="ftabs" id="convTabs">
+                <button class="ftab on" data-f="all">الكل</button>
+                <button class="ftab" data-f="open">مفتوحة</button>
+                <button class="ftab" data-f="pending">بانتظار الرد</button>
+                <button class="ftab" data-f="closed">مغلقة</button>
+              </div>
+            </div>
+            <div id="convList" style="overflow:auto;flex:1"></div>
+          </div>
+          <div class="inbox-room" id="inboxRoom"><div class="room-empty">اختر محادثة من القائمة لعرضها والرد عليها.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHATSAPP SETTINGS -->
+    <section class="sect" id="sec-whatsapp">
+      <div class="panel" style="max-width:700px">
+        <div class="panel-h"><div><h2>واتساب بيزنس</h2><span class="sub">اربط رقم واتساب الأعمال عبر Meta Cloud API</span></div></div>
+        <div class="modal-b">
+          <div class="wa-hint">
+            ضع هذا الرابط في إعدادات Meta (Webhook):<br>
+            <code>https://YOUR-SERVER/whatsapp/webhook</code><br>
+            البريدج/السيرفر موجود في مجلد <code>whatsapp/</code> بالمشروع (راجع <b>whatsapp/README</b> لخطوات النشر).
+          </div>
+          <div class="f"><label>الحالة</label><label class="toggle"><input type="checkbox" id="wa-enabled"> تفعيل تكامل واتساب</label></div>
+          <div class="grid2">
+            <div class="f"><label>رقم واتساب الأعمال</label><input id="wa-phone" placeholder="+9665XXXXXXXX" dir="ltr"></div>
+            <div class="f"><label>Phone Number ID</label><input id="wa-pnid" placeholder="1234567890" dir="ltr"></div>
+          </div>
+          <div class="f"><label>Access Token</label><input id="wa-token" type="password" placeholder="EAAB…" dir="ltr"></div>
+          <div class="f"><label>Verify Token</label><input id="wa-verify" placeholder="onetrip-verify" dir="ltr"></div>
+          <button class="btn btn-pri" id="saveWa">حفظ الإعدادات</button>
+          <div class="wa-hint" style="margin-top:14px">
+            <b>تجربة بدون نشر:</b> اضغط الزر لمحاكاة رسالة واردة من عميل على واتساب — هتظهر فورًا في قسم <b>المحادثات</b> وتقدر تردّ عليها، والرد يتسجّل في <b>صندوق الصادر</b> تحت (جاهز ليرسله البريدج للعميل على واتساب بعد النشر).
+            <div style="margin-top:10px"><button class="btn btn-org" id="waSimulate"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.3A8.5 8.5 0 1 1 21 11.5Z"/></svg> محاكاة رسالة واتساب واردة</button></div>
+          </div>
+        </div>
+        <div class="panel-h" style="border-top:1px solid var(--line)"><div><h2 style="font-size:16px">صندوق الصادر (Outbox)</h2><span class="sub">رسائل بانتظار الإرسال عبر البريدج — للتشخيص</span></div></div>
+        <div class="modal-b" id="waOutbox"></div>
+      </div>
+    </section>
+
+    <!-- SUPABASE SYNC -->
+    <section class="sect" id="sec-supabase">
+      <div class="panel" style="max-width:700px">
+        <div class="panel-h"><div><h2>مزامنة Supabase</h2><span class="sub">تزامن المحادثات عبر كل الأجهزة (مش نفس المتصفح بس)</span></div><span id="sb-status"></span></div>
+        <div class="modal-b">
+          <div class="wa-hint">
+            للتفعيل: أنشئ مشروع Supabase ونفّذ <code>supabase/schema.sql</code>، ثم ضع الـURL والـanon key هنا.<br>
+            الخطوات بالتفصيل في <b>supabase/README</b>. <b>تنويه أمني:</b> سياسات الديمو مفتوحة — قيّدها قبل الإنتاج.
+          </div>
+          <div class="f"><label>الحالة</label><label class="toggle"><input type="checkbox" id="sb-enabled"> تفعيل المزامنة السحابية</label></div>
+          <div class="f"><label>Project URL</label><input id="sb-url" placeholder="https://xxxx.supabase.co" dir="ltr"></div>
+          <div class="f"><label>anon public key</label><input id="sb-key" type="password" placeholder="eyJhbGci…" dir="ltr"></div>
+          <button class="btn btn-pri" id="saveSb">حفظ الإعدادات</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SURVEYS / CSAT -->
+    <section class="sect" id="sec-surveys">
+      <div class="stats" id="surveyStatsCards"></div>
+      <div style="height:18px"></div>
+      <div class="panel" style="margin-bottom:18px">
+        <div class="panel-h"><div><h2>متوسط التقييم لكل موظف</h2><span class="sub">المتوسط والعدد وتوزيع النجوم لكل موظف خدمة عملاء</span></div></div>
+        <div style="overflow:auto" id="surveyAgents"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><div><h2>كل التقييمات</h2><span class="sub">آراء العملاء بعد إغلاق المحادثات</span></div></div>
+        <div style="overflow:auto" id="surveyList"></div>
+      </div>
+    </section>
+
+    <!-- USERS / EMPLOYEES -->
+    <section class="sect" id="sec-users">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>الموظفين والصلاحيات</h2><span class="sub">أنشئ حسابات للموظفين وحدّد لكل واحد الأقسام المسموح له بها (مثلًا: المحادثات فقط)</span></div>
+          <button class="btn btn-org" id="addUser"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة موظف</button>
+        </div>
+        <div style="overflow:auto" id="usersTable"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -290,9 +499,73 @@
   </div>
 </div>
 
+<!-- ===== ADDON MODAL ===== -->
+<div class="modal" id="addonModal">
+  <div class="modal-card" style="max-width:560px">
+    <div class="modal-h"><h3 id="addonModalTitle">إضافة عنصر</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="a-id">
+      <div class="f"><label>الاسم *</label><input id="a-name" placeholder="تأمين شامل (CDW)"></div>
+      <div class="grid3">
+        <div class="f"><label>النوع</label><select id="a-type"><option value="insurance">تأمين</option><option value="service">خدمة</option><option value="equipment">معدّات</option></select></div>
+        <div class="f"><label>السعر (ريال)</label><input id="a-price" type="number" value="20"></div>
+        <div class="f"><label>الوحدة</label><select id="a-unit"><option value="day">باليوم</option><option value="booking">للحجز</option></select></div>
+      </div>
+      <div class="f"><label>الوصف</label><textarea id="a-desc" rows="2" placeholder="وصف مختصر يظهر للعميل"></textarea></div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveAddon">حفظ العنصر</button></div>
+  </div>
+</div>
+
+<!-- ===== PROMO MODAL ===== -->
+<div class="modal" id="promoModal">
+  <div class="modal-card" style="max-width:520px">
+    <div class="modal-h"><h3 id="promoModalTitle">إضافة كود</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="p-orig">
+      <div class="grid2">
+        <div class="f"><label>الكود *</label><input id="p-code" placeholder="ONETRIP10" style="text-transform:uppercase"></div>
+        <div class="f"><label>النوع</label><select id="p-type"><option value="percent">نسبة ٪</option><option value="fixed">مبلغ ثابت</option></select></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label>القيمة</label><input id="p-value" type="number" value="10"></div>
+        <div class="f"><label>الحد الأدنى للطلب (ريال)</label><input id="p-min" type="number" value="0"></div>
+      </div>
+      <div class="f"><label>الحالة</label><label class="toggle"><input type="checkbox" id="p-active" checked> فعّال</label></div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="savePromo">حفظ الكود</button></div>
+  </div>
+</div>
+
+<!-- ===== USER MODAL ===== -->
+<div class="modal" id="userModal">
+  <div class="modal-card" style="max-width:560px">
+    <div class="modal-h"><h3 id="userModalTitle">إضافة موظف</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="u-id">
+      <div class="grid2">
+        <div class="f"><label>الاسم *</label><input id="u-name" placeholder="أحمد علي"></div>
+        <div class="f"><label>اسم المستخدم *</label><input id="u-username" placeholder="ahmed" dir="ltr"></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label>كلمة المرور *</label><input id="u-pass" type="text" placeholder="••••••" dir="ltr"></div>
+        <div class="f"><label>الدور</label><select id="u-role"><option value="agent">موظف خدمة عملاء</option><option value="admin">مدير (كل الصلاحيات)</option></select></div>
+      </div>
+      <div id="u-perms-wrap">
+        <div class="sub-h">الأقسام المسموح بها للموظف</div>
+        <div id="u-sections" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveUser">حفظ الموظف</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script src="cars.js"></script>
+<script src="cars.js?v=5"></script>
+<script src="chat.js"></script>
+<script src="supabase-sync.js"></script>
+<script src="booking-core.js?v=5"></script>
 <script>
 (function(){
   'use strict';
@@ -341,31 +614,123 @@
   var tEl=$('#toast'),tT;
   function toast(msg,kind){ tEl.textContent=msg; tEl.className='toast on '+(kind||''); clearTimeout(tT); tT=setTimeout(function(){tEl.className='toast '+(kind||'');},2200); }
 
+  /* ---------- users / permissions (نظام صلاحيات الموظفين — localStorage تجريبي) ---------- */
+  var UK='ot_users';
+  /* الأقسام اللي ينفع تتمنح للموظف (الأدمن عنده كله) */
+  var GRANT=[['chat','المحادثات'],['leads','الطلبات'],['bookings','الحجوزات'],['cars','السيارات'],['cats','الفئات'],['branches','الفروع'],['promos','أكواد الخصم'],['addons','الإضافات'],['intro','واجهة الرئيسية'],['whatsapp','واتساب بيزنس'],['supabase','مزامنة Supabase']];
+  function seedUsers(){ if(localStorage.getItem(UK)==null) save(UK,[{id:'u_admin',name:'المدير',username:'admin',pass:'onetrip',role:'admin',sections:[]}]); }
+  function users(){ return load(UK,[]); }
+  function curUser(){
+    var id=sessionStorage.getItem('ot_user');
+    var u=users().filter(function(x){return x.id===id;})[0];
+    if(u) return u;
+    if(sessionStorage.getItem('ot_admin')==='1') return {id:'u_admin',name:'المدير',role:'admin',sections:[]};
+    return null;
+  }
+  function isAdmin(){ var u=curUser(); return !!(u&&u.role==='admin'); }
+  function allowed(sec){ if(sec==='users') return isAdmin(); if(isAdmin()) return true; var u=curUser(); if(!u) return false; if(sec==='surveys') return true; return (u.sections||[]).indexOf(sec)>=0; }
+
+  function applyPerms(){
+    var u=curUser();
+    var w=$('#whoami'); if(w) w.textContent = u ? ((u.name||u.username||'مستخدم')+' · '+(u.role==='admin'?'مدير':'موظف')) : '';
+    $$('.nav-i').forEach(function(b){ b.style.display = allowed(b.getAttribute('data-sec'))?'':'none'; });
+    var rb=$('#resetBtn'); if(rb) rb.style.display=isAdmin()?'':'none';
+    /* لو القسم النشِط مش مسموح، انتقل لأول قسم مسموح (مثلًا الموظف يهبط على المحادثات) */
+    var active=$('.nav-i.active');
+    var okActive = active && active.style.display!=='none';
+    /* مؤجّل بـsetTimeout عشان النقر يشتغل بعد ربط مستمعي التنقّل (showApp بيتنده وقت التحميل قبل ربطهم) */
+    if(!okActive){ setTimeout(function(){ var first=$$('.nav-i').filter(function(b){return b.style.display!=='none';})[0]; if(first) first.click(); },0); }
+  }
+
   /* ---------- login ---------- */
-  function showApp(){ $('#login').style.display='none'; $('#app').classList.add('on'); seed(); renderAll(); }
-  if(sessionStorage.getItem('ot_admin')==='1') showApp();
-  function tryLogin(){ if($('#pass').value.trim()==='onetrip'){ sessionStorage.setItem('ot_admin','1'); showApp(); } else { toast('كلمة المرور غير صحيحة','err'); } }
+  function showApp(){ $('#login').style.display='none'; $('#app').classList.add('on'); seedUsers(); seed(); renderAll(); applyPerms(); initNotify(); }
+  if(sessionStorage.getItem('ot_admin')==='1' || sessionStorage.getItem('ot_user')) showApp();
+  function tryLogin(){
+    seedUsers();
+    var un=($('#user')?$('#user').value.trim():''), pw=$('#pass').value.trim();
+    var u=users().filter(function(x){return x.username===un && x.pass===pw;})[0];
+    if(!u && !un && pw==='onetrip') u=users().filter(function(x){return x.role==='admin';})[0]; /* توافق قديم: كلمة المرور وحدها */
+    if(u){ sessionStorage.setItem('ot_user',u.id); sessionStorage.setItem('ot_admin', u.role==='admin'?'1':'0'); showApp(); }
+    else toast('بيانات الدخول غير صحيحة','err');
+  }
   $('#loginBtn').addEventListener('click',tryLogin);
   $('#pass').addEventListener('keydown',function(e){if(e.key==='Enter')tryLogin();});
-  $('#logoutBtn').addEventListener('click',function(){ sessionStorage.removeItem('ot_admin'); location.reload(); });
+  if($('#user')) $('#user').addEventListener('keydown',function(e){if(e.key==='Enter')tryLogin();});
+  $('#logoutBtn').addEventListener('click',function(){ sessionStorage.removeItem('ot_admin'); sessionStorage.removeItem('ot_user'); location.reload(); });
+
+  /* ---------- users management UI ---------- */
+  function secLabel(s){ var g=GRANT.filter(function(x){return x[0]===s;})[0]; return g?g[1]:s; }
+  function renderUsers(){
+    var box=$('#usersTable'); if(!box) return;
+    if(!isAdmin()){ box.innerHTML='<div class="empty" style="padding:24px">هذا القسم للمدير فقط.</div>'; return; }
+    seedUsers();
+    var rows=users().map(function(u){
+      var perms = u.role==='admin' ? 'كل الصلاحيات' : ((u.sections||[]).map(secLabel).join('، ')||'—');
+      var del = u.id==='u_admin' ? '' : '<button class="iact del" data-du="'+u.id+'" title="حذف"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>';
+      return '<tr><td><b>'+esc(u.name||'')+'</b></td><td dir="ltr" style="text-align:right">'+esc(u.username||'')+'</td>'+
+        '<td>'+(u.role==='admin'?'<span class="pill orange">مدير</span>':'<span class="pill blue">موظف</span>')+'</td>'+
+        '<td style="color:#5a6488;font-size:13px;max-width:280px">'+esc(perms)+'</td>'+
+        '<td><div class="rowacts"><button class="iact" data-eu="'+u.id+'" title="تعديل"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+del+'</div></td></tr>';
+    }).join('');
+    box.innerHTML='<table><thead><tr><th>الاسم</th><th>المستخدم</th><th>الدور</th><th>الصلاحيات</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#usersTable [data-eu]').forEach(function(b){b.addEventListener('click',function(){openUser(b.getAttribute('data-eu'));});});
+    $$('#usersTable [data-du]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف هذا الموظف؟')){ save(UK,users().filter(function(x){return x.id!==b.getAttribute('data-du');})); renderUsers(); toast('تم الحذف','ok'); } });});
+  }
+  function toggleRoleUI(){ var ag=$('#u-role').value==='agent'; var wrap=$('#u-perms-wrap'); if(wrap) wrap.style.display=ag?'':'none'; }
+  function openUser(id){
+    if(!isAdmin()) return;
+    var u = id ? users().filter(function(x){return x.id===id;})[0] : {id:'',name:'',username:'',pass:'',role:'agent',sections:['chat']};
+    if(!u) return;
+    $('#u-id').value=u.id||''; $('#u-name').value=u.name||''; $('#u-username').value=u.username||''; $('#u-pass').value=u.pass||'';
+    $('#u-role').value=u.role||'agent';
+    $('#u-sections').innerHTML=GRANT.map(function(g){ var ck=(u.sections||[]).indexOf(g[0])>=0?'checked':''; return '<label class="toggle" style="font-size:13px;height:42px"><input type="checkbox" value="'+g[0]+'" '+ck+'> '+g[1]+'</label>'; }).join('');
+    $('#userModalTitle').textContent = id?'تعديل موظف':'إضافة موظف';
+    toggleRoleUI();
+    openModal('#userModal');
+  }
+  if($('#u-role')) $('#u-role').addEventListener('change',toggleRoleUI);
+  if($('#addUser')) $('#addUser').addEventListener('click',function(){ openUser(''); });
+  if($('#saveUser')) $('#saveUser').addEventListener('click',function(){
+    var id=$('#u-id').value || ('u_'+Date.now());
+    var name=$('#u-name').value.trim(), un=$('#u-username').value.trim(), pw=$('#u-pass').value.trim(), role=$('#u-role').value;
+    if(!name||!un||!pw){ toast('اكمل الاسم واسم المستخدم وكلمة المرور','err'); return; }
+    if(users().some(function(x){return x.username===un && x.id!==id;})){ toast('اسم المستخدم مستخدم بالفعل','err'); return; }
+    var secs = role==='admin' ? [] : $$('#u-sections input:checked').map(function(c){return c.value;});
+    var arr=users(), i=arr.findIndex(function(x){return x.id===id;}), rec={id:id,name:name,username:un,pass:pw,role:role,sections:secs};
+    if(i>=0) arr[i]=rec; else arr.push(rec);
+    save(UK,arr); closeModal(); renderUsers(); toast('تم حفظ الموظف ✓','ok');
+  });
   $('#resetBtn').addEventListener('click',function(){ if(confirm('استرجاع كل البيانات للوضع الافتراضي؟ (هيمسح تعديلاتك على هذا المتصفح)')){ [K.cars,K.cats,K.br,K.leads,K.intro].forEach(function(k){localStorage.removeItem(k);}); seed(); renderAll(); toast('تم الاسترجاع','ok'); } });
 
   /* ---------- nav ---------- */
-  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',intro:'واجهة الرئيسية'};
+  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',supabase:'مزامنة Supabase',surveys:'التقييمات',users:'الموظفين'};
   $$('.nav-i').forEach(function(b){ b.addEventListener('click',function(){
     $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
-    $('#pgTitle').textContent=titles[s];
+    $('#pgTitle').textContent=titles[s]||'';
+    if(s==='chat'){ renderInbox(); loadChatSettings(); clearNotify(); }
+    if(s==='whatsapp') renderWa();
+    if(s==='supabase') renderSb();
+    if(s==='surveys') renderSurveys();
+    if(s==='users') renderUsers();
   });});
 
   /* ---------- renderers ---------- */
-  function renderAll(){ renderCounts(); renderDash(); renderCars(); renderCats(); renderBranches(); renderLeads(); renderIntro(); }
+  /* عزل الأعطال: لو رندرر واحد رمى استثناء، ما يوقّفش باقي اللوحة (وخصوصًا قسم المحادثات) */
+  function safeRender(fn){ try{ fn(); }catch(e){ if(window.console&&console.warn) console.warn('renderAll: تخطّي رندرر فشل —', e&&e.message); } }
+  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderIntro,renderChatBadge,renderSurveys,renderUsers].forEach(safeRender); }
   function renderCounts(){
     $('#ctCars').textContent=toAr(DB.cars.all().length);
     $('#ctCats').textContent=toAr(DB.cats.all().length);
     $('#ctBr').textContent=toAr(DB.br.all().length);
     var nw=DB.leads.all().filter(function(l){return l.status!=='handled';}).length;
     $('#ctLeads').textContent=toAr(nw);
+    var hasOTB=!!window.OTB;
+    var confirmed=hasOTB?OTB.bookings().filter(function(b){return b.status==='confirmed';}).length:0;
+    $('#ctBook').textContent=toAr(confirmed);
+    $('#ctAddons').textContent=toAr(addonStore().length);
+    $('#ctPromos').textContent=toAr(promoStore().length);
+    renderChatBadge();
   }
   function statCard(ic,n,label){ return '<div class="stat"><div class="ic">'+ic+'</div><b>'+toAr(n)+'</b><span>'+label+'</span></div>'; }
   function renderDash(){
@@ -458,6 +823,133 @@
   function renderIntro(){ var i=DB.intro.get(); $('#in-eyebrow').value=i.eyebrow||''; $('#in-h1').value=i.heading1||''; $('#in-h2').value=i.heading2||''; $('#in-sub').value=i.subtext||''; }
   $('#saveIntro').addEventListener('click',function(){ DB.intro.set({eyebrow:$('#in-eyebrow').value,heading1:$('#in-h1').value,heading2:$('#in-h2').value,subtext:$('#in-sub').value}); toast('تم الحفظ — حدّث الرئيسية','ok'); });
 
+  /* ========== BOOKINGS (read-only from OTB) ========== */
+  function shortDT(s){ if(!s) return '—'; var p=String(s).split('T'); var d=(p[0]||'').replace(/-/g,'/'); var t=(p[1]||'').slice(0,5); return toAr(d)+(t?' '+toAr(t):''); }
+  function renderBookings(){
+    var el=$('#bookTable');
+    if(!window.OTB){ el.innerHTML='<div class="empty">محرّك الحجز غير محمّل.</div>'; return; }
+    var list=OTB.bookings().slice().reverse();
+    if(!list.length){ el.innerHTML='<div class="empty">لا توجد حجوزات بعد — تظهر هنا أول ما يكمّل عميل حجزًا من الموقع.</div>'; return; }
+    var rows=list.map(function(b){
+      var cust=esc((b.customer&&b.customer.name)||'—');
+      var phone=(b.customer&&b.customer.phone)||'';
+      var total=(b.totals&&b.totals.total!=null)?OTB.money(b.totals.total):'—';
+      var st=b.status==='cancelled'?'<span class="pill gray">ملغي</span>':'<span class="pill green">مؤكّد</span>';
+      var act=b.status==='confirmed'
+        ? '<button class="iact del" data-bcancel="'+esc(b.reference)+'" title="إلغاء الحجز"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
+        : '';
+      return '<tr>'+
+        '<td dir="ltr" style="text-align:right;font-weight:800;color:#1b2a7a">'+esc(b.reference)+'</td>'+
+        '<td><b>'+esc(b.carName||'—')+'</b></td>'+
+        '<td>'+cust+(phone?'<br><span dir="ltr" style="color:#98a0bd;font-size:12.5px">'+esc(phone)+'</span>':'')+'</td>'+
+        '<td style="white-space:nowrap;color:#5a6488;font-size:13px">'+shortDT(b.pickupAt)+'<br>← '+shortDT(b.returnAt)+'</td>'+
+        '<td>'+toAr(b.days||OTB.days(b.pickupAt,b.returnAt))+'</td>'+
+        '<td class="price">'+total+'</td>'+
+        '<td>'+st+'</td>'+
+        '<td><div class="rowacts">'+act+'</div></td>'+
+      '</tr>';
+    }).join('');
+    el.innerHTML='<table><thead><tr><th>رقم الحجز</th><th>السيارة</th><th>العميل</th><th>من → إلى</th><th>الأيام</th><th>الإجمالي</th><th>الحالة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#bookTable [data-bcancel]').forEach(function(b){b.addEventListener('click',function(){
+      var ref=b.getAttribute('data-bcancel');
+      if(confirm('إلغاء الحجز '+ref+'؟')){ OTB.cancelBooking(ref); renderAll(); toast('تم إلغاء الحجز','ok'); }
+    });});
+  }
+
+  /* ========== ADD-ONS (localStorage otb_extras) ========== */
+  function addonStore(){
+    var v=load('otb_extras',null);
+    if(v==null){ v=(window.OTB?OTB.extras():[]).map(function(e){return {id:e.id,name:e.name,type:e.type,price:e.price,unit:e.unit,desc:e.desc};}); save('otb_extras',v); }
+    return v;
+  }
+  function addonSave(arr){ save('otb_extras',arr); }
+  function renderAddons(){
+    var ATYPE={insurance:'تأمين',service:'خدمة',equipment:'معدّات'};
+    var list=addonStore();
+    if(!list.length){ $('#addonTable').innerHTML='<div class="empty">مفيش إضافات — اضغط «إضافة عنصر».</div>'; return; }
+    var rows=list.map(function(e){
+      return '<tr>'+
+        '<td><b>'+esc(e.name)+'</b>'+(e.desc?'<br><span style="color:#98a0bd;font-size:12.5px">'+esc(e.desc)+'</span>':'')+'</td>'+
+        '<td><span class="pill blue">'+esc(ATYPE[e.type]||e.type||'')+'</span></td>'+
+        '<td class="price">'+toAr(e.price||0)+' <small style="color:#f5901e">ريال</small></td>'+
+        '<td>'+(e.unit==='booking'?'<span class="pill orange">للحجز</span>':'<span class="pill gray">باليوم</span>')+'</td>'+
+        '<td><div class="rowacts"><button class="iact" data-eda="'+esc(e.id)+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+          '<button class="iact del" data-dla="'+esc(e.id)+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></td>'+
+      '</tr>';
+    }).join('');
+    $('#addonTable').innerHTML='<table><thead><tr><th>الاسم</th><th>النوع</th><th>السعر</th><th>الوحدة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#addonTable [data-eda]').forEach(function(b){b.addEventListener('click',function(){openAddon(b.getAttribute('data-eda'));});});
+    $$('#addonTable [data-dla]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف العنصر؟')){ addonSave(addonStore().filter(function(x){return x.id!==b.getAttribute('data-dla');})); renderAll(); toast('تم الحذف','ok'); } });});
+  }
+  function openAddon(id){
+    var e=id?addonStore().find(function(x){return x.id===id;}):null;
+    $('#addonModalTitle').textContent=e?'تعديل عنصر':'إضافة عنصر';
+    $('#a-id').value=e?e.id:''; $('#a-name').value=e?e.name:''; $('#a-type').value=e?(e.type||'service'):'service';
+    $('#a-price').value=e?e.price:20; $('#a-unit').value=e?(e.unit||'day'):'day'; $('#a-desc').value=e?(e.desc||''):'';
+    openModal('#addonModal');
+  }
+  $('#addAddon').addEventListener('click',function(){openAddon(null);});
+  $('#saveAddon').addEventListener('click',function(){
+    var name=$('#a-name').value.trim(); if(!name){toast('اكتب اسم العنصر','err');return;}
+    var pr=parseFloat($('#a-price').value); if(isNaN(pr))pr=0;
+    var id=$('#a-id').value||('addon_'+Date.now());
+    var arr=addonStore(); var i=arr.findIndex(function(x){return x.id===id;});
+    var item={id:id,name:name,type:$('#a-type').value,price:pr,unit:$('#a-unit').value,desc:$('#a-desc').value.trim()};
+    if(i>=0)arr[i]=item; else arr.push(item);
+    addonSave(arr); closeModal(); renderAll(); toast('تم حفظ العنصر ✓','ok');
+  });
+
+  /* ========== PROMO CODES (localStorage otb_promos) ========== */
+  function promoStore(){
+    var v=load('otb_promos',null);
+    if(v==null){ v=(window.OTB?OTB.promos():[]).map(function(p){return {code:p.code,type:p.type,value:p.value,minTotal:p.minTotal,active:p.active};}); save('otb_promos',v); }
+    return v;
+  }
+  function promoSave(arr){ save('otb_promos',arr); }
+  function renderPromos(){
+    var list=promoStore();
+    if(!list.length){ $('#promoTable').innerHTML='<div class="empty">مفيش أكواد — اضغط «إضافة كود».</div>'; return; }
+    var rows=list.map(function(p){
+      var val=p.type==='percent'?(toAr(p.value)+'٪'):(toAr(p.value)+' ريال');
+      return '<tr>'+
+        '<td dir="ltr" style="text-align:right;font-weight:900;color:#1b2a7a">'+esc(p.code)+'</td>'+
+        '<td><span class="pill blue">'+(p.type==='percent'?'نسبة':'مبلغ ثابت')+'</span></td>'+
+        '<td class="price">'+val+'</td>'+
+        '<td>'+toAr(p.minTotal||0)+' <small style="color:#f5901e">ريال</small></td>'+
+        '<td>'+(p.active?'<span class="pill green">فعّال</span>':'<span class="pill gray">موقوف</span>')+'</td>'+
+        '<td><div class="rowacts">'+
+          '<button class="iact" data-ptg="'+esc(p.code)+'" title="'+(p.active?'إيقاف':'تفعيل')+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M8.5 8.5a4.5 4.5 0 0 1 7 5.6"/></svg></button>'+
+          '<button class="iact" data-edp="'+esc(p.code)+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+          '<button class="iact del" data-dp="'+esc(p.code)+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></td>'+
+      '</tr>';
+    }).join('');
+    $('#promoTable').innerHTML='<table><thead><tr><th>الكود</th><th>النوع</th><th>القيمة</th><th>الحد الأدنى</th><th>الحالة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#promoTable [data-ptg]').forEach(function(b){b.addEventListener('click',function(){ var code=b.getAttribute('data-ptg'); var arr=promoStore(); var p=arr.find(function(x){return x.code===code;}); if(p){ p.active=!p.active; promoSave(arr); renderAll(); toast(p.active?'تم التفعيل':'تم الإيقاف','ok'); } });});
+    $$('#promoTable [data-edp]').forEach(function(b){b.addEventListener('click',function(){openPromo(b.getAttribute('data-edp'));});});
+    $$('#promoTable [data-dp]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف الكود؟')){ promoSave(promoStore().filter(function(x){return x.code!==b.getAttribute('data-dp');})); renderAll(); toast('تم الحذف','ok'); } });});
+  }
+  function openPromo(code){
+    var p=code?promoStore().find(function(x){return x.code===code;}):null;
+    $('#promoModalTitle').textContent=p?'تعديل كود':'إضافة كود';
+    $('#p-orig').value=p?p.code:''; $('#p-code').value=p?p.code:''; $('#p-type').value=p?(p.type||'percent'):'percent';
+    $('#p-value').value=p?p.value:10; $('#p-min').value=p?(p.minTotal||0):0; $('#p-active').checked=p?!!p.active:true;
+    openModal('#promoModal');
+  }
+  $('#addPromo').addEventListener('click',function(){openPromo(null);});
+  $('#savePromo').addEventListener('click',function(){
+    var code=$('#p-code').value.trim().toUpperCase(); if(!code){toast('اكتب الكود','err');return;}
+    var val=parseFloat($('#p-value').value); if(isNaN(val))val=0;
+    var min=parseFloat($('#p-min').value); if(isNaN(min))min=0;
+    var orig=$('#p-orig').value;
+    var arr=promoStore();
+    if((!orig||orig!==code) && arr.some(function(x){return x.code===code;})){ toast('الكود موجود بالفعل','err'); return; }
+    var item={code:code,type:$('#p-type').value,value:val,minTotal:min,active:$('#p-active').checked};
+    var i=orig?arr.findIndex(function(x){return x.code===orig;}):-1;
+    if(i>=0)arr[i]=item; else arr.push(item);
+    promoSave(arr); closeModal(); renderAll(); toast('تم حفظ الكود ✓','ok');
+  });
+
+
   /* ---------- car modal ---------- */
   function fillCats(){ $('#c-category').innerHTML=DB.cats.all().map(function(c){return '<option>'+esc(c.name)+'</option>';}).join(''); }
   function openCar(id){
@@ -510,6 +1002,344 @@
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
 
   function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  /* ========== CHAT INBOX ========== */
+  function CHAT(){ return (window.OneTrip&&window.OneTrip.Chat)||null; }
+  var chatFilter='all', selConv=null;
+
+  /* اسم الموظف من معرّفه (assignedTo = id الموظف) */
+  function agentName(id){ if(!id) return ''; var u=users().filter(function(x){return x.id===id;})[0]; return u?(u.name||u.username||id):id; }
+  function agentList(){ return users().filter(function(u){return u.role==='agent';}); }
+
+  function chatTime(ts){
+    if(!ts) return '';
+    var d=new Date(ts), now=new Date();
+    var sameDay=d.toDateString()===now.toDateString();
+    if(sameDay) return toAr(('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2));
+    return toAr(d.getDate()+'/'+(d.getMonth()+1));
+  }
+  function statusName(s){ return s==='pending'?'بانتظار الرد':(s==='closed'?'مغلقة':'مفتوحة'); }
+
+  function renderChatBadge(){
+    var c=CHAT(), n=0;
+    try{ n=c?(c.unreadAgentTotal()||0):0; }catch(e){ n=0; }
+    var el=$('#ctChat'); if(el) el.textContent=toAr(n);
+  }
+
+  /* تبويب «وارد جديد» يظهر للموظف فقط ليستلم المحادثات غير المسنودة */
+  function syncInboxTabs(){
+    var tabs=$('#convTabs'); if(!tabs) return;
+    var has=$('#convTabs .ftab[data-f="inbox"]');
+    var agent=!isAdmin();
+    if(agent && !has){ var b=document.createElement('button'); b.className='ftab'; b.setAttribute('data-f','inbox'); b.textContent='وارد جديد';
+      b.addEventListener('click',function(){ $$('#convTabs .ftab').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); chatFilter='inbox'; renderInbox(); });
+      tabs.appendChild(b);
+    } else if(!agent && has){ has.remove(); if(chatFilter==='inbox'){ chatFilter='all'; var all=$('#convTabs .ftab[data-f="all"]'); if(all){ $$('#convTabs .ftab').forEach(function(x){x.classList.remove('on');}); all.classList.add('on'); } } }
+  }
+
+  function renderInbox(){
+    var c=CHAT();
+    if(!c){ $('#convList').innerHTML='<div class="empty" style="padding:30px">وحدة الدردشة (chat.js) غير محمّلة.</div>'; renderChatBadge(); return; }
+    syncInboxTabs();
+    var me=curUser(), admin=isAdmin(), myId=me?me.id:null;
+    var list=[]; try{ list=c.listConversations()||[]; }catch(e){ list=[]; }
+    var q=($('#convSearch').value||'').trim().toLowerCase();
+    var rows=list.filter(function(cv){
+      if(!admin){
+        if(chatFilter==='inbox'){ if(cv.assignedTo) return false; }       /* الوارد الجديد: غير المسنودة */
+        else { if(cv.assignedTo!==myId) return false; }                    /* غير كده: محادثات الموظف فقط */
+      }
+      if(chatFilter!=='all' && chatFilter!=='inbox' && cv.status!==chatFilter) return false;
+      if(q){ var hay=((cv.name||'')+' '+(cv.phone||'')).toLowerCase(); if(hay.indexOf(q)<0) return false; }
+      return true;
+    });
+    if(!rows.length){ $('#convList').innerHTML='<div class="empty" style="padding:30px">لا توجد محادثات.</div>'; }
+    else $('#convList').innerHTML=rows.map(function(cv){
+      var msgs=cv.messages||[], last=msgs.length?msgs[msgs.length-1]:null;
+      var snip=last?(last.type==='card'?'بطاقة معلومات':(last.text||'')):'لا رسائل';
+      var initial=esc(((cv.name||'ز').trim()[0])||'ز');
+      var chBadge=cv.channel==='whatsapp'?'<span class="ch-badge wa">واتساب</span>':'<span class="ch-badge">ويب</span>';
+      var newBadge=(!cv.agentOpened && cv.status!=='closed')?'<span class="ch-badge" style="background:#fff3e0;color:#f5901e">لم تُفتح</span>':'';
+      var unread=cv.unreadAgent>0?'<span class="unread">'+toAr(cv.unreadAgent)+'</span>':'';
+      var asg=cv.assignedTo?'<span class="ch-badge" style="background:#eef0f7;color:#5a6488">'+esc(agentName(cv.assignedTo))+'</span>':'';
+      var claim=(!admin && !cv.assignedTo)?'<button class="qchip" data-claim="'+esc(cv.id)+'" style="margin-right:auto;padding:3px 9px;font-size:11px">تسليم لي</button>':'';
+      return '<div class="conv'+(selConv===cv.id?' sel':'')+'" data-cv="'+esc(cv.id)+'">'+
+        '<div class="av">'+initial+'<span class="dot '+esc(cv.status||'open')+'"></span></div>'+
+        '<div class="mid"><div class="top"><span class="nm">'+esc(cv.name||'زائر')+'</span><span class="tm">'+chatTime(cv.updatedAt)+'</span></div>'+
+        '<div class="snip">'+esc(snip)+'</div>'+
+        '<div class="meta">'+chBadge+newBadge+(cv.phone?'<span class="tm" dir="ltr">'+esc(cv.phone)+'</span>':'')+asg+unread+claim+'</div></div></div>';
+    }).join('');
+    $$('#convList [data-claim]').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); var id=b.getAttribute('data-claim'); try{c.assign(id,myId);}catch(err){} toast('تم تسليم المحادثة لك ✓','ok'); renderInbox(); }); });
+    $$('#convList [data-cv]').forEach(function(el){ el.addEventListener('click',function(){ openConv(el.getAttribute('data-cv')); }); });
+    renderChatBadge();
+    if(selConv && !rows.some(function(x){return x.id===selConv;}) && !list.some(function(x){return x.id===selConv;})) selConv=null;
+  }
+
+  function openConv(id){
+    var c=CHAT(); if(!c) return;
+    selConv=id;
+    try{ c.markRead(id,'agent'); }catch(e){}
+    /* الموظف فتح المحادثة → يوقف رسائل الانتظار والتحويل التلقائي ويسنِدها له لو غير مسنودة */
+    try{ var me=curUser(); c.markOpened&&c.markOpened(id, me&&me.id); }catch(e){}
+    renderRoom();
+    renderInbox();
+  }
+
+  function renderRoom(){
+    var c=CHAT(), room=$('#inboxRoom');
+    var cv=null; try{ cv=selConv?c.getConversation(selConv):null; }catch(e){}
+    if(!cv){ room.innerHTML='<div class="room-empty">اختر محادثة من القائمة لعرضها والرد عليها.</div>'; return; }
+    var chLabel=cv.channel==='whatsapp'?'واتساب':'ويب';
+    var admin=isAdmin();
+    var assignCtl = admin
+      ? '<select id="rmAssign" style="width:150px"><option value="">غير مسنود</option>'+agentList().map(function(u){return '<option value="'+esc(u.id)+'"'+(cv.assignedTo===u.id?' selected':'')+'>'+esc(u.name||u.username)+'</option>';}).join('')+'</select>'
+      : (cv.assignedTo?'<span class="pill blue" style="height:38px;align-self:center">'+esc(agentName(cv.assignedTo))+'</span>':'<span class="pill gray" style="height:38px;align-self:center">غير مسنود</span>');
+    var quicks=['أهلًا بك، كيف نخدمك؟','سعر السيارة يبدأ من … ريال يوميًا.','تفضّل بزيارة أقرب فرع لإتمام الحجز.','تم تحويلك لأحد موظفينا، لحظات من فضلك.'];
+    room.innerHTML=
+      '<div class="room-h">'+
+        '<div class="ri"><div class="nm">'+esc(cv.name||'زائر')+'</div>'+
+        '<div class="ph">'+(cv.phone?'<span dir="ltr">'+esc(cv.phone)+'</span> · ':'')+'القناة: '+chLabel+'</div></div>'+
+        '<select id="rmStatus"><option value="open"'+(cv.status==='open'?' selected':'')+'>مفتوحة</option>'+
+          '<option value="pending"'+(cv.status==='pending'?' selected':'')+'>بانتظار الرد</option>'+
+          '<option value="closed"'+(cv.status==='closed'?' selected':'')+'>مغلقة</option></select>'+
+        assignCtl+
+        '<button class="btn btn-ghost" id="rmClose" style="height:38px;padding:0 14px" title="إنهاء وإرسال التقييم"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg> إنهاء المحادثة</button>'+
+      '</div>'+
+      '<div class="thread" id="rmThread"></div>'+
+      '<div class="quicks">'+quicks.map(function(t,i){return '<button class="qchip" data-q="'+i+'">'+esc(t)+'</button>';}).join('')+'</div>'+
+      '<div class="composer"><textarea id="rmText" rows="1" placeholder="اكتب رسالة…"></textarea>'+
+        '<button class="sendb" id="rmSend"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z"/></svg></button></div>';
+
+    renderThread(cv);
+
+    $('#rmStatus').addEventListener('change',function(){ try{c.setStatus(cv.id,this.value);}catch(e){} renderRoom(); renderInbox(); renderSurveys(); });
+    var rmAsg=$('#rmAssign');
+    if(rmAsg&&rmAsg.tagName==='SELECT') rmAsg.addEventListener('change',function(){ try{c.assign(cv.id,this.value||null);}catch(e){} renderInbox(); });
+    $('#rmClose').addEventListener('click',function(){ try{c.setStatus(cv.id,'closed');}catch(e){} renderRoom(); renderInbox(); renderSurveys(); });
+    $$('#inboxRoom .qchip').forEach(function(b){ b.addEventListener('click',function(){ var ta=$('#rmText'); ta.value=quicks[+b.getAttribute('data-q')]; ta.focus(); }); });
+    function send(){ var ta=$('#rmText'), t=ta.value.trim(); if(!t) return;
+      var me=curUser();
+      if(me && !isAdmin() && !cv.assignedTo){ try{ c.assign(cv.id, me.id); }catch(e){} }  /* رد الموظف على محادثة غير مسنودة ⇒ تُسنَد له */
+      try{ c.sendMessage(cv.id,{from:'agent',text:t}); }catch(e){} ta.value=''; renderRoom(); renderInbox(); }
+    $('#rmSend').addEventListener('click',send);
+    $('#rmText').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); send(); } });
+  }
+
+  function renderThread(cv){
+    var th=$('#rmThread'); if(!th) return;
+    var msgs=cv.messages||[];
+    if(!msgs.length){ th.innerHTML='<div class="room-empty">لا توجد رسائل بعد.</div>'; return; }
+    th.innerHTML=msgs.map(function(m){
+      var side=m.from==='user'?'user':(m.from==='bot'?'bot':'agent');
+      if(m.type==='card'){
+        var rows='';
+        var items=(m.data&&(m.data.items||m.data.cars||m.data.rows))||null;
+        if(items&&items.length){ rows=items.map(function(it){ return '<div class="cd-row"><span>'+esc(it.name||it.label||'')+'</span><b>'+esc(it.price!=null?(toAr(it.price)+' ريال'):(it.value||''))+'</b></div>'; }).join(''); }
+        else rows='<div>'+esc(m.text||'بطاقة')+'</div>';
+        return '<div class="bub card"><div style="font-weight:900;color:var(--blue);margin-bottom:4px">'+esc(m.text||'')+'</div>'+rows+'<span class="bt">'+chatTime(m.ts)+'</span></div>';
+      }
+      return '<div class="bub '+side+'">'+esc(m.text||'').replace(/\n/g,'<br>')+'<span class="bt">'+chatTime(m.ts)+'</span></div>';
+    }).join('');
+    th.scrollTop=th.scrollHeight;
+  }
+
+  // filter tabs + search
+  $$('#convTabs .ftab').forEach(function(b){ b.addEventListener('click',function(){
+    $$('#convTabs .ftab').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
+    chatFilter=b.getAttribute('data-f'); renderInbox();
+  }); });
+  $('#convSearch').addEventListener('input',renderInbox);
+
+  /* ========== تنبيه الموظف عند رسالة/محادثة جديدة (صوت + بصري) ========== */
+  var SNDK='ot_admin_sound', _ac=null, _notifyPrev=-1, _baseTitle=(document.title||'لوحة التحكم'), _titleTimer=null;
+  function soundOn(){ try{ return localStorage.getItem(SNDK)!=='0'; }catch(e){ return true; } }
+  function renderSoundBtn(){
+    var b=$('#soundToggle'); if(!b) return; var on=soundOn();
+    var icOn='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>';
+    var icOff='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
+    b.innerHTML=(on?icOn:icOff)+' '+(on?'الصوت مفعّل':'صامت'); b.style.opacity=on?'1':'.55';
+  }
+  function setSound(on){ try{ localStorage.setItem(SNDK,on?'1':'0'); }catch(e){} renderSoundBtn(); if(on) beep(); }
+  function beep(){
+    if(!soundOn()) return;
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+      _ac=_ac||new AC(); if(_ac.state==='suspended'){ _ac.resume(); }
+      [[880,0],[1175,0.18]].forEach(function(p){
+        var o=_ac.createOscillator(), g=_ac.createGain(); o.connect(g); g.connect(_ac.destination);
+        o.type='sine'; o.frequency.value=p[0]; var t=_ac.currentTime+p[1];
+        g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.012); g.gain.exponentialRampToValueAtTime(0.0001,t+0.15);
+        o.start(t); o.stop(t+0.16);
+      });
+    }catch(e){}
+  }
+  function stopTitle(){ if(_titleTimer){ clearInterval(_titleTimer); _titleTimer=null; } if(_baseTitle) document.title=_baseTitle; }
+  function flashTitle(n){ stopTitle(); var on=false; _titleTimer=setInterval(function(){ document.title= on? _baseTitle : ('🔔 ('+toAr(n)+') رسالة جديدة'); on=!on; },1000); }
+  function relevantUnread(){
+    var c=CHAT(); if(!c) return 0;
+    try{
+      if(isAdmin()) return c.unreadAgentTotal()||0;
+      var me=curUser(), id=me&&me.id, arr=c.listConversations()||[], n=0;
+      arr.forEach(function(x){ if(x.assignedTo===id || !x.assignedTo) n+=(x.unreadAgent||0); });
+      return n;
+    }catch(e){ return 0; }
+  }
+  function pulseBadge(on){ var el=$('#ctChat'); if(el) el.classList.toggle('has-new',!!on); }
+  function clearNotify(){ stopTitle(); pulseBadge(false); _notifyPrev=relevantUnread(); }
+  function notifyMaybe(){
+    var cur=relevantUnread();
+    var viewing = $('#sec-chat').classList.contains('on') && document.hasFocus();
+    if(_notifyPrev>=0 && cur>_notifyPrev && !viewing){ beep(); pulseBadge(true); flashTitle(cur); toast('🔔 وصلت رسالة جديدة','ok'); }
+    _notifyPrev=cur;
+  }
+  function initNotify(){
+    _baseTitle=document.title||'لوحة التحكم'; _notifyPrev=relevantUnread(); renderSoundBtn();
+    var resume=function(){ try{ if(_ac&&_ac.state==='suspended') _ac.resume(); }catch(e){} };
+    document.addEventListener('click',resume); document.addEventListener('keydown',resume);
+    window.addEventListener('focus',function(){ if($('#sec-chat').classList.contains('on')) clearNotify(); });
+    /* فحص دوري لتحويل المحادثات المتأخرة لموظف آخر (حسب إعداد الدقائق) */
+    if(!window.__otSweep){ window.__otSweep=setInterval(function(){ try{ var c=CHAT(); if(c&&c.reassignSweep) c.reassignSweep(); }catch(e){} },25000); }
+  }
+  if($('#soundToggle')) $('#soundToggle').addEventListener('click',function(){ setSound(!soundOn()); });
+
+  // realtime: rerender on any change + keep badge live + تنبيه
+  (function(){
+    var c=CHAT(); if(!c||!c.on) return;
+    c.on('change',function(){
+      renderChatBadge();
+      notifyMaybe();
+      if($('#sec-chat').classList.contains('on')){ renderInbox(); if(selConv) renderThread(c.getConversation(selConv)||{}); }
+      if($('#sec-surveys').classList.contains('on')) safeRender(renderSurveys);
+    });
+  })();
+
+  /* ========== CHAT SETTINGS (رسالة الإغلاق + التقييم) ========== */
+  function loadChatSettings(){
+    var c=CHAT(); var s={}; try{ s=(c&&c.settings&&c.settings())||{}; }catch(e){ s={}; }
+    var box=$('#chatSettingsBox'); if(!box) return;
+    if($('#cs-close')) $('#cs-close').value=s.closeMessage||'';
+    if($('#cs-waiting')) $('#cs-waiting').value=s.waitingMessage||'';
+    if($('#cs-survey')) $('#cs-survey').checked=s.surveyEnabled!==false;
+    if($('#cs-question')) $('#cs-question').value=s.surveyQuestion||'';
+    if($('#cs-reassign')) $('#cs-reassign').value=(s.reassignMinutes!=null?s.reassignMinutes:3);
+  }
+  if($('#cs-save')) $('#cs-save').addEventListener('click',function(){
+    var c=CHAT(); if(!c||!c.saveSettings){ toast('وحدة الدردشة غير محمّلة','err'); return; }
+    try{ c.saveSettings({ closeMessage:$('#cs-close').value, waitingMessage:$('#cs-waiting').value, surveyEnabled:$('#cs-survey').checked, surveyQuestion:$('#cs-question').value.trim(), reassignMinutes:parseInt($('#cs-reassign').value,10)||0 }); toast('تم حفظ إعدادات الشات ✓','ok'); }
+    catch(e){ toast('تعذّر الحفظ','err'); }
+  });
+
+  /* ========== SURVEYS / CSAT ========== */
+  function stars(n){ n=Math.round(n||0); var s=''; for(var i=1;i<=5;i++){ s+= i<=n?'★':'☆'; } return s; }
+  function renderSurveys(){
+    if(!$('#surveyList')) return;
+    var c=CHAT(), admin=isAdmin(), me=curUser(), myId=me?me.id:null;
+    if(!c||!c.surveys){ $('#surveyList').innerHTML='<div class="empty" style="padding:30px">وحدة الدردشة (chat.js) غير محمّلة.</div>'; if($('#surveyStatsCards'))$('#surveyStatsCards').innerHTML=''; if($('#surveyAgents'))$('#surveyAgents').innerHTML=''; return; }
+    var all=[]; try{ all=c.surveys()||[]; }catch(e){ all=[]; }
+    var stat={overall:{count:0,avg:0},perAgent:{}}; try{ stat=c.surveyStats()||stat; }catch(e){}
+    var list = admin ? all : all.filter(function(s){ return s.agent===myId; });
+
+    /* بطاقات إجمالية */
+    if($('#surveyStatsCards')){
+      var ov = admin ? (stat.overall||{count:0,avg:0}) : (function(){ var cnt=list.length, sum=list.reduce(function(a,b){return a+(b.rating||0);},0); return {count:cnt,avg:cnt?sum/cnt:0}; })();
+      var starIc='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>';
+      var cntIc='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+      var avgTxt=ov.count?toAr((Math.round(ov.avg*10)/10).toString()):'٠';
+      $('#surveyStatsCards').innerHTML=
+        '<div class="stat"><div class="ic">'+starIc+'</div><b>'+avgTxt+' <small style="font-size:16px;color:#f5901e">★</small></b><span>'+(admin?'متوسط التقييم العام':'متوسط تقييمك')+'</span></div>'+
+        '<div class="stat"><div class="ic">'+cntIc+'</div><b>'+toAr(ov.count)+'</b><span>عدد التقييمات</span></div>';
+    }
+
+    /* جدول لكل موظف (للأدمن فقط) */
+    if($('#surveyAgents')){
+      if(!admin){ $('#surveyAgents').innerHTML='<div class="empty" style="padding:24px">هذا الجدول للمدير. ترى أدناه تقييماتك أنت فقط.</div>'; }
+      else {
+        var pa=stat.perAgent||{}, keys=Object.keys(pa);
+        if(!keys.length){ $('#surveyAgents').innerHTML='<div class="empty" style="padding:24px">لا توجد تقييمات بعد.</div>'; }
+        else {
+          var arows=keys.map(function(k){
+            var a=pa[k]||{}, nm = k==='unassigned' ? 'غير مسنود' : (agentName(k)||a.name||k);
+            var cnt=a.counts||{}, dist=[5,4,3,2,1].map(function(n){ return '<span class="pill gray" style="font-size:11px">'+toAr(n)+'★ '+toAr(cnt[n]||0)+'</span>'; }).join(' ');
+            return '<tr><td><b>'+esc(nm)+'</b></td><td class="price">'+toAr(Math.round((a.avg||0)*10)/10)+' <small style="color:#f5901e">★</small></td><td>'+toAr(a.count||0)+'</td><td><div class="rowacts" style="flex-wrap:wrap;gap:5px">'+dist+'</div></td></tr>';
+          }).join('');
+          $('#surveyAgents').innerHTML='<table><thead><tr><th>الموظف</th><th>المتوسط</th><th>العدد</th><th>توزيع النجوم</th></tr></thead><tbody>'+arows+'</tbody></table>';
+        }
+      }
+    }
+
+    /* جدول كل التقييمات */
+    if(!list.length){ $('#surveyList').innerHTML='<div class="empty" style="padding:30px">لا توجد تقييمات بعد.</div>'; return; }
+    var rows=list.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(s){
+      var cust=esc(s.customer||'—'), ag=esc(s.agentName||agentName(s.agent)||'غير مسنود');
+      return '<tr><td style="color:#f5901e;font-size:16px;white-space:nowrap" title="'+toAr(s.rating||0)+'/٥">'+stars(s.rating)+'</td>'+
+        '<td style="max-width:320px;color:#5a6488">'+(s.comment?esc(s.comment):'<span style="color:#98a0bd">—</span>')+'</td>'+
+        '<td><b>'+cust+'</b></td><td>'+ag+'</td>'+
+        '<td style="white-space:nowrap;color:#98a0bd">'+chatTime(s.ts)+'</td></tr>';
+    }).join('');
+    $('#surveyList').innerHTML='<table><thead><tr><th>التقييم</th><th>التعليق</th><th>العميل</th><th>الموظف المسؤول</th><th>الوقت</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+
+  /* ========== WHATSAPP SETTINGS ========== */
+  var WAK='ot_wa_config';
+  function renderWa(){
+    var cfg=load(WAK,{enabled:false,businessPhone:'',phoneNumberId:'',token:'',verifyToken:''});
+    $('#wa-enabled').checked=!!cfg.enabled;
+    $('#wa-phone').value=cfg.businessPhone||'';
+    $('#wa-pnid').value=cfg.phoneNumberId||'';
+    $('#wa-token').value=cfg.token||'';
+    $('#wa-verify').value=cfg.verifyToken||'';
+    renderWaOutbox();
+  }
+  function renderWaOutbox(){
+    var box=$('#waOutbox'), c=CHAT(), items=[];
+    try{ items=(c&&c.WhatsApp&&c.WhatsApp.outbox())||load('ot_wa_outbox',[]); }catch(e){ items=load('ot_wa_outbox',[]); }
+    var pending=items.filter(function(x){return !x.sent;}).length;
+    if(!items.length){ box.innerHTML='<div class="empty" style="padding:24px">صندوق الصادر فارغ.</div>'; return; }
+    var rows=items.slice(0,12).map(function(x){
+      return '<tr><td dir="ltr" style="text-align:right">'+esc(x.phone||'')+'</td><td style="max-width:280px;color:#5a6488">'+esc(x.text||'')+'</td>'+
+        '<td>'+(x.sent?'<span class="pill green">أُرسلت</span>':'<span class="pill orange">بانتظار</span>')+'</td>'+
+        '<td style="white-space:nowrap;color:#98a0bd">'+chatTime(x.ts)+'</td></tr>';
+    }).join('');
+    box.innerHTML='<div class="sub" style="margin-bottom:8px;color:#5a6488;font-weight:700">بانتظار الإرسال: '+toAr(pending)+' من '+toAr(items.length)+'</div>'+
+      '<div style="overflow:auto"><table><thead><tr><th>الرقم</th><th>النص</th><th>الحالة</th><th>الوقت</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+  $('#saveWa').addEventListener('click',function(){
+    var cfg={ enabled:$('#wa-enabled').checked, businessPhone:$('#wa-phone').value.trim(),
+      phoneNumberId:$('#wa-pnid').value.trim(), token:$('#wa-token').value.trim(), verifyToken:$('#wa-verify').value.trim() };
+    if(save(WAK,cfg)) toast('تم حفظ إعدادات واتساب ✓','ok');
+  });
+
+  /* محاكاة رسالة واتساب واردة — لتجربة المسار كاملًا بدون نشر السيرفر */
+  var _waSim=0;
+  if($('#waSimulate')) $('#waSimulate').addEventListener('click',function(){
+    var c=CHAT();
+    if(!c||!c.WhatsApp||!c.WhatsApp.ingestInbound){ toast('وحدة الدردشة (chat.js) غير محمّلة','err'); return; }
+    _waSim++;
+    var samples=['السلام عليكم، السيارة متاحة بكرة؟','عايز أأجر كامري لمدة أسبوع','كم سعر التأجير الشهري؟','ممكن أستلم من مطار الملك خالد؟'];
+    try{ c.WhatsApp.ingestInbound({ phone:'96650'+(100000+_waSim), name:'عميل واتساب '+toAr(_waSim), text:samples[_waSim%samples.length], waId:'wamid.SIM'+Date.now() }); }
+    catch(e){ toast('تعذّرت المحاكاة','err'); return; }
+    toast('وصلت رسالة واتساب — افتح «المحادثات» للرد','ok');
+    var navc=$('.nav-i[data-sec="chat"]'); if(navc) navc.click();
+    var list=c.listConversations&&c.listConversations(); if(list&&list[0]){ selConv=list[0].id; renderRoom(); }
+    renderInbox(); renderChatBadge();
+  });
+
+  /* ========== SUPABASE SYNC SETTINGS ========== */
+  var SBK='ot_supabase_config';
+  function sbStatus(){ try{ return (window.OneTrip&&OneTrip.ChatSync&&OneTrip.ChatSync.status&&OneTrip.ChatSync.status())||'off'; }catch(e){ return 'off'; } }
+  function renderSb(){
+    var cfg=load(SBK,{enabled:false,url:'',anonKey:''});
+    $('#sb-enabled').checked=!!cfg.enabled;
+    $('#sb-url').value=cfg.url||'';
+    $('#sb-key').value=cfg.anonKey||'';
+    var map={off:['غير مفعّل','gray'],connecting:['جارٍ الاتصال…','orange'],live:['متصل ومتزامن','green'],error:['تعذّر الاتصال','orange']};
+    var m=map[sbStatus()]||map.off;
+    var el=$('#sb-status'); if(el) el.innerHTML='<span class="pill '+m[1]+'">'+m[0]+'</span>';
+  }
+  $('#saveSb').addEventListener('click',function(){
+    var cfg={ enabled:$('#sb-enabled').checked, url:$('#sb-url').value.trim().replace(/\/+$/,''), anonKey:$('#sb-key').value.trim() };
+    if(save(SBK,cfg)){ toast('تم حفظ إعدادات Supabase ✓ — أعد تحميل الصفحة للاتصال','ok'); renderSb(); }
+  });
 })();
 </script>
 </body>
