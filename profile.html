@@ -186,6 +186,41 @@
   .convo .cm{font-size:13.5px;color:#5a6488;font-weight:600;margin-top:3px;max-width:560px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .convo .cd{font-size:12.5px;color:#9aa0b4;font-weight:700;white-space:nowrap;}
 
+  /* ---------- booking requirements / my documents ---------- */
+  .docs-summary{
+    display:flex;align-items:center;gap:9px;font-weight:800;font-size:15px;
+    padding:13px 16px;border-radius:13px;margin-bottom:22px;line-height:1.6;
+  }
+  .docs-summary.ok{background:#e9f7ef;color:#1f8a4c;border:1.5px solid #bfe6cf;}
+  .docs-summary.warn{background:#fff5e8;color:#b9650f;border:1.5px solid #f6d9b0;}
+  .docs-att{
+    border:1.5px solid var(--field-border);border-radius:16px;padding:16px;margin-top:14px;
+    display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;
+  }
+  .docs-att .att-main{flex:1;min-width:220px;display:flex;flex-direction:column;gap:9px;}
+  .docs-att .att-label{font-weight:900;font-size:15.5px;color:var(--green);}
+  .docs-att .att-thumb{
+    width:104px;height:104px;border-radius:13px;border:1.5px solid var(--field-border);
+    object-fit:cover;background:#f4f6fd;flex:none;
+  }
+  .docs-att .att-file{font-size:13px;font-weight:700;color:#7a82a0;word-break:break-all;}
+  .docs-att input[type=file]{
+    font-family:inherit;font-size:13.5px;font-weight:600;color:var(--green);
+    border:1.5px dashed var(--field-border);border-radius:11px;padding:9px 11px;background:#fafbff;cursor:pointer;
+  }
+  .docs-att .att-msg{font-weight:800;font-size:13.5px;margin:0;min-height:1px;}
+  .docs-att .att-msg.ok{color:#1f8a4c;}
+  .docs-att .att-msg.err{color:#c0392b;}
+  .att-pill{
+    display:inline-flex;align-items:center;gap:6px;width:fit-content;
+    font-weight:800;font-size:12.5px;padding:5px 12px;border-radius:999px;
+  }
+  .att-pill.pending{background:#fff5e8;color:#b9650f;}
+  .att-pill.approved{background:#e9f7ef;color:#1f8a4c;}
+  .att-pill.rejected{background:#fdecea;color:#c0392b;}
+  .att-pill.none{background:#eef1fb;color:#5a6488;}
+  .att-note{font-size:13px;font-weight:700;color:#c0392b;}
+
   /* ---------- footer (matches index.html) ---------- */
   .site-footer{background:#141d5c;color:#e8e1cf;}
   .footer-inner{
@@ -297,6 +332,7 @@
 <link rel="stylesheet" href="chat-widget.css">
 <script src="cars.js?v=7"></script>
 <script src="auth-core.js?v=1"></script>
+<script src="req-core.js?v=1"></script>
 <script src="booking-core.js?v=7"></script>
 <script src="branch-map.js"></script>
 <script src="chat.js"></script>
@@ -313,6 +349,7 @@
 
   /* ---- helpers (guarded; never crash if a global is missing) ---- */
   var Auth = (window.OneTrip && window.OneTrip.Auth) || null;
+  var Reqs = (window.OneTrip && window.OneTrip.Reqs) || null;
 
   function esc(s){
     return String(s == null ? '' : s)
@@ -428,6 +465,158 @@
     return out;
   }
 
+  /* ============================================================
+     BOOKING REQUIREMENTS / MY DOCUMENTS  (contract §5)
+     ============================================================ */
+  var MAX_FILE_BYTES = 1.5 * 1024 * 1024;   /* ~1.5MB حد حجم الملف */
+
+  function currentCustId(){
+    try { var cur = Auth && Auth.current(); return (cur && cur.id) ? cur.id : null; }
+    catch(e){ return null; }
+  }
+
+  function attStatusPill(rec){
+    var st = rec && rec.status;
+    if (st === 'approved') return '<span class="att-pill approved">معتمد ✓</span>';
+    if (st === 'rejected') return '<span class="att-pill rejected">مرفوض ✕</span>';
+    if (st === 'pending')  return '<span class="att-pill pending">قيد المراجعة</span>';
+    return '<span class="att-pill none">لم يُرفع بعد</span>';
+  }
+
+  /* ملخّص الحالة من Reqs.check (المصدر الوحيد) */
+  function docsSummaryHtml(custId){
+    var r = null;
+    try { r = Reqs.check(custId); } catch(e){ r = null; }
+    if (!r) return '';
+    if (r.ok){
+      return '<div class="docs-summary ok">'+
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'+
+        'مستنداتك مكتملة ✓</div>';
+    }
+    var miss = [];
+    (r.missingFields || []).forEach(function(f){ if (f) miss.push(esc(f.label || f.id)); });
+    (r.missingAttachments || []).forEach(function(a){ if (a) miss.push(esc(a.label || a.id)); });
+    (r.rejected || []).forEach(function(a){ if (a) miss.push(esc((a.label || a.id) + ' (مرفوض)')); });
+    return '<div class="docs-summary warn">'+
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>'+
+      'ناقص: ' + (miss.length ? miss.join('، ') : 'بيانات مطلوبة') + '</div>';
+  }
+
+  function docsHtml(){
+    if (!Reqs) return '';
+    var custId = currentCustId();
+    if (!custId) return '';
+    var cfg = {};
+    try { cfg = Reqs.config() || {}; } catch(e){ cfg = {}; }
+    var d = {};
+    try { d = Reqs.docs(custId) || {}; } catch(e){ d = {}; }
+    var fields = Array.isArray(cfg.fields) ? cfg.fields : [];
+    var attachments = Array.isArray(cfg.attachments) ? cfg.attachments : [];
+    var dFields = (d.fields && typeof d.fields === 'object') ? d.fields : {};
+    var dAtts   = (d.attachments && typeof d.attachments === 'object') ? d.attachments : {};
+
+    var out =
+      '<section id="docs" class="card" style="scroll-margin-top:90px;margin-top:34px;">' +
+        '<div class="card-head">' +
+          '<div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>' +
+          '<div><h2>متطلبات الحجز / مستنداتي</h2><div class="sub">أكمل بياناتك وارفع مستنداتك المطلوبة قبل الحجز</div></div>' +
+        '</div>' +
+        docsSummaryHtml(custId);
+
+    /* ---- الحقول ---- */
+    if (fields.length){
+      out += '<div class="grid2">';
+      fields.forEach(function(f){
+        f = f || {};
+        if (f.id == null) return;
+        var type = (f.type === 'date') ? 'date' : 'text';
+        var val = dFields[f.id];
+        val = (val == null) ? '' : val;
+        var lp = (type === 'date') ? '' : ' dir="ltr"';
+        out +=
+          '<div class="fld">' +
+            '<label for="docf_' + esc(f.id) + '">' + esc(f.label || f.id) + (f.required ? ' *' : '') + '</label>' +
+            '<input id="docf_' + esc(f.id) + '" data-field="' + esc(f.id) + '" type="' + type + '"' + lp + ' value="' + esc(val) + '">' +
+          '</div>';
+      });
+      out += '</div>';
+    }
+
+    /* ---- المرفقات ---- */
+    attachments.forEach(function(a){
+      a = a || {};
+      if (a.id == null) return;
+      var rec = dAtts[a.id] || null;
+      var hasImg = rec && rec.dataURL && /^data:image\//.test(String(rec.dataURL));
+      out +=
+        '<div class="docs-att">' +
+          (hasImg ? '<img class="att-thumb" src="' + esc(rec.dataURL) + '" alt="' + esc(a.label || a.id) + '">' : '') +
+          '<div class="att-main">' +
+            '<span class="att-label">' + esc(a.label || a.id) + (a.required ? ' *' : '') + '</span>' +
+            attStatusPill(rec) +
+            (rec && rec.status === 'rejected' && rec.note ? '<span class="att-note">سبب الرفض: ' + esc(rec.note) + '</span>' : '') +
+            (rec && rec.name ? '<span class="att-file">الملف: ' + esc(rec.name) + '</span>' : '') +
+            '<input type="file" accept="image/*,application/pdf" data-att="' + esc(a.id) + '">' +
+            '<p class="att-msg" data-att-msg="' + esc(a.id) + '"></p>' +
+          '</div>' +
+        '</div>';
+    });
+
+    out += '</section>';
+    return out;
+  }
+
+  function wireDocs(){
+    if (!Reqs) return;
+    var custId = currentCustId();
+    if (!custId) return;
+    var sec = document.getElementById('docs');
+    if (!sec) return;
+
+    /* حفظ الحقول عند التغيير/الخروج من الحقل */
+    var inputs = sec.querySelectorAll('input[data-field]');
+    Array.prototype.forEach.call(inputs, function(inp){
+      var save = function(){
+        try { Reqs.saveField(custId, inp.getAttribute('data-field'), inp.value || ''); } catch(e){}
+      };
+      inp.addEventListener('change', save);
+      inp.addEventListener('blur', save);
+    });
+
+    /* رفع المرفقات عبر FileReader → dataURL مع حدّ الحجم */
+    var files = sec.querySelectorAll('input[type=file][data-att]');
+    Array.prototype.forEach.call(files, function(fin){
+      fin.addEventListener('change', function(){
+        var attId = fin.getAttribute('data-att');
+        var msg = sec.querySelector('[data-att-msg="' + attId + '"]');
+        var file = fin.files && fin.files[0];
+        if (!file) return;
+        if (file.size > MAX_FILE_BYTES){
+          if (msg){ msg.className = 'att-msg err'; msg.textContent = 'الملف كبير جدًا — الحد الأقصى ١٫٥ ميجابايت. الرجاء اختيار ملف أصغر.'; }
+          fin.value = '';
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(){
+          var r = {};
+          try { r = Reqs.saveAttachment(custId, attId, { name: file.name, dataURL: String(reader.result || '') }) || {}; }
+          catch(e){ r = { ok:false }; }
+          if (msg){
+            if (r.ok){ msg.className = 'att-msg ok'; msg.textContent = 'تم الرفع — قيد المراجعة'; }
+            else { msg.className = 'att-msg err'; msg.textContent = r.error || 'تعذّر رفع الملف.'; }
+          }
+          /* إعادة الرسم تتم تلقائيًا عبر Reqs.on('change') */
+        };
+        reader.onerror = function(){
+          if (msg){ msg.className = 'att-msg err'; msg.textContent = 'تعذّر قراءة الملف.'; }
+        };
+        try { reader.readAsDataURL(file); } catch(e){
+          if (msg){ msg.className = 'att-msg err'; msg.textContent = 'تعذّر قراءة الملف.'; }
+        }
+      });
+    });
+  }
+
   function renderLoggedIn(){
     var c = {};
     try { c = Auth.current() || {}; } catch(e){ c = {}; }
@@ -476,6 +665,9 @@
         bookingsHtml() +
       '</section>' +
 
+      /* ---- متطلبات الحجز / مستنداتي ---- */
+      docsHtml() +
+
       /* ---- محادثاتي (اختياري) ---- */
       conversationsHtml() +
 
@@ -486,6 +678,7 @@
       '</div>';
 
     wireLoggedIn();
+    wireDocs();
   }
 
   /* ---- show inline feedback ---- */
@@ -561,17 +754,30 @@
     if (Auth && typeof Auth.on === 'function') Auth.on('change', render);
   } catch(e){}
 
-  /* if Auth isn't ready yet (script order/race), retry briefly */
-  if (!Auth){
+  /* re-render docs on requirements/documents change (guarded) */
+  try {
+    if (Reqs && typeof Reqs.on === 'function') Reqs.on('change', render);
+  } catch(e){}
+
+  /* if Auth/Reqs aren't ready yet (script order/race), retry briefly */
+  if (!Auth || !Reqs){
     var tries = 0;
     var iv = setInterval(function(){
-      Auth = (window.OneTrip && window.OneTrip.Auth) || null;
       tries++;
-      if (Auth){
+      if (!Auth){
+        Auth = (window.OneTrip && window.OneTrip.Auth) || null;
+        if (Auth){ try { if (typeof Auth.on === 'function') Auth.on('change', render); } catch(e){} }
+      }
+      if (!Reqs){
+        Reqs = (window.OneTrip && window.OneTrip.Reqs) || null;
+        if (Reqs){ try { if (typeof Reqs.on === 'function') Reqs.on('change', render); } catch(e){} }
+      }
+      if ((Auth && Reqs) || tries > 40){
         clearInterval(iv);
-        try { if (typeof Auth.on === 'function') Auth.on('change', render); } catch(e){}
         render();
-      } else if (tries > 40){ clearInterval(iv); render(); }
+      } else if (Auth){
+        render();
+      }
     }, 50);
   }
 
