@@ -394,6 +394,7 @@
         </div>
       </div>
       <a href="#bookingWidget">الاشتراك الشهري</a>
+      <a href="news.html">أخبارنا</a>
       <a href="contact.html">تواصل معنا</a>
     </nav>
 
@@ -423,100 +424,8 @@
     </p>
   </section>
 
-  <!-- ===== BOOKING WIDGET (real HTML — top rebuilt, palm + skyline kept) ===== -->
-  <section class="booking" id="bookingWidget">
-    <!-- Tabs -->
-    <div class="tab-bar" id="tabBar">
-      <button class="tab active" data-tab="0">
-        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.5l1.2-4.6A2.2 2.2 0 0 1 8.3 10.3h7.4a2.2 2.2 0 0 1 2.1 1.6l1.2 4.6"/><path d="M4 16.5h16v2.2a1 1 0 0 1-1 1h-1.6a1 1 0 0 1-1-1v-1.2H7.6v1.2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
-        ابحث الآن
-      </button>
-      <button class="tab" data-tab="1">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M5.5 18 4 8l4.5 3.4L12 5l3.5 6.4L20 8l-1.5 10"/></svg>
-        الاشتراك الشهري
-      </button>
-      <span class="tab-divider"></span>
-      <button class="tab" data-tab="2">
-        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
-        إدارة الحجز
-      </button>
-      <span class="tab-divider"></span>
-      <button class="tab" data-tab="3">
-        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16.5" x2="13" y2="16.5"/></svg>
-        تأجير طويل الأجل
-      </button>
-      <span class="tab-divider"></span>
-      <button class="tab" data-tab="4">
-        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="18" y2="10.5"/><line x1="18" y1="20" x2="6" y2="10.5"/><path d="M12 10c-1.7-1.1-2.3-2.9-1.7-4.7.9.7 1.4 1.6 1.7 2.7.3-1.1.8-2 1.7-2.7.6 1.8 0 3.6-1.7 4.7Z" fill="currentColor" stroke="none"/><circle cx="12" cy="20.5" r="1.1" fill="currentColor" stroke="none"/></svg>
-        بلو ليموزين
-      </button>
-    </div>
-
-    <!-- Form card -->
-    <div class="form-card">
-      <!-- original Saudi skyline (towers + palms + flag), cropped from the design as an image -->
-      <img class="deco deco-skyline" src="booking-skyline.png" alt="" aria-hidden="true">
-
-      <div class="form-content">
-        <div class="field-grid">
-          <!-- Location -->
-          <div>
-            <div class="field-head">
-              <label class="field-label inline">موقع الاستلام و التسليم</label>
-              <label class="return-toggle" id="returnToggle">
-                <span class="checkbox" id="returnCheckbox">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1b2a7a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </span>
-                الرجوع لموقع مختلف
-              </label>
-            </div>
-            <div class="field-box">
-              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>
-              <input type="text" placeholder="مكان البحث">
-            </div>
-          </div>
-
-          <!-- Pickup date + time -->
-          <div>
-            <label class="field-label">تاريخ و وقت التسليم</label>
-            <div class="dt-row">
-              <div class="field-box date">
-                <input type="text" placeholder="التاريخ">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
-              </div>
-              <div class="field-box time">
-                <input type="text" placeholder="الوقت">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Return date + time -->
-          <div>
-            <label class="field-label">تاريخ و وقت العودة</label>
-            <div class="dt-row">
-              <div class="field-box date">
-                <input type="text" placeholder="التاريخ">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>
-              </div>
-              <div class="field-box time">
-                <input type="text" placeholder="الوقت">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5901e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Search button -->
-        <div class="search-row">
-          <button class="search-btn" id="searchBtn" type="button">
-            بحث
-            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#f3ecdb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- ===== BOOKING WIDGET (self-mounting via ui.js) ===== -->
+  <section class="booking" id="bookingWidget"></section>
 </div>
 
 <!-- ===== FLEET SECTION (real text + decorative image + data-driven cards) ===== -->
@@ -579,7 +488,9 @@
   <div class="footer-bar">© 2026 One Trip Car Rent — جميع الحقوق محفوظة</div>
 </footer>
 
-<script src="cars.js"></script>
+<script src="cars.js?v=7"></script>
+<script src="booking-core.js?v=7"></script>
+<script src="ui.js?v=7"></script>
 <script>
 (function(){
   'use strict';
@@ -596,34 +507,9 @@
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  /* ---- booking widget (real HTML) ---- */
-  var tabBar = document.getElementById('tabBar');
-  if (tabBar){
-    tabBar.addEventListener('click', function(e){
-      var btn = e.target.closest('.tab');
-      if (!btn) return;
-      tabBar.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-      btn.classList.add('active');
-    });
-  }
-  var returnState = false;
-  var returnToggle = document.getElementById('returnToggle');
-  var returnCheckbox = document.getElementById('returnCheckbox');
-  if (returnToggle && returnCheckbox){
-    returnToggle.addEventListener('click', function(e){
-      e.preventDefault();
-      returnState = !returnState;
-      returnCheckbox.classList.toggle('checked', returnState);
-    });
-  }
-  var searchBtn = document.getElementById('searchBtn');
-  if (searchBtn){
-    searchBtn.addEventListener('click', function(){
-      var loc = (document.querySelector('.form-card input') || {}).value || '';
-      var activeTab = (tabBar && tabBar.querySelector('.tab.active')) ? tabBar.querySelector('.tab.active').textContent.trim() : '';
-      console.log('بحث:', { tab: activeTab, location: loc, returnDifferent: returnState });
-      window.location.href = 'create-booking.html';   // go to the results page
-    });
+  /* ---- booking widget (self-mounting from ui.js) ---- */
+  if (window.OneTrip && OneTrip.mountBookingWidget){
+    OneTrip.mountBookingWidget('#bookingWidget');
   }
 
   /* ===========================================================
@@ -742,6 +628,7 @@
 </script>
 <script src="anim.js"></script>
 <link rel="stylesheet" href="chat-widget.css">
+<script src="branch-map.js"></script>
 <script src="chat.js"></script>
 <script src="supabase-sync.js"></script>
 <script src="chat-widget.js"></script>

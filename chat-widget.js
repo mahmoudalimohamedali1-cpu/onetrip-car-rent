@@ -538,8 +538,10 @@
 
   // card messages — payload in m.data.items | m.data.cars | m.data.rows  (name + price)
   Widget.prototype.renderCard = function (m) {
+    var self = this;
     var data = m.data || {};
-    var items = data.items || data.cars || data.rows || [];
+    var items = data.items || data.branches || data.cars || data.rows || [];
+    var BM = window.OneTrip && window.OneTrip.BranchMap;
     var card = document.createElement('div');
     card.className = 'otchat-card';
 
@@ -554,18 +556,42 @@
         var price = (it.price != null) ? it.price : (it.daily != null ? it.daily : null);
         var unit = it.unit || (price != null ? ' ريال/يوم' : '');
         var phone = it.phone ? ('<div class="otchat-card-sub" dir="ltr">' + esc(it.phone) + '</div>') : '';
+        var canMap = !!(BM && BM.hasLocation(it));
+        var mapBtn = canMap ? '<button type="button" class="otchat-map-btn" data-mapidx="' + i + '"><span>📍</span> عرض على الخريطة</button>' : '';
         body += '<div class="otchat-card-item">' +
             '<div class="otchat-card-main">' +
               '<div class="otchat-card-name">' + esc(name) + '</div>' +
-              (sub ? '<div class="otchat-card-sub">' + esc(sub) + '</div>' : '') + phone +
+              (sub ? '<div class="otchat-card-sub">' + esc(sub) + '</div>' : '') + phone + mapBtn +
             '</div>' +
             (price != null ? '<div class="otchat-card-price">' + esc(price) + esc(unit) + '</div>' : '') +
-          '</div>';
+          '</div>' +
+          (canMap ? '<div class="otchat-map-slot" data-mapslot="' + i + '"></div>' : '');
       }
     } else {
       body = '<div class="otchat-card-item"><div class="otchat-card-name">' + esc(m.text || 'لا توجد بيانات') + '</div></div>';
     }
     card.innerHTML = head + body;
+
+    // أزرار «عرض على الخريطة» — تفتح/تقفل خريطة جوجل مضمّنة داخل الشات
+    if (BM) {
+      var btns = card.querySelectorAll('.otchat-map-btn');
+      for (var k = 0; k < btns.length; k++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            var idx = +btn.getAttribute('data-mapidx');
+            var slot = card.querySelector('[data-mapslot="' + idx + '"]');
+            if (!slot) return;
+            if (slot.innerHTML) { slot.innerHTML = ''; btn.innerHTML = '<span>📍</span> عرض على الخريطة'; }
+            else {
+              slot.innerHTML = BM.embedHTML(items[idx], { height: 170 }) +
+                '<a class="otchat-map-link" href="' + BM.linkURL(items[idx]) + '" target="_blank" rel="noopener">فتح في خرائط جوجل ↗</a>';
+              btn.innerHTML = '<span>📍</span> إخفاء الخريطة';
+            }
+            safe(function () { self.scrollBottom(); });
+          });
+        })(btns[k]);
+      }
+    }
     return card;
   };
 
