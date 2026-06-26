@@ -6,6 +6,7 @@
 <title>بياناتك — One Trip Car Rent</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="booking.css">
+<link rel="stylesheet" href="auth-widget.css">
 </head>
 <body>
 
@@ -80,6 +81,9 @@
 
 <script src="cars.js?v=7"></script>
 <script src="booking-core.js?v=7"></script>
+<script src="auth-core.js"></script>
+<script src="req-core.js"></script>
+<script src="auth-widget.js"></script>
 <script>
 (function(){
   'use strict';
@@ -159,6 +163,158 @@
     refresh();
   });
 
+  /* ============================================================
+     متطلبات الحجز (OneTrip.Reqs) + شريط الحساب (OneTrip.Auth)
+     إضافي بالكامل — محروس: لو الوحدات غير محمّلة يعمل التدفّق الأصلي كما هو.
+     ============================================================ */
+  var Auth = (window.OneTrip && window.OneTrip.Auth) || null;
+  var Reqs = (window.OneTrip && window.OneTrip.Reqs) || null;
+  var AuthWidget = (window.OneTrip && window.OneTrip.AuthWidget) || null;
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+  }); }
+  function digits(s){ return String(s==null?'':s).replace(/\D/g,''); }
+
+  /* custId: معرّف المسجّل، أو ضيف مبني على أرقام الجوال */
+  function custId(){
+    try{
+      var cur = Auth && Auth.current && Auth.current();
+      if(cur && cur.id) return cur.id;
+    }catch(e){}
+    var ph = digits(document.getElementById('fPhone').value);
+    return 'guest_' + ph;
+  }
+
+  /* ---- شريط الحساب أعلى عمود النموذج (فوق لوحة «بيانات المستأجر») ---- */
+  var firstPanel = document.querySelector('.otb-grid > div > .otb-panel');
+  var acctBar = null;
+  if(Auth && firstPanel){
+    acctBar = document.createElement('div');
+    acctBar.className = 'otb-panel';
+    acctBar.id = 'acctBar';
+    acctBar.style.display = 'flex';
+    acctBar.style.alignItems = 'center';
+    acctBar.style.justifyContent = 'space-between';
+    acctBar.style.gap = '12px';
+    acctBar.style.flexWrap = 'wrap';
+    firstPanel.parentNode.insertBefore(acctBar, firstPanel);
+  }
+  function renderAcctBar(){
+    if(!acctBar || !Auth) return;
+    var cur = null;
+    try{ cur = Auth.current && Auth.current(); }catch(e){}
+    if(cur && Auth.isLoggedIn && Auth.isLoggedIn()){
+      acctBar.innerHTML = '<span style="font-weight:700;">مرحبًا '+esc(cur.name||'')+'</span>'+
+        '<button type="button" id="acctLogout" class="otb-btn otb-btn-ghost sm">تسجيل الخروج</button>';
+      /* املأ الحقول الفارغة من الحساب */
+      var f;
+      if((f=document.getElementById('fName')) && !f.value)  f.value = cur.name || '';
+      if((f=document.getElementById('fPhone')) && !f.value) f.value = digits(cur.phone||'').slice(0,10);
+      if((f=document.getElementById('fEmail')) && !f.value) f.value = cur.email || '';
+      var lo = document.getElementById('acctLogout');
+      if(lo) lo.addEventListener('click',function(){ try{ Auth.logout(); }catch(e){} });
+    } else {
+      acctBar.innerHTML = '<span>سجّل الدخول لإكمال متطلبات الحجز.</span>'+
+        '<button type="button" id="acctLogin" class="otb-btn otb-btn-pri sm">سجّل الدخول</button>';
+      var li = document.getElementById('acctLogin');
+      if(li) li.addEventListener('click',function(){
+        try{ if(AuthWidget && AuthWidget.open) AuthWidget.open('login'); }catch(e){}
+      });
+    }
+  }
+
+  /* ---- لوحة «متطلبات الحجز» بعد لوحة «بيانات المستأجر» ---- */
+  var reqsPanel = null;
+  if(Reqs && firstPanel){
+    reqsPanel = document.createElement('div');
+    reqsPanel.className = 'otb-panel';
+    reqsPanel.id = 'reqsPanel';
+    firstPanel.parentNode.insertBefore(reqsPanel, firstPanel.nextSibling);
+  }
+  function statusLabel(st){
+    if(st==='approved') return '<span style="color:#16a34a;font-weight:700;">معتمد ✓</span>';
+    if(st==='rejected') return '<span style="color:#dc2626;font-weight:700;">مرفوض</span>';
+    return '<span style="color:#f5901e;font-weight:700;">قيد المراجعة</span>';
+  }
+  function renderReqsPanel(){
+    if(!reqsPanel || !Reqs) return;
+    var cfg, dcs;
+    try{ cfg = Reqs.config(); dcs = Reqs.docs(custId()); }
+    catch(e){ return; }
+    var fields = (cfg && cfg.fields) || [];
+    var atts   = (cfg && cfg.attachments) || [];
+    var html = '<h2 class="line">متطلبات الحجز</h2>'+
+      '<div id="reqsAlert"></div><div class="otb-2">';
+    fields.forEach(function(f){
+      var v = (dcs.fields && dcs.fields[f.id] != null) ? dcs.fields[f.id] : '';
+      html += '<div class="otb-f">'+
+        '<label for="rq_'+esc(f.id)+'">'+esc(f.label||f.id)+(f.required?' *':'')+'</label>'+
+        '<input id="rq_'+esc(f.id)+'" data-fid="'+esc(f.id)+'" type="'+(f.type==='date'?'date':'text')+'" value="'+esc(v)+'">'+
+        '</div>';
+    });
+    atts.forEach(function(a){
+      var rec = (dcs.attachments && dcs.attachments[a.id]) || null;
+      var info = '';
+      if(rec){
+        info = '<div style="font-size:13px;margin-top:4px;">'+
+          esc(rec.name||'ملف مرفوع')+' — '+statusLabel(rec.status)+
+          (rec.status==='rejected' && rec.note ? ' <em style="color:#dc2626;">('+esc(rec.note)+')</em>' : '')+'</div>';
+      }
+      html += '<div class="otb-f">'+
+        '<label for="rq_'+esc(a.id)+'">'+esc(a.label||a.id)+(a.required?' *':'')+'</label>'+
+        '<input id="rq_'+esc(a.id)+'" data-aid="'+esc(a.id)+'" type="file" accept="image/*,application/pdf">'+
+        info+'</div>';
+    });
+    html += '</div>';
+    reqsPanel.innerHTML = html;
+
+    /* حفظ الحقول عند التغيير */
+    fields.forEach(function(f){
+      var el = document.getElementById('rq_'+f.id);
+      if(el) el.addEventListener('change',function(){
+        try{ Reqs.saveField(custId(), f.id, this.value); }catch(e){}
+      });
+    });
+    /* قراءة المرفقات FileReader→dataURL وحفظها */
+    atts.forEach(function(a){
+      var el = document.getElementById('rq_'+a.id);
+      if(!el) return;
+      el.addEventListener('change',function(){
+        var file = this.files && this.files[0];
+        var alertBox = document.getElementById('reqsAlert');
+        if(!file) return;
+        if(file.size > 1.5*1024*1024){
+          if(alertBox) alertBox.innerHTML='<div class="otb-alert err">حجم الملف كبير جدًا — الحد الأقصى ١٫٥ ميجابايت.</div>';
+          this.value='';
+          return;
+        }
+        var fr = new FileReader();
+        fr.onload = function(){
+          try{
+            var res = Reqs.saveAttachment(custId(), a.id, {name:file.name, dataURL:fr.result});
+            if(res && res.ok===false && alertBox){
+              alertBox.innerHTML='<div class="otb-alert err">'+esc(res.error||'تعذّر حفظ الملف.')+'</div>';
+            } else {
+              renderReqsPanel();
+            }
+          }catch(e){}
+        };
+        fr.onerror = function(){
+          if(alertBox) alertBox.innerHTML='<div class="otb-alert err">تعذّرت قراءة الملف.</div>';
+        };
+        fr.readAsDataURL(file);
+      });
+    });
+  }
+
+  renderAcctBar();
+  renderReqsPanel();
+
+  /* إعادة الرسم عند الدخول/الخروج أو تغيّر المتطلبات */
+  try{ if(Auth && Auth.on) Auth.on('change',function(){ renderAcctBar(); renderReqsPanel(); }); }catch(e){}
+  try{ if(Reqs && Reqs.on) Reqs.on('change',function(){ renderReqsPanel(); }); }catch(e){}
+
   /* proceed to payment */
   document.getElementById('goPay').addEventListener('click',function(){
     var name    = document.getElementById('fName').value.trim();
@@ -187,8 +343,39 @@
       return;
     }
 
+    var customer = { name:name, phone:phone, email:email, nationalId:nid, license:license, dob:dob, notes:notes };
+
+    /* ---- بوابة متطلبات الحجز (محروسة) ---- */
+    if(Reqs){
+      try{
+        var cid = custId();
+        /* خزّن قيم حقول المتطلبات الحالية قبل الفحص */
+        if(reqsPanel){
+          var inputs = reqsPanel.querySelectorAll('input[data-fid]');
+          for(var i=0;i<inputs.length;i++){
+            try{ Reqs.saveField(cid, inputs[i].getAttribute('data-fid'), inputs[i].value); }catch(e){}
+          }
+        }
+        var r = Reqs.check(cid);
+        if(r && !r.ok){
+          var parts = [];
+          (r.missingFields||[]).forEach(function(x){ parts.push(x.label); });
+          (r.missingAttachments||[]).forEach(function(x){ parts.push(x.label); });
+          (r.rejected||[]).forEach(function(x){ parts.push(x.label + (x.note?' ('+x.note+')':'')); });
+          var msg = 'يجب إكمال/إرفاق متطلبات الحجز التالية: ' + parts.join('، ');
+          var ab = document.getElementById('reqsAlert');
+          if(ab) ab.innerHTML = '<div class="otb-alert err">'+esc(msg)+'</div>';
+          (reqsPanel || promoAlert).scrollIntoView({behavior:'smooth',block:'center'});
+          alert(msg);
+          return;
+        }
+        /* تمام: ضمّن لقطة المستندات داخل customer */
+        try{ customer.docs = Reqs.snapshot(cid); }catch(e){}
+      }catch(e){ /* لو فشل أي شيء في طبقة المتطلبات لا نمنع التدفّق الأصلي */ }
+    }
+
     OTB.draft.set({
-      customer:{ name:name, phone:phone, email:email, nationalId:nid, license:license, dob:dob, notes:notes },
+      customer: customer,
       promo: appliedCode || null
     });
     location.href='payment.html';
