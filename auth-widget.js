@@ -118,6 +118,29 @@
       (document.body || document.documentElement).appendChild(control);
     }
     this.el.control = control;
+
+    /* إزالة زر «تسجيل الدخول/حساب جديد» الثابت لو موجود في الهيدر (من قالب الموقع)
+       حتى لا يظهر زرّان — ودجتنا هي الوحيدة الفعّالة. (يُعاد المحاولة لو الهيدر تأخّر) */
+    var self = this;
+    self.hideNativeLogin();
+    setTimeout(function(){ self.hideNativeLogin(); }, 400);
+    setTimeout(function(){ self.hideNativeLogin(); }, 1200);
+  };
+
+  Widget.prototype.hideNativeLogin = function () {
+    try {
+      var scope = document.querySelector('header, .site-header, .header-actions') || document;
+      var els = scope.querySelectorAll('.login-link, a, button');
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (el.closest && el.closest('.otauth-control')) continue;       // لا تلمس ودجتنا
+        if (el.getAttribute('data-otauth-dup')) continue;
+        var isLoginLink = /(^|\s)login-link(\s|$)/.test(el.className || '');
+        var t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+        var isDup = isLoginLink || t === 'حساب جديد' || t === 'تسجيل الدخول' || t === 'تسجيل الدخول / حساب جديد' || t === 'تسجيل الدخول/حساب جديد';
+        if (isDup) { el.style.display = 'none'; el.setAttribute('data-otauth-dup', '1'); }
+      }
+    } catch (e) {}
   };
 
   /* ---------- modal ---------- */
