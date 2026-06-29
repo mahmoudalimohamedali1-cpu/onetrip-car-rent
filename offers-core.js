@@ -278,26 +278,27 @@
       '.ot-ribbon-ic{font-size:14px;line-height:1;}' +
       '.ot-ribbon-tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
 
-      '.ot-offers{position:relative;overflow:hidden;color:#fff;padding:64px 20px;direction:rtl;font-family:inherit;' +
-        'background:radial-gradient(120% 130% at 85% 0%, #2a0fb0 0%, #1b2a7a 48%, #111a52 100%);}' +
-      /* v3: طبقات زينة خلف الكروت (سكايلاين + سيارات) */
-      '.ot-offers-sky{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;opacity:.5;z-index:0;pointer-events:none;}' +
-      '.ot-offers-cars{position:absolute;left:0;bottom:0;width:min(46%,560px);height:auto;opacity:.14;z-index:0;pointer-events:none;}' +
+      /* خلفية كريمي فاتحة (مش أزرق) لفصلها عن الفوتر الأزرق */
+      '.ot-offers{position:relative;overflow:hidden;color:#1b2440;padding:64px 20px;direction:rtl;font-family:inherit;' +
+        'background:linear-gradient(180deg,#f8f2e7 0%, #f1e9d8 100%);border-top:1px solid #ece3d2;}' +
+      /* v3: طبقات زينة خفيفة خلف الكروت (سكايلاين + سيارات) */
+      '.ot-offers-sky{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;opacity:.10;z-index:0;pointer-events:none;}' +
+      '.ot-offers-cars{position:absolute;left:0;bottom:0;width:min(42%,520px);height:auto;opacity:.10;z-index:0;pointer-events:none;}' +
       '.ot-offers-inner{position:relative;z-index:1;max-width:1180px;margin:0 auto;}' +
       '.ot-offers-head{text-align:center;margin-bottom:38px;}' +
       '.ot-offers-eyebrow{display:inline-flex;align-items:center;gap:8px;color:#f7a23e;font-weight:800;' +
         'font-size:15px;letter-spacing:.3px;margin-bottom:12px;}' +
-      '.ot-offers-title{margin:0 0 10px;font-weight:900;font-size:clamp(28px,3vw,42px);color:#fff;line-height:1.15;}' +
-      '.ot-offers-title em{font-style:normal;color:#f7a23e;}' +
-      '.ot-offers-sub{margin:0;color:rgba(255,255,255,.82);font-weight:500;font-size:16px;}' +
+      '.ot-offers-title{margin:0 0 10px;font-weight:900;font-size:clamp(28px,3vw,42px);color:#1b2a7a;line-height:1.15;}' +
+      '.ot-offers-title em{font-style:normal;color:#f5901e;}' +
+      '.ot-offers-sub{margin:0;color:#5a6488;font-weight:500;font-size:16px;}' +
       '.ot-offers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:24px;}' +
 
       '.ot-offer-card{position:relative;display:flex;flex-direction:column;align-items:center;background:#fff;' +
-        'border:1px solid rgba(255,255,255,.55);border-radius:24px 24px 16px 16px;padding:22px 14px 20px;' +
-        'box-shadow:0 24px 50px rgba(8,12,46,.42);transition:transform .18s ease,box-shadow .18s ease;}' +
+        'border:1px solid #ece3d2;border-radius:24px 24px 16px 16px;padding:22px 14px 20px;' +
+        'box-shadow:0 18px 40px rgba(27,42,122,.13);transition:transform .18s ease,box-shadow .18s ease;}' +
       /* v3: كرت العرض بصورة (بوستر) */
-      '.ot-offer-imgcard{position:relative;display:block;background:#fff;border:1px solid rgba(255,255,255,.55);' +
-        'border-radius:20px;overflow:hidden;box-shadow:0 24px 50px rgba(8,12,46,.42);text-decoration:none;' +
+      '.ot-offer-imgcard{position:relative;display:block;background:#fff;border:1px solid #ece3d2;' +
+        'border-radius:20px;overflow:hidden;box-shadow:0 18px 40px rgba(27,42,122,.13);text-decoration:none;' +
         'transition:transform .18s ease,box-shadow .18s ease;}' +
       '.ot-offer-imgcard:hover{transform:translateY(-4px);box-shadow:0 30px 60px rgba(8,12,46,.5);}' +
       '.ot-offer-img{display:block;width:100%;height:300px;object-fit:cover;}' +
