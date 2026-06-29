@@ -591,6 +591,14 @@
         <div class="f"><label>تاريخ البداية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></label><input id="o-startsAt" type="date"></div>
         <div class="f"><label>تاريخ النهاية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></label><input id="o-endsAt" type="date"></div>
       </div>
+      <div class="f"><label>صورة العرض (بوستر) <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري — حد ١.٥ ميجابايت)</span></label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <label class="btn btn-ghost" style="cursor:pointer;white-space:nowrap">رفع صورة<input type="file" id="o-file" accept="image/*" hidden></label>
+          <button type="button" class="btn btn-ghost" id="o-imgClear" style="white-space:nowrap">إزالة الصورة</button>
+          <img id="o-imgPrev" alt="معاينة" style="height:54px;border-radius:8px;border:1.5px solid var(--line);visibility:hidden">
+          <input type="hidden" id="o-image">
+        </div>
+      </div>
       <div class="sub-h">السيارات المشمولة <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختيار متعدد — يظهر السعر الأصلي لكل سيارة)</span></div>
       <div id="o-cars" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:240px;overflow:auto"></div>
       <div class="sub-h">معاينة السعر <span style="font-weight:600;color:#98a0bd;font-size:12px">(تحديث حيّ)</span></div>
@@ -1298,7 +1306,7 @@
       var pk=(o.perks&&o.perks.length)?(' <span class="pill green" title="'+esc(o.perks.join('، '))+'">+'+toAr(o.perks.length)+' مزايا</span>'):'';
       var per=(o.startsAt||o.endsAt)?(esc(o.startsAt||'…')+' ← '+esc(o.endsAt||'…')):'<span style="color:#98a0bd">بلا حد</span>';
       return '<tr>'+
-        '<td><b style="color:#1b2a7a">'+esc(o.title||'—')+'</b>'+pk+'</td>'+
+        '<td><b style="color:#1b2a7a">'+esc(o.title||'—')+'</b>'+(o.image?' <span title="بصورة">🖼️</span>':'')+pk+'</td>'+
         '<td>'+carsLbl+'</td>'+
         '<td class="price">'+disc+'</td>'+
         '<td style="font-size:18px">'+offerIcon(o.icon)+'</td>'+
@@ -1330,6 +1338,7 @@
     $('#o-startsAt').value=o?(o.startsAt||''):'';
     $('#o-endsAt').value=o?(o.endsAt||''):'';
     setOfferColor(o?(o.color||'#e0322b'):'#e0322b');
+    if($('#o-image')){ $('#o-image').value=(o&&o.image)||''; setOfferPrev((o&&o.image)||''); }
     var sel=(o&&o.carIds)||[];
     $('#o-cars').innerHTML=DB.cars.all().map(function(c){
       var on=sel.indexOf(c.id)>=0;
@@ -1363,6 +1372,9 @@
       return '<div>'+esc(name)+': <b>السعر الأصلي '+toAr(orig)+'</b> → <b style="color:#0a8f4d">بعد الخصم '+toAr(Math.round(nw))+' ريال</b></div>';
     }).join('');
   }
+  function setOfferPrev(src){ var p=$('#o-imgPrev'); if(!p) return; if(src){ p.src=src; p.style.visibility='visible'; } else { p.removeAttribute('src'); p.style.visibility='hidden'; } }
+  if($('#o-file')) $('#o-file').addEventListener('change',function(){ var f=this.files[0]; this.value=''; if(!f) return; if(f.size>1.5*1024*1024){ toast('الصورة كبيرة (الحد ١.٥ ميجابايت)','err'); return; } var r=new FileReader(); r.onload=function(){ if($('#o-image')) $('#o-image').value=r.result; setOfferPrev(r.result); }; r.readAsDataURL(f); });
+  if($('#o-imgClear')) $('#o-imgClear').addEventListener('click',function(){ if($('#o-image')) $('#o-image').value=''; setOfferPrev(''); });
   $$('#offerModal .oclr').forEach(function(s){ s.addEventListener('click',function(){ setOfferColor(s.getAttribute('data-clr')); }); });
   if($('#o-color')) $('#o-color').addEventListener('input',function(){ setOfferColor(this.value); });
   if($('#o-discountType')) $('#o-discountType').addEventListener('change',updateOfferPreview);
@@ -1384,7 +1396,8 @@
     var o={ id:$('#o-id').value||('offer_'+Date.now()), title:title, carIds:carIds,
       discountType:$('#o-discountType').value, discountValue:val, perks:perks,
       icon:$('#o-icon').value, color:($('#o-color')&&$('#o-color').value)||'#e0322b',
-      active:$('#o-active').checked, startsAt:$('#o-startsAt').value||'', endsAt:$('#o-endsAt').value||'' };
+      active:$('#o-active').checked, startsAt:$('#o-startsAt').value||'', endsAt:$('#o-endsAt').value||'',
+      image:($('#o-image')&&$('#o-image').value)||'' };
     try{ O.saveOffer(o); }catch(e){ toast('تعذّر الحفظ','err'); return; }
     closeModal(); renderOffers(); toast('تم حفظ العرض ✓','ok');
   });
