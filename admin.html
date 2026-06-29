@@ -198,6 +198,7 @@
     <div class="brand"><img src="assets/onetrip-logo.png" alt=""><b>One Trip<br>لوحة التحكم</b></div>
     <button class="nav-i active" data-sec="dash"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> لوحة التحكم</button>
     <button class="nav-i" data-sec="cars"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2-5a2 2 0 0 1 2-1.3h10A2 2 0 0 1 19 8l2 5M5 13h14v5H5zM7 18v2M17 18v2"/></svg> السيارات <span class="ct" id="ctCars">0</span></button>
+    <button class="nav-i" data-sec="offers"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13 21a1.8 1.8 0 0 1-2.6 0L3 13.6V3h10.6L20.6 10a2.4 2.4 0 0 1 0 3.4Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg> العروض <span class="ct" id="ctOffers">0</span></button>
     <button class="nav-i" data-sec="cats"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> الفئات <span class="ct" id="ctCats">0</span></button>
     <button class="nav-i" data-sec="branches"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5.5-8 11-8 11s-8-5.5-8-11a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg> الفروع <span class="ct" id="ctBr">0</span></button>
     <button class="nav-i" data-sec="leads"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg> الطلبات <span class="ct" id="ctLeads">0</span></button>
@@ -247,6 +248,17 @@
           <button class="btn btn-org" id="addCar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة سيارة</button>
         </div>
         <div style="overflow:auto" id="carsTable"></div>
+      </div>
+    </section>
+
+    <!-- OFFERS -->
+    <section class="sect" id="sec-offers">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>العروض</h2><span class="sub">أنشئ عروضًا على السيارات (ريبون + سعر مخفّض) — تظهر على الموقع</span></div>
+          <button class="btn btn-org" id="addOffer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة عرض</button>
+        </div>
+        <div style="overflow:auto" id="offersTable"></div>
       </div>
     </section>
 
@@ -539,6 +551,53 @@
   </div>
 </div>
 
+<!-- ===== OFFER MODAL ===== -->
+<div class="modal" id="offerModal">
+  <div class="modal-card" style="max-width:620px">
+    <div class="modal-h"><h3 id="offerModalTitle">إضافة عرض</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="o-id">
+      <div class="f"><label>عنوان العرض * <span style="font-weight:600;color:#98a0bd;font-size:12px">(يظهر في الريبون)</span></label><input id="o-title" placeholder="عروض عودة المدارس"></div>
+      <div class="grid3">
+        <div class="f"><label>نوع الخصم</label><select id="o-discountType"><option value="percent">نسبة ٪</option><option value="amount">مبلغ (ريال)</option></select></div>
+        <div class="f"><label>القيمة</label><input id="o-discountValue" type="number" value="20"></div>
+        <div class="f"><label>الحالة</label><label class="toggle"><input type="checkbox" id="o-active" checked> فعّال</label></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label>الأيقونة</label><select id="o-icon">
+          <option value="school">🎒 عودة المدارس</option>
+          <option value="national">🇸🇦 اليوم الوطني</option>
+          <option value="tag">🏷️ تخفيض</option>
+          <option value="flash">⚡ عرض سريع</option>
+          <option value="snow">❄️ الشتاء</option>
+          <option value="sun">☀️ الصيف</option>
+          <option value="percent">٪ نسبة</option>
+          <option value="gift">🎁 هدية</option>
+          <option value="star">⭐ مميّز</option>
+          <option value="fire">🔥 الأكثر طلبًا</option>
+        </select></div>
+        <div class="f"><label>لون الشارة</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="oclr" data-clr="#e0322b" style="width:26px;height:26px;border-radius:50%;background:#e0322b;cursor:pointer;border:2px solid transparent"></span>
+            <span class="oclr" data-clr="#1b2a7a" style="width:26px;height:26px;border-radius:50%;background:#1b2a7a;cursor:pointer;border:2px solid transparent"></span>
+            <span class="oclr" data-clr="#f5901e" style="width:26px;height:26px;border-radius:50%;background:#f5901e;cursor:pointer;border:2px solid transparent"></span>
+            <span class="oclr" data-clr="#0a8f4d" style="width:26px;height:26px;border-radius:50%;background:#0a8f4d;cursor:pointer;border:2px solid transparent"></span>
+            <span class="oclr" data-clr="#7b2ff7" style="width:26px;height:26px;border-radius:50%;background:#7b2ff7;cursor:pointer;border:2px solid transparent"></span>
+            <input type="color" id="o-color" value="#e0322b" style="width:42px;height:30px;border:1.5px solid var(--line);border-radius:8px;background:#fcfdff;cursor:pointer;padding:2px">
+          </div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label>تاريخ البداية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></label><input id="o-startsAt" type="date"></div>
+        <div class="f"><label>تاريخ النهاية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></label><input id="o-endsAt" type="date"></div>
+      </div>
+      <div class="sub-h">السيارات المشمولة <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختيار متعدد)</span></div>
+      <div id="o-cars" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:240px;overflow:auto"></div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveOffer">حفظ العرض</button></div>
+  </div>
+</div>
+
 <!-- ===== BRANCH MODAL ===== -->
 <div class="modal" id="brModal">
   <div class="modal-card" style="max-width:520px">
@@ -638,6 +697,7 @@
 <script src="branch-map.js"></script>
 <script src="chat.js"></script>
 <script src="auth-core.js"></script>
+<script src="offers-core.js"></script>
 <script src="req-core.js"></script>
 <script src="supabase-sync.js"></script>
 <script src="booking-core.js?v=7"></script>
@@ -937,13 +997,14 @@
   $('#resetBtn').addEventListener('click',function(){ if(confirm('استرجاع كل البيانات للوضع الافتراضي؟ (هيمسح تعديلاتك على هذا المتصفح)')){ [K.cars,K.cats,K.br,K.leads,K.intro].forEach(function(k){localStorage.removeItem(k);}); seed(); renderAll(); toast('تم الاسترجاع','ok'); } });
 
   /* ---------- nav ---------- */
-  var titles={dash:'لوحة التحكم',cars:'السيارات',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',emails:'الإيميلات',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',surveys:'التقييمات',users:'الموظفين',customers:'العملاء',reqs:'متطلبات الحجز',docs:'مراجعة المستندات'};
+  var titles={dash:'لوحة التحكم',cars:'السيارات',offers:'العروض',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',emails:'الإيميلات',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',surveys:'التقييمات',users:'الموظفين',customers:'العملاء',reqs:'متطلبات الحجز',docs:'مراجعة المستندات'};
   $$('.nav-i').forEach(function(b){ b.addEventListener('click',function(){
     $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
     $('#pgTitle').textContent=titles[s]||'';
     if(s==='chat'){ renderInbox(); loadChatSettings(); clearNotify(); }
     if(s==='whatsapp') renderWa();
+    if(s==='offers') renderOffers();
     if(s==='surveys') renderSurveys();
     if(s==='users') renderUsers();
     if(s==='customers') renderCustomers();
@@ -954,7 +1015,7 @@
   /* ---------- renderers ---------- */
   /* عزل الأعطال: لو رندرر واحد رمى استثناء، ما يوقّفش باقي اللوحة (وخصوصًا قسم المحادثات) */
   function safeRender(fn){ try{ fn(); }catch(e){ if(window.console&&console.warn) console.warn('renderAll: تخطّي رندرر فشل —', e&&e.message); } }
-  function renderAll(){ [renderCounts,renderDash,renderCars,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderEmails,renderIntro,renderChatBadge,renderSurveys,renderUsers,renderCustomers,renderReqs,renderDocs].forEach(safeRender); }
+  function renderAll(){ [renderCounts,renderDash,renderCars,renderOffers,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderEmails,renderIntro,renderChatBadge,renderSurveys,renderUsers,renderCustomers,renderReqs,renderDocs].forEach(safeRender); }
   function renderCounts(){
     $('#ctCars').textContent=toAr(DB.cars.all().length);
     $('#ctCats').textContent=toAr(DB.cats.all().length);
@@ -1207,6 +1268,83 @@
     promoSave(arr); closeModal(); renderAll(); toast('تم حفظ الكود ✓','ok');
   });
 
+
+  /* ---------- offers (OneTrip.Offers) — admin only ---------- */
+  function OFF(){ return (window.OneTrip && window.OneTrip.Offers) || null; }
+  var OFFER_ICONS={school:'🎒',national:'🇸🇦',tag:'🏷️',flash:'⚡',snow:'❄️',sun:'☀️',percent:'٪',gift:'🎁',star:'⭐',fire:'🔥'};
+  function offerIcon(k){ var O=OFF(); if(O&&O.iconFor){ try{return O.iconFor(k);}catch(e){} } return OFFER_ICONS[k]||'🏷️'; }
+  function carNamesFor(ids){
+    var map={}; DB.cars.all().forEach(function(c){ map[c.id]=c.name; });
+    return (ids||[]).map(function(id){ return map[id]||id; });
+  }
+  function renderOffers(){
+    var box=$('#offersTable'); if(!box) return;
+    if(!isAdmin()){ box.innerHTML='<div class="empty" style="padding:24px">هذا القسم للمدير فقط.</div>'; if($('#ctOffers'))$('#ctOffers').textContent=toAr(0); return; }
+    var O=OFF();
+    if(!O){ box.innerHTML='<div class="empty" style="padding:24px">وحدة العروض غير محمّلة (offers-core.js).</div>'; return; }
+    var list=[]; try{ list=O.offers()||[]; }catch(e){}
+    if($('#ctOffers')) $('#ctOffers').textContent=toAr(list.length);
+    if(!list.length){ box.innerHTML='<div class="empty" style="padding:40px">لا توجد عروض — اضغط «إضافة عرض».</div>'; return; }
+    var rows=list.map(function(o){
+      var names=carNamesFor(o.carIds);
+      var carsLbl=names.length?esc(names.slice(0,3).join('، '))+(names.length>3?' +'+toAr(names.length-3):''):'<span style="color:#98a0bd">—</span>';
+      var disc=(o.discountType==='amount')?(toAr(o.discountValue||0)+' ريال'):(toAr(o.discountValue||0)+'٪');
+      var per=(o.startsAt||o.endsAt)?(esc(o.startsAt||'…')+' ← '+esc(o.endsAt||'…')):'<span style="color:#98a0bd">بلا حد</span>';
+      return '<tr>'+
+        '<td><b style="color:#1b2a7a">'+esc(o.title||'—')+'</b></td>'+
+        '<td>'+carsLbl+'</td>'+
+        '<td class="price">'+disc+'</td>'+
+        '<td style="font-size:18px">'+offerIcon(o.icon)+'</td>'+
+        '<td>'+(o.active?'<span class="pill green">فعّال</span>':'<span class="pill gray">متوقف</span>')+'</td>'+
+        '<td dir="ltr" style="text-align:right;font-size:12.5px;white-space:nowrap">'+per+'</td>'+
+        '<td><div class="rowacts">'+
+          '<button class="iact" data-edo="'+esc(o.id)+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+          '<button class="iact del" data-do="'+esc(o.id)+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></td>'+
+      '</tr>';
+    }).join('');
+    box.innerHTML='<table><thead><tr><th>العنوان</th><th>السيارات</th><th>الخصم</th><th>الأيقونة</th><th>الحالة</th><th>المدة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#offersTable [data-edo]').forEach(function(b){ b.addEventListener('click',function(){ openOffer(b.getAttribute('data-edo')); }); });
+    $$('#offersTable [data-do]').forEach(function(b){ b.addEventListener('click',function(){ if(confirm('حذف العرض؟')){ try{ OFF().deleteOffer(b.getAttribute('data-do')); }catch(e){} renderOffers(); toast('تم الحذف','ok'); } }); });
+  }
+  function setOfferColor(val){
+    if($('#o-color')) $('#o-color').value=val||'#e0322b';
+    $$('#offerModal .oclr').forEach(function(s){ s.style.borderColor=(s.getAttribute('data-clr')===val)?'#1b2a7a':'transparent'; });
+  }
+  function openOffer(id){
+    var O=OFF(); if(!O){ toast('وحدة العروض غير محمّلة','err'); return; }
+    var o=null; if(id){ try{ o=(O.offers()||[]).filter(function(x){return String(x.id)===String(id);})[0]||null; }catch(e){} }
+    $('#offerModalTitle').textContent=o?'تعديل عرض':'إضافة عرض';
+    $('#o-id').value=o?o.id:'';
+    $('#o-title').value=o?(o.title||''):'';
+    $('#o-discountType').value=o?(o.discountType||'percent'):'percent';
+    $('#o-discountValue').value=o?(o.discountValue!=null?o.discountValue:20):20;
+    $('#o-icon').value=o?(o.icon||'tag'):'tag';
+    $('#o-active').checked=o?!!o.active:true;
+    $('#o-startsAt').value=o?(o.startsAt||''):'';
+    $('#o-endsAt').value=o?(o.endsAt||''):'';
+    setOfferColor(o?(o.color||'#e0322b'):'#e0322b');
+    var sel=(o&&o.carIds)||[];
+    $('#o-cars').innerHTML=DB.cars.all().map(function(c){
+      var on=sel.indexOf(c.id)>=0;
+      return '<label class="toggle" style="font-weight:600;font-size:13.5px"><input type="checkbox" class="o-car" value="'+esc(c.id)+'"'+(on?' checked':'')+'> '+esc(c.name||c.id)+'</label>';
+    }).join('') || '<div class="empty" style="padding:14px">لا توجد سيارات بعد.</div>';
+    openModal('#offerModal');
+  }
+  $$('#offerModal .oclr').forEach(function(s){ s.addEventListener('click',function(){ setOfferColor(s.getAttribute('data-clr')); }); });
+  if($('#o-color')) $('#o-color').addEventListener('input',function(){ setOfferColor(this.value); });
+  $('#addOffer').addEventListener('click',function(){ openOffer(null); });
+  $('#saveOffer').addEventListener('click',function(){
+    var O=OFF(); if(!O){ toast('وحدة العروض غير محمّلة','err'); return; }
+    var title=$('#o-title').value.trim(); if(!title){ toast('اكتب عنوان العرض','err'); return; }
+    var carIds=$$('#o-cars .o-car').filter(function(i){return i.checked;}).map(function(i){return i.value;});
+    var val=parseFloat($('#o-discountValue').value); if(isNaN(val)) val=0;
+    var o={ id:$('#o-id').value||('offer_'+Date.now()), title:title, carIds:carIds,
+      discountType:$('#o-discountType').value, discountValue:val,
+      icon:$('#o-icon').value, color:($('#o-color')&&$('#o-color').value)||'#e0322b',
+      active:$('#o-active').checked, startsAt:$('#o-startsAt').value||'', endsAt:$('#o-endsAt').value||'' };
+    try{ O.saveOffer(o); }catch(e){ toast('تعذّر الحفظ','err'); return; }
+    closeModal(); renderOffers(); toast('تم حفظ العرض ✓','ok');
+  });
 
   /* ---------- car modal ---------- */
   function fillCats(){ $('#c-category').innerHTML=DB.cats.all().map(function(c){return '<option>'+esc(c.name)+'</option>';}).join(''); }

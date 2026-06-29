@@ -1,0 +1,73 @@
+# One Trip — عقد سيستم العروض (Offers / Promotions)
+
+سيستم عروض كامل: الأدمن يعمل عرضًا ويختار سيارات متاحة، فيظهر **ريبون/شارة على صورة السيارة**
+(عودة المدارس، اليوم الوطني، خصم...) + **السعر المخفّض**، ويظهر سكشن **«عروضنا»** في الرئيسية
+بالسيارات اللي عليها عروض. الأسلوب: Vanilla JS، IIFE، RTL، `window.OneTrip`، localStorage (تجريبي).
+
+## 1) التخزين
+`ot_offers` (localStorage) = مصفوفة عروض. لا تلمس أشكال `ot_catalog` (السيارات).
+
+## 2) نموذج العرض (Offer)
+```js
+{ id:'offer_<ts>',
+  title:'عروض عودة المدارس',         // اسم العرض (يظهر في الريبون)
+  carIds:['camry23','accent25'],     // سيارات العرض (اختيار متعدد من السيارات المتاحة)
+  discountType:'percent'|'amount',   // نوع الخصم
+  discountValue:20,                  // القيمة (٪ أو ريال)
+  icon:'school',                     // مفتاح أيقونة من القائمة الثابتة (انظر iconFor)
+  color:'#e0322b',                   // لون الشارة (خلفية الريبون)
+  active:true,
+  startsAt:'2026-08-01', endsAt:'2026-09-15',  // اختياري (فاضي = بلا حد)
+  order:0 }
+```
+أيقونات ثابتة (مفتاح → إيموجي): school 🎒، national 🇸🇦، tag 🏷️، flash ⚡، snow ❄️، sun ☀️،
+percent ٪، gift 🎁، star ⭐، fire 🔥. (تُعرض في قائمة منسدلة للأدمن.)
+
+## 3) واجهة `window.OneTrip.Offers` (يطبّقها `offers-core.js` — المالك: إيجنت A)
+```js
+offers()                       // كل العروض (مرتبة order)
+saveOffer(o)                   // إضافة/تعديل + emit
+deleteOffer(id)
+activeOffers()                 // active===true وضمن المدى الزمني (لو startsAt/endsAt محددين)
+offerForCar(carId)            // أول عرض فعّال يشمل carId أو null
+discounted(carId, basePrice)  // ⇒ {hasOffer, oldPrice, newPrice, save, label}  (label مثل «خصم ٢٠٪»)
+iconFor(key)                  // ⇒ الإيموجي للمفتاح
+badgeHTML(offer)              // ⇒ ريبون HTML (أيقونة + العنوان) لوضعه فوق صورة السيارة
+on('change',cb)/off
+mountHomeOffers()             // يحقن سكشن «عروضنا» في الرئيسية تلقائيًا (لو فيه عروض فعّالة)
+```
+كل localStorage داخل try/catch؛ لا يرمي. كل تعديل يبثّ 'change' عبر BroadcastChannel('ot_offers').
+
+## 4) سكشن «عروضنا» في الرئيسية (offers-core.js — إيجنت A، حقن تلقائي بلا تعديل index.html)
+- على DOMContentLoaded: لو الصفحة فيها سكشن الأسطول (`#fleet`/`.fleet`/أي مرجع) أو هي الرئيسية، وفيه `activeOffers()`،
+  احقن `<section class="ot-offers">` (يفضّل **قبل الفوتر** أو بعد سكشن الأسطول).
+- يعرض السيارات اللي عليها عروض فعّالة (من `OneTrip.bookingCars()` المطابقة بالـid): كرت لكل سيارة فيه:
+  صورة السيارة + **ريبون العرض فوقها** (`badgeHTML`) + الاسم + **السعر القديم مشطوب والجديد** (`discounted`) + زر «احجز الآن» (create-booking.html).
+- ستايل ذاتي (CSS يحقنه offers-core.js ببادئة `.ot-offers`) متطابق مع هوية الموقع (أزرق `#1b2a7a`/`#141d5c`، برتقالي `#f5901e`) ومتجاوب RTL. يقلّد شكل كروت الأسطول في index.html.
+- لو مفيش عروض فعّالة ⇒ لا يحقن شيئًا.
+
+## 5) ريبون على كروت الأسطول/الحجز (offers-core.js — إيجنت A، اختياري وآمن)
+auto-wire: على fleet.html/create-booking.html، لكل كرت سيارة (`.car`) يطابق سيارة عليها عرض، ضع ريبون
+العرض فوق صورتها (موضع absolute على حاوية الصورة). المطابقة بالاسم/الـid لو متاح. لا يلمس ملفات الصفحات.
+
+## 6) إدارة العروض في الداشبورد (admin.html — المالك: إيجنت B — وحده يعدّل admin.html)
+أضف `<script src="offers-core.js"></script>` بجانب باقي السكربتات. استخدم أنماط admin
+(nav titles/handler/renderAll، `$,$$,toAr,esc,toast,load/save,openModal/closeModal,.panel,.pill,.f,.grid2/3`).
+- قسم «العروض» `data-sec="offers"` + `#sec-offers` (للمدير): جدول العروض (العنوان/السيارات/الخصم/الحالة/المدة) + «إضافة عرض».
+- مودال العرض: العنوان، **اختيار سيارات متعدد** (checkboxes من `DB.cars.all()` أو `OneTrip.bookingCars()`)،
+  نوع الخصم (٪/ريال) + القيمة، أيقونة (قائمة من iconFor keys)، اللون (ألوان جاهزة أو color input)،
+  تفعيل، تاريخ بداية/نهاية (اختياري) → `OneTrip.Offers.saveOffer`. + حذف.
+- بادج عدد العروض الفعّالة في الـnav (اختياري). للمدير فقط.
+
+## 7) الربط (إيجنت C)
+- أضف `<script src="offers-core.js"></script>` بعد `cars.js` في: index.html, fleet.html, create-booking.html (idempotent، لا تلمس باقي المنطق).
+- أنشئ `OFFERS_README.md` (عربي) بشرح النظام والتدفّق ومسار Supabase للإنتاج.
+
+## 8) ملكية الملفات
+| الملف | المالك |
+|---|---|
+| `offers-core.js` (جديد) | A |
+| `admin.html` (قسم العروض) | B |
+| وسوم السكربت في index/fleet/create-booking + README | C |
+
+ترتيب التحميل: `cars.js` → `offers-core.js`. ألوان الهوية: `#1b2a7a`/`#141d5c`/`#f5901e`.
