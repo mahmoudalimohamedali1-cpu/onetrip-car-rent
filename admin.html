@@ -560,7 +560,7 @@
       <div class="f"><label>عنوان العرض * <span style="font-weight:600;color:#98a0bd;font-size:12px">(يظهر في الريبون)</span></label><input id="o-title" placeholder="عروض عودة المدارس"></div>
       <div class="grid3">
         <div class="f"><label>نوع الخصم</label><select id="o-discountType"><option value="percent">نسبة ٪</option><option value="amount">مبلغ (ريال)</option></select></div>
-        <div class="f"><label>القيمة</label><input id="o-discountValue" type="number" value="20"></div>
+        <div class="f"><label>القيمة <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري — اتركه 0 لعرض بلا خصم)</span></label><input id="o-discountValue" type="number" min="0" value="20"></div>
         <div class="f"><label>الحالة</label><label class="toggle"><input type="checkbox" id="o-active" checked> فعّال</label></div>
       </div>
       <div class="grid2">
@@ -591,8 +591,13 @@
         <div class="f"><label>تاريخ البداية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></label><input id="o-startsAt" type="date"></div>
         <div class="f"><label>تاريخ النهاية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></label><input id="o-endsAt" type="date"></div>
       </div>
-      <div class="sub-h">السيارات المشمولة <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختيار متعدد)</span></div>
+      <div class="sub-h">السيارات المشمولة <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختيار متعدد — يظهر السعر الأصلي لكل سيارة)</span></div>
       <div id="o-cars" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:240px;overflow:auto"></div>
+      <div class="sub-h">معاينة السعر <span style="font-weight:600;color:#98a0bd;font-size:12px">(تحديث حيّ)</span></div>
+      <div id="o-preview" style="border:1.5px dashed var(--line);border-radius:10px;padding:10px;background:#fcfdff;font-size:13px;color:#54607d;min-height:42px"></div>
+      <div class="sub-h">المزايا / المشتملات المجانية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></div>
+      <div id="o-perks"></div>
+      <button type="button" class="btn btn-ghost" id="o-addPerk" style="margin-top:6px;font-size:13px">+ إضافة ميزة</button>
     </div>
     <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveOffer">حفظ العرض</button></div>
   </div>
@@ -1288,10 +1293,12 @@
     var rows=list.map(function(o){
       var names=carNamesFor(o.carIds);
       var carsLbl=names.length?esc(names.slice(0,3).join('، '))+(names.length>3?' +'+toAr(names.length-3):''):'<span style="color:#98a0bd">—</span>';
-      var disc=(o.discountType==='amount')?(toAr(o.discountValue||0)+' ريال'):(toAr(o.discountValue||0)+'٪');
+      var dv=parseFloat(o.discountValue)||0;
+      var disc=dv>0?((o.discountType==='amount')?(toAr(dv)+' ريال'):(toAr(dv)+'٪')):'<span style="color:#98a0bd">—</span>';
+      var pk=(o.perks&&o.perks.length)?(' <span class="pill green" title="'+esc(o.perks.join('، '))+'">+'+toAr(o.perks.length)+' مزايا</span>'):'';
       var per=(o.startsAt||o.endsAt)?(esc(o.startsAt||'…')+' ← '+esc(o.endsAt||'…')):'<span style="color:#98a0bd">بلا حد</span>';
       return '<tr>'+
-        '<td><b style="color:#1b2a7a">'+esc(o.title||'—')+'</b></td>'+
+        '<td><b style="color:#1b2a7a">'+esc(o.title||'—')+'</b>'+pk+'</td>'+
         '<td>'+carsLbl+'</td>'+
         '<td class="price">'+disc+'</td>'+
         '<td style="font-size:18px">'+offerIcon(o.icon)+'</td>'+
@@ -1326,20 +1333,56 @@
     var sel=(o&&o.carIds)||[];
     $('#o-cars').innerHTML=DB.cars.all().map(function(c){
       var on=sel.indexOf(c.id)>=0;
-      return '<label class="toggle" style="font-weight:600;font-size:13.5px"><input type="checkbox" class="o-car" value="'+esc(c.id)+'"'+(on?' checked':'')+'> '+esc(c.name||c.id)+'</label>';
+      return '<label class="toggle" style="font-weight:600;font-size:13.5px"><input type="checkbox" class="o-car" value="'+esc(c.id)+'" data-price="'+(parseFloat(c.daily)||0)+'"'+(on?' checked':'')+'> '+esc(c.name||c.id)+' <span style="color:#f5901e;font-weight:700">— '+toAr(c.daily||0)+' ريال/يوم</span></label>';
     }).join('') || '<div class="empty" style="padding:14px">لا توجد سيارات بعد.</div>';
+    renderPerks((o&&o.perks)||[]);
+    updateOfferPreview();
     openModal('#offerModal');
+  }
+  function renderPerks(arr){
+    var box=$('#o-perks'); if(!box) return;
+    arr=(arr&&arr.length)?arr:[''];
+    box.innerHTML=arr.map(function(p){
+      return '<div class="o-perk-row" style="display:flex;gap:6px;margin-bottom:6px"><input class="o-perk" placeholder="تأمين شامل مجاني" value="'+esc(p||'')+'" style="flex:1"><button type="button" class="btn btn-ghost o-perk-del" style="padding:4px 10px">&times;</button></div>';
+    }).join('');
+  }
+  function offerPreviewCalc(orig){
+    var type=$('#o-discountType').value, v=parseFloat($('#o-discountValue').value); if(isNaN(v)) v=0;
+    if(v<=0) return null;
+    return (type==='percent') ? orig*(1-v/100) : Math.max(0,orig-v);
+  }
+  function updateOfferPreview(){
+    var box=$('#o-preview'); if(!box) return;
+    var checked=$$('#o-cars .o-car').filter(function(i){return i.checked;});
+    if(!checked.length){ box.innerHTML='<span style="color:#98a0bd">اختر سيارة لمعاينة السعر.</span>'; return; }
+    box.innerHTML=checked.map(function(i){
+      var orig=parseFloat(i.getAttribute('data-price'))||0;
+      var name=esc((i.parentNode.textContent||'').trim());
+      var nw=offerPreviewCalc(orig);
+      if(nw==null) return '<div>'+name+' — <span style="color:#54607d">بدون خصم سعري</span></div>';
+      return '<div>'+esc(name)+': <b>السعر الأصلي '+toAr(orig)+'</b> → <b style="color:#0a8f4d">بعد الخصم '+toAr(Math.round(nw))+' ريال</b></div>';
+    }).join('');
   }
   $$('#offerModal .oclr').forEach(function(s){ s.addEventListener('click',function(){ setOfferColor(s.getAttribute('data-clr')); }); });
   if($('#o-color')) $('#o-color').addEventListener('input',function(){ setOfferColor(this.value); });
+  if($('#o-discountType')) $('#o-discountType').addEventListener('change',updateOfferPreview);
+  if($('#o-discountValue')) $('#o-discountValue').addEventListener('input',updateOfferPreview);
+  if($('#o-cars')) $('#o-cars').addEventListener('change',function(e){ if(e.target&&e.target.classList.contains('o-car')) updateOfferPreview(); });
+  if($('#o-addPerk')) $('#o-addPerk').addEventListener('click',function(){
+    var box=$('#o-perks'); var div=document.createElement('div'); div.className='o-perk-row'; div.style.cssText='display:flex;gap:6px;margin-bottom:6px';
+    div.innerHTML='<input class="o-perk" placeholder="تأمين شامل مجاني" style="flex:1"><button type="button" class="btn btn-ghost o-perk-del" style="padding:4px 10px">&times;</button>';
+    box.appendChild(div);
+  });
+  if($('#o-perks')) $('#o-perks').addEventListener('click',function(e){ if(e.target&&e.target.classList.contains('o-perk-del')){ var r=e.target.closest('.o-perk-row'); if(r) r.parentNode.removeChild(r); } });
   $('#addOffer').addEventListener('click',function(){ openOffer(null); });
   $('#saveOffer').addEventListener('click',function(){
     var O=OFF(); if(!O){ toast('وحدة العروض غير محمّلة','err'); return; }
     var title=$('#o-title').value.trim(); if(!title){ toast('اكتب عنوان العرض','err'); return; }
     var carIds=$$('#o-cars .o-car').filter(function(i){return i.checked;}).map(function(i){return i.value;});
-    var val=parseFloat($('#o-discountValue').value); if(isNaN(val)) val=0;
+    var val=parseFloat($('#o-discountValue').value); if(isNaN(val)||val<0) val=0;
+    var perks=$$('#o-perks .o-perk').map(function(i){return (i.value||'').trim();}).filter(function(s){return s;});
     var o={ id:$('#o-id').value||('offer_'+Date.now()), title:title, carIds:carIds,
-      discountType:$('#o-discountType').value, discountValue:val,
+      discountType:$('#o-discountType').value, discountValue:val, perks:perks,
       icon:$('#o-icon').value, color:($('#o-color')&&$('#o-color').value)||'#e0322b',
       active:$('#o-active').checked, startsAt:$('#o-startsAt').value||'', endsAt:$('#o-endsAt').value||'' };
     try{ O.saveOffer(o); }catch(e){ toast('تعذّر الحفظ','err'); return; }
