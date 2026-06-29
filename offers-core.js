@@ -74,6 +74,22 @@
     catch(e){ return false; }
   }
 
+  /* v4: تطبيع مصفوفة extraOffers ⇒ [{id,mode,value}] دفاعيًا */
+  function normExtraOffers(list){
+    if (!isArr(list)) return [];
+    var out = [];
+    for (var i = 0; i < list.length; i++){
+      var x = list[i];
+      if (!x || typeof x !== 'object') continue;
+      var id = x.id != null ? String(x.id) : '';
+      if (!id) continue;
+      var mode = (x.mode === 'percent' || x.mode === 'amount') ? x.mode : 'free';
+      var val = mode === 'free' ? 0 : (num(x.value) != null ? num(x.value) : 0);
+      out.push({ id: id, mode: mode, value: val });
+    }
+    return out;
+  }
+
   function byOrder(a,b){ return ((a && a.order)||0) - ((b && b.order)||0); }
 
   /* كل العروض مرتبة حسب order */
@@ -145,7 +161,11 @@
       /* v2: مزايا/مشتملات مجانية (نصوص) — افتراضي [] */
       perks:         isArr(o.perks) ? o.perks.map(function(p){ return String(p == null ? '' : p); })
                                           .filter(function(p){ return p.replace(/\s+/g,'') !== ''; })
-                                    : []
+                                    : [],
+      /* v3: صورة بوستر للعرض (dataURL) — اختياري */
+      image:         o.image != null ? String(o.image) : '',
+      /* v4: إضافات حقيقية مربوطة بالعرض — [{id,mode,value}] (value يُتجاهل لو free) */
+      extraOffers:   normExtraOffers(o.extraOffers)
     };
     var found = false;
     for (var i = 0; i < arr.length; i++){
@@ -199,11 +219,74 @@
     return null;
   }
 
-  /* v2: مزايا/مشتملات العرض الفعّال لتلك السيارة (أو []) */
-  function perksForCar(carId){
+  /* مزايا نصّية حرة قديمة (legacy perks) للعرض الفعّال — توافق رجعي */
+  function legacyPerksForCar(carId){
     var o = offerForCar(carId);
     if (o && isArr(o.perks)) return o.perks.slice();
     return [];
+  }
+
+  /* ---------- v4: المزايا من نظام الإضافات (extras) ---------- */
+  /* اسم الإضافة من OTB.extra(id) لو متاح، وإلا الـid نفسه */
+  function extraNameById(id){
+    try {
+      if (window.OTB && typeof window.OTB.extra === 'function'){
+        var e = window.OTB.extra(id);
+        if (e && e.name) return String(e.name);
+      }
+    } catch(e){}
+    return String(id);
+  }
+
+  /* تركيب نص الـlabel حسب الوضع */
+  function extraLabel(mode, value, name){
+    if (mode === 'percent') return 'خصم ' + toAr(value) + '٪: ' + name;
+    if (mode === 'amount')  return 'خصم ' + toAr(value) + ' ريال: ' + name;
+    return name + ' مجانًا';
+  }
+
+  /* من أول عرض فعّال للسيارة يحتوي extraId ⇒ {mode,value} أو null */
+  function extraModifierForCar(carId, extraId){
+    if (carId == null || extraId == null) return null;
+    var o = offerForCar(carId);
+    if (!o || !isArr(o.extraOffers)) return null;
+    var target = String(extraId);
+    for (var i = 0; i < o.extraOffers.length; i++){
+      var x = o.extraOffers[i];
+      if (x && String(x.id) === target){
+        var mode = (x.mode === 'percent' || x.mode === 'amount') ? x.mode : 'free';
+        var val = mode === 'free' ? 0 : (num(x.value) != null ? num(x.value) : 0);
+        return { mode: mode, value: val };
+      }
+    }
+    return null;
+  }
+
+  /* للعرض الفعّال على السيارة ⇒ [{id,name,mode,value,label}] */
+  function offerExtrasForCar(carId){
+    var o = offerForCar(carId);
+    if (!o || !isArr(o.extraOffers)) return [];
+    var out = [];
+    for (var i = 0; i < o.extraOffers.length; i++){
+      var x = o.extraOffers[i];
+      if (!x || x.id == null) continue;
+      var id = String(x.id);
+      var mode = (x.mode === 'percent' || x.mode === 'amount') ? x.mode : 'free';
+      var val = mode === 'free' ? 0 : (num(x.value) != null ? num(x.value) : 0);
+      var name = extraNameById(id);
+      out.push({ id: id, name: name, mode: mode, value: val, label: extraLabel(mode, val, name) });
+    }
+    return out;
+  }
+
+  /* v2/v4: قائمة نصوص المزايا (labels) للسيارة = إضافات العرض + المزايا النصّية القديمة */
+  function perksForCar(carId){
+    var out = [];
+    var ex = offerExtrasForCar(carId);
+    for (var i = 0; i < ex.length; i++){ if (ex[i] && ex[i].label) out.push(ex[i].label); }
+    var legacy = legacyPerksForCar(carId);
+    for (var j = 0; j < legacy.length; j++){ var p = String(legacy[j] || ''); if (p) out.push(p); }
+    return out;
   }
 
   /* تحويل عدد لأرقام عربية (٠١٢...) للعرض في الـlabel */
@@ -276,19 +359,32 @@
       '.ot-ribbon-ic{font-size:14px;line-height:1;}' +
       '.ot-ribbon-tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
 
-      '.ot-offers{background:#f3ecdb;padding:64px 20px;direction:rtl;font-family:inherit;}' +
-      '.ot-offers-inner{max-width:1180px;margin:0 auto;}' +
+      /* خلفية كريمي فاتحة (مش أزرق) لفصلها عن الفوتر الأزرق */
+      '.ot-offers{position:relative;overflow:hidden;color:#1b2440;padding:64px 20px;direction:rtl;font-family:inherit;' +
+        'background:linear-gradient(180deg,#f8f2e7 0%, #f1e9d8 100%);border-top:1px solid #ece3d2;}' +
+      /* v3: طبقات زينة خفيفة خلف الكروت (سكايلاين + سيارات) */
+      '.ot-offers-sky{position:absolute;left:0;right:0;bottom:0;width:100%;height:auto;opacity:.10;z-index:0;pointer-events:none;}' +
+      '.ot-offers-cars{position:absolute;left:0;bottom:0;width:min(42%,520px);height:auto;opacity:.10;z-index:0;pointer-events:none;}' +
+      '.ot-offers-inner{position:relative;z-index:1;max-width:1180px;margin:0 auto;}' +
       '.ot-offers-head{text-align:center;margin-bottom:38px;}' +
-      '.ot-offers-eyebrow{display:inline-flex;align-items:center;gap:8px;color:#f5901e;font-weight:800;' +
+      '.ot-offers-eyebrow{display:inline-flex;align-items:center;gap:8px;color:#f7a23e;font-weight:800;' +
         'font-size:15px;letter-spacing:.3px;margin-bottom:12px;}' +
       '.ot-offers-title{margin:0 0 10px;font-weight:900;font-size:clamp(28px,3vw,42px);color:#1b2a7a;line-height:1.15;}' +
       '.ot-offers-title em{font-style:normal;color:#f5901e;}' +
       '.ot-offers-sub{margin:0;color:#5a6488;font-weight:500;font-size:16px;}' +
       '.ot-offers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:24px;}' +
 
-      '.ot-offer-card{position:relative;display:flex;flex-direction:column;align-items:center;background:#faf7f1;' +
-        'border:1px solid #d8def0;border-radius:24px 24px 16px 16px;padding:22px 14px 20px;' +
-        'box-shadow:0 18px 40px rgba(27,42,122,.1);transition:transform .18s ease,box-shadow .18s ease;}' +
+      '.ot-offer-card{position:relative;display:flex;flex-direction:column;align-items:center;background:#fff;' +
+        'border:1px solid #ece3d2;border-radius:24px 24px 16px 16px;padding:22px 14px 20px;' +
+        'box-shadow:0 18px 40px rgba(27,42,122,.13);transition:transform .18s ease,box-shadow .18s ease;}' +
+      /* v3: كرت العرض بصورة (بوستر) */
+      '.ot-offer-imgcard{position:relative;display:block;background:#fff;border:1px solid #ece3d2;' +
+        'border-radius:20px;overflow:hidden;box-shadow:0 18px 40px rgba(27,42,122,.13);text-decoration:none;' +
+        'transition:transform .18s ease,box-shadow .18s ease;}' +
+      '.ot-offer-imgcard:hover{transform:translateY(-4px);box-shadow:0 30px 60px rgba(8,12,46,.5);}' +
+      '.ot-offer-img{display:block;width:100%;height:300px;object-fit:cover;}' +
+      '.ot-offer-imgcard .ot-offer-band{margin:0;width:100%;}' +
+      '.ot-offer-imgcard .ot-offer-perks{margin:10px 12px 12px;}' +
       '.ot-offer-card:hover{transform:translateY(-4px);box-shadow:0 26px 54px rgba(27,42,122,.16);}' +
       '.ot-offer-photo{position:relative;width:100%;height:158px;display:flex;align-items:center;justify-content:center;margin:6px 0 14px;}' +
       '.ot-offer-photo img{height:100%;width:auto;max-width:100%;object-fit:contain;}' +
@@ -320,7 +416,8 @@
       '.ot-offer-band .ot-offer-noprice{font-weight:900;font-size:20px;}' +
       '.ot-offer-band .ot-offer-noprice small{font-weight:700;font-size:13px;color:#f7a23e;}' +
 
-      '@media(max-width:560px){.ot-offers{padding:48px 14px;}.ot-offers-grid{gap:16px;}}';
+      '@media(max-width:560px){.ot-offers{padding:48px 14px;}.ot-offers-grid{gap:16px;}' +
+        '.ot-offers-cars{width:62%;opacity:.1;}.ot-offer-img{height:220px;}}';
 
       var st = document.createElement('style');
       st.id = STYLE_ID;
@@ -364,9 +461,9 @@
         var car = carById(cars, cid);
         if (!car) continue;
         var d = discounted(cid, car.price);
-        var perks = (isArr(o.perks) ? o.perks : []);
-        // v2: اعرض الكرت لو فيه خصم سعري أو مزايا (العرض صالح بأيٍّ منهما)
-        if (!d.hasOffer && !perks.length) continue;
+        var perks = perksForCar(cid); // v4: إضافات العرض + المزايا النصّية القديمة (labels)
+        // v2/v3/v4: اعرض الكرت لو فيه خصم سعري أو مزايا أو صورة بوستر (العرض صالح بأيٍّ منها)
+        if (!d.hasOffer && !perks.length && !o.image) continue;
         seen[cid] = true;
         out.push({ car: car, disc: d, offer: o });
       }
@@ -382,7 +479,7 @@
     var cardsHTML = '';
     for (var i = 0; i < items.length; i++){
       var it = items[i], c = it.car, d = it.disc;
-      var perks = (it.offer && isArr(it.offer.perks)) ? it.offer.perks : [];
+      var perks = perksForCar(c.id); // v4: labels من إضافات العرض + المزايا القديمة
 
       // شريط السعر: خصم سعري (قديم مشطوب + جديد) أو السعر العادي بلا شطب
       var bandHTML;
@@ -408,6 +505,18 @@
         perksHTML += '</div>';
       }
 
+      // v3: عرض بصورة (بوستر) — الكرت كله صورة مربوطة بصفحة الحجز للسيارة
+      var img = (it.offer && it.offer.image) ? String(it.offer.image) : '';
+      if (img){
+        cardsHTML +=
+          '<a class="ot-offer-imgcard" href="create-booking.html?id=' + encodeURIComponent(c.id) + '">' +
+            '<img class="ot-offer-img" src="' + esc(img) + '" alt="' + esc((it.offer && it.offer.title) || c.name || 'عرض') + '" loading="lazy">' +
+            perksHTML +
+            ((d && d.hasOffer) ? '<div class="ot-offer-band">' + bandHTML + '</div>' : '') +
+          '</a>';
+        continue;
+      }
+
       cardsHTML +=
         '<article class="ot-offer-card">' +
           '<div class="ot-offer-cat">' + esc(c.category || '') + '</div>' +
@@ -425,10 +534,12 @@
     }
 
     sec.innerHTML =
+      '<img class="ot-offers-sky" src="booking-skyline.png" alt="" aria-hidden="true" loading="lazy">' +
+      '<img class="ot-offers-cars" src="assets/contact-cars.png" alt="" aria-hidden="true" loading="lazy">' +
       '<div class="ot-offers-inner">' +
         '<div class="ot-offers-head">' +
-          '<div class="ot-offers-eyebrow">🔥 <span>وفّر أكثر</span></div>' +
-          '<h2 class="ot-offers-title">عروض<em> ‫حصرية‬</em></h2>' +
+          '<div class="ot-offers-eyebrow">🇸🇦 <span>عروض المملكة الحصرية</span> 🔥</div>' +
+          '<h2 class="ot-offers-title">العروض<em> الحصرية</em></h2>' +
           '<p class="ot-offers-sub">عروضنا الحالية بأسعار مخفّضة — احجز قبل انتهاء العرض</p>' +
         '</div>' +
         '<div class="ot-offers-grid">' + cardsHTML + '</div>' +
@@ -545,7 +656,7 @@
   /* أضِف شرائح المزايا داخل المواصفات (idempotent عبر data-otoff-perks) */
   function applyPerkChips(card, hit){
     try {
-      var perks = (hit.offer && isArr(hit.offer.perks)) ? hit.offer.perks : [];
+      var perks = (hit.car) ? perksForCar(hit.car.id) : []; // v4: إضافات العرض + المزايا القديمة
       if (!perks.length) return;
       var sn = specsNodeOf(card);
       if (!sn) return;
@@ -645,6 +756,8 @@
     activeOffers:   activeOffers,
     offerForCar:    offerForCar,
     perksForCar:    perksForCar,
+    extraModifierForCar: extraModifierForCar,
+    offerExtrasForCar:   offerExtrasForCar,
     discounted:     discounted,
     iconFor:        iconFor,
     badgeHTML:      badgeHTML,

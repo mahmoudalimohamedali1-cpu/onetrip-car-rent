@@ -98,3 +98,49 @@ auto-wire: على fleet.html/create-booking.html، لكل كرت سيارة (`.c
 - قائمة السيارات (checkbox) تعرض **السعر الأصلي** لكل سيارة (من `DB.cars.all().daily`).
 - **معاينة حيّة:** عند اختيار سيارة وتحديد الخصم، اعرض «السعر الأصلي X → بعد الخصم Y» (تتحدّث مع تغيير الخصم/السيارات).
 - الخصم **اختياري** (يقبل فارغ/0). أضِف **مزايا/مشتملات** (صفوف نصية متعددة: تأمين مجاني...) → `perks[]`.
+
+---
+
+## 10) إصدار v3 — عرض بصورة + خلفية «العروض الحصرية»
+
+### عرض بصورة فقط (offers-core + admin)
+- إضافة حقل `image` للعرض (dataURL لبوستر يرفعه الأدمن) — اختياري.
+- في مودال اللوحة: رفع صورة (file → dataURL، حد ~1.5MB، معاينة، إمكانية إزالة) → `saveOffer` يحفظ `image`؛ `openOffer` يحمّلها.
+- في سكشن العروض: لو `offer.image` موجودة ⇒ الكرت يعرض **الصورة** كبصرية أساسية (مربوطة بـcreate-booking للسيارة عبر carIds[0]) بدل/فوق الكرت المولّد. لو مفيش صورة ⇒ الكرت المولّد الحالي (صورة السيارة + ريبون + سعر + مزايا).
+
+### خلفية سكشن «العروض الحصرية» (offers-core CSS — مثل كرت «ابحث الآن»)
+- غيّر عنوان السكشن إلى **«العروض الحصرية»**.
+- خلفية السكشن: **تدرّج أزرق** `radial-gradient(120% 130% at 85% 0%, #2a0fb0, #1b2a7a 48%, #111a52)` + **أبراج المملكة/سكايلاين** `booking-skyline.png` أسفل السكشن + لمسة **سيارات** `assets/contact-cars.png` + **علم/أعلام** (🇸🇦 أو لمسة لونية) — كله `position:absolute` خلف الكروت، `pointer-events:none`، وزينة خفيفة. الكروت بيضاء فوق الخلفية (تباين واضح، نص العنوان أبيض).
+- متجاوب RTL، يقلّد إحساس `.book-band`/`.form-card` في create-booking/index.
+
+---
+
+## 11) إصدار v4 — المزايا من نظام الإضافات (احتساب صحيح)
+
+بدل المزايا النصية الحرة، العرض يربط بإضافات حقيقية (otb_extras / OTB.extras) ويحدّد لكل واحدة:
+مجاني أو خصم٪ أو خصم مبلغ — ويُحتسب في الـquote فيظهر صح في خطوة الإضافات والملخّص والدفع.
+
+### النموذج
+```js
+offer.extraOffers = [ { id:'cdw', mode:'free'|'percent'|'amount', value:0 } ]  // value يُتجاهل لو free
+```
+(يبقى دعم `perks:[strings]` القديمة للعرض فقط — توافق رجعي.)
+
+### offers-core (إيجنت A)
+- `extraModifierForCar(carId, extraId)` ⇒ من أول عرض فعّال للسيارة يحتوي extraId ⇒ `{mode,value}` أو null.
+- `offerExtrasForCar(carId)` ⇒ `[{id,name,mode,value,label}]` (الاسم من OTB.extra(id) أو otb_extras؛
+  label: free→«{الاسم} مجانًا»، percent→«خصم {v}٪: {الاسم}»، amount→«خصم {v} ريال: {الاسم}»).
+- شرائح المزايا (الرئيسية/الكروت) تُبنى من `offerExtrasForCar` (+ legacy perks). `saveOffer` يحفظ `extraOffers`.
+
+### admin offer modal (إيجنت B)
+- استبدل صفوف المزايا النصية بـ**منتقي إضافات**: لكل عنصر في `OTB.extras()` (أو otb_extras seed):
+  checkbox + الاسم + السعر + select الوضع (مجاني/خصم٪/خصم مبلغ) + قيمة (تظهر لو مش مجاني) ⇒ `extraOffers`.
+- openOffer يحمّل extraOffers؛ saveOffer يجمّعها. (السعر الأصلي/الخصم على إيجار السيارة كما هو من v2.)
+
+### booking-core quote (المنسّق) — احتساب
+داخل حلقة الإضافات في `quote(o)`: بعد حساب `amt` للإضافة، طبّق
+`OneTrip.Offers.extraModifierForCar(o.carId, e.id)` لو موجود:
+free⇒amt=0 ; percent⇒amt*=(1-value/100) ; amount⇒amt=max(0, amt-value). محروس (لو Offers غير موجود لا شيء يتغيّر).
+
+### extras.html (المنسّق) — عرض
+عند رسم كل إضافة، لو `extraModifierForCar(d.carId, e.id)` موجود، اعرض السعر الأصلي مشطوبًا + «مجانًا»/الجديد.
