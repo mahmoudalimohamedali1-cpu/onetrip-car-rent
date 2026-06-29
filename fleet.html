@@ -55,9 +55,8 @@
   .book-band .lead{margin:0 0 30px;color:rgba(255,255,255,.82);font-size:17px;}
 
   /* ---- full-image hero (header overlaid, image shown complete) ---- */
-  .fleet-hero{position:relative;background:#0a0e1a;line-height:0;text-align:center;}
-  .fleet-hero-img{display:inline-block;width:auto;max-width:100%;max-height:min(70vh,560px);height:auto;}  /* أصغر: حد أقصى للارتفاع + توسيط على خلفية داكنة (بلا قص) */
-  @media(max-width:760px){.fleet-hero-img{max-height:62vh;}}
+  .fleet-hero{position:relative;background:#0a0e1a;line-height:0;}
+  .fleet-hero-img{display:block;width:100%;height:auto;aspect-ratio:1536/928;object-fit:cover;object-position:top center;}  /* عرض كامل + قص بسيط من تحت فقط (التاج فوق محفوظ) */
   .fleet-hero-top{position:absolute;top:0;left:0;right:0;z-index:5;line-height:normal;}
   .search-wrap{background:#f4f7ff;padding:42px 48px 8px;}      /* light section for the search widget */
 
