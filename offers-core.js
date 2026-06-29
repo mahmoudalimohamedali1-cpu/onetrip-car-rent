@@ -28,6 +28,17 @@
   /* ---------- أدوات صغيرة دفاعية ---------- */
   function isArr(a){ return Object.prototype.toString.call(a) === '[object Array]'; }
   function num(v){ var n = parseFloat(v); return isNaN(n) ? null : n; }
+  /* استخراج رقم من نص قد يحوي أرقامًا عربية-هندية ٠-٩ وفواصل */
+  function numFromText(s){
+    try {
+      var t = String(s == null ? '' : s).replace(/[٠-٩]/g, function(d){
+        return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+      });
+      t = t.replace(/[٬,]/g, '');                 // فواصل آلاف
+      var m = t.match(/\d+(?:\.\d+)?/);
+      return m ? num(m[0]) : null;
+    } catch(e){ return null; }
+  }
   function esc(s){
     return String(s == null ? '' : s)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -130,7 +141,11 @@
       active:        o.active !== false,
       startsAt:      o.startsAt || '',
       endsAt:        o.endsAt || '',
-      order:         num(o.order) != null ? num(o.order) : 0
+      order:         num(o.order) != null ? num(o.order) : 0,
+      /* v2: مزايا/مشتملات مجانية (نصوص) — افتراضي [] */
+      perks:         isArr(o.perks) ? o.perks.map(function(p){ return String(p == null ? '' : p); })
+                                          .filter(function(p){ return p.replace(/\s+/g,'') !== ''; })
+                                    : []
     };
     var found = false;
     for (var i = 0; i < arr.length; i++){
@@ -184,6 +199,13 @@
     return null;
   }
 
+  /* v2: مزايا/مشتملات العرض الفعّال لتلك السيارة (أو []) */
+  function perksForCar(carId){
+    var o = offerForCar(carId);
+    if (o && isArr(o.perks)) return o.perks.slice();
+    return [];
+  }
+
   /* تحويل عدد لأرقام عربية (٠١٢...) للعرض في الـlabel */
   function toAr(n){
     try {
@@ -211,6 +233,9 @@
   function discounted(carId, basePrice){
     var o = offerForCar(carId);
     if (!o) return { hasOffer:false };
+    /* v2: العرض صالح بلا خصم سعري — لكن discounted لا يحسب سعرًا حينها */
+    var dv = num(o.discountValue);
+    if (dv == null || dv <= 0) return { hasOffer:false };
     var oldP = num(basePrice); if (oldP == null) oldP = 0;
     var newP = computeNew(o, oldP);
     var save = oldP - newP; if (save < 0) save = 0;
@@ -283,6 +308,18 @@
       '.ot-offer-book:hover{filter:brightness(1.08);}' +
       '.ot-offer-book:active{transform:scale(.97);}' +
 
+      /* v2: شرائح المزايا داخل المواصفات (auto-wire) + سعر الكرت المخفّض */
+      '.ot-perk{display:inline-flex;align-items:center;gap:5px;background:#e8f5ee;color:#1f8a4c;' +
+        'border:1px solid #bfe6cf;border-radius:999px;font-weight:800;font-size:12px;line-height:1.1;' +
+        'padding:4px 10px;font-family:inherit;direction:rtl;}' +
+      '.ot-perk-ic{font-size:12px;line-height:1;}' +
+      '.ot-price-old{text-decoration:line-through;color:#9aa0b5;font-weight:700;opacity:.85;margin-inline-end:6px;}' +
+      '.ot-price-new{color:#1f8a4c;font-weight:900;}' +
+      /* شرائح المزايا داخل كرت سكشن عروضنا */
+      '.ot-offer-perks{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 2px 0;}' +
+      '.ot-offer-band .ot-offer-noprice{font-weight:900;font-size:20px;}' +
+      '.ot-offer-band .ot-offer-noprice small{font-weight:700;font-size:13px;color:#f7a23e;}' +
+
       '@media(max-width:560px){.ot-offers{padding:48px 14px;}.ot-offers-grid{gap:16px;}}';
 
       var st = document.createElement('style');
@@ -327,7 +364,9 @@
         var car = carById(cars, cid);
         if (!car) continue;
         var d = discounted(cid, car.price);
-        if (!d.hasOffer) continue;
+        var perks = (isArr(o.perks) ? o.perks : []);
+        // v2: اعرض الكرت لو فيه خصم سعري أو مزايا (العرض صالح بأيٍّ منهما)
+        if (!d.hasOffer && !perks.length) continue;
         seen[cid] = true;
         out.push({ car: car, disc: d, offer: o });
       }
@@ -343,6 +382,32 @@
     var cardsHTML = '';
     for (var i = 0; i < items.length; i++){
       var it = items[i], c = it.car, d = it.disc;
+      var perks = (it.offer && isArr(it.offer.perks)) ? it.offer.perks : [];
+
+      // شريط السعر: خصم سعري (قديم مشطوب + جديد) أو السعر العادي بلا شطب
+      var bandHTML;
+      if (d && d.hasOffer){
+        bandHTML =
+          '<span class="ot-offer-old">' + esc(toAr(d.oldPrice)) + ' ريال</span>' +
+          '<div class="ot-offer-new">' + esc(toAr(d.newPrice)) + ' <small>ريال / يوم</small></div>' +
+          '<span class="ot-offer-save">' + esc(d.label) + '</span>';
+      } else {
+        bandHTML =
+          '<div class="ot-offer-noprice">' + esc(toAr(num(c.price) != null ? num(c.price) : c.price)) +
+            ' <small>ريال / يوم</small></div>';
+      }
+
+      // شرائح المزايا
+      var perksHTML = '';
+      if (perks.length){
+        perksHTML = '<div class="ot-offer-perks">';
+        for (var p = 0; p < perks.length; p++){
+          var pt = String(perks[p] || ''); if (!pt) continue;
+          perksHTML += '<span class="ot-perk"><span class="ot-perk-ic">✓</span>' + esc(pt) + '</span>';
+        }
+        perksHTML += '</div>';
+      }
+
       cardsHTML +=
         '<article class="ot-offer-card">' +
           '<div class="ot-offer-cat">' + esc(c.category || '') + '</div>' +
@@ -351,11 +416,8 @@
             badgeHTML(it.offer) +
             '<img src="' + esc(c.image || '') + '" alt="' + esc(c.name || '') + '" loading="lazy">' +
           '</div>' +
-          '<div class="ot-offer-band">' +
-            '<span class="ot-offer-old">' + esc(d.oldPrice) + ' ريال</span>' +
-            '<div class="ot-offer-new">' + esc(d.newPrice) + ' <small>ريال / يوم</small></div>' +
-            '<span class="ot-offer-save">' + esc(d.label) + '</span>' +
-          '</div>' +
+          perksHTML +
+          '<div class="ot-offer-band">' + bandHTML + '</div>' +
           '<a class="ot-offer-book" href="create-booking.html?id=' + encodeURIComponent(c.id) + '">احجز الآن' +
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>' +
           '</a>' +
@@ -427,6 +489,81 @@
     return card;
   }
 
+  /* عنصر السعر داخل الكرت — جرّب محدّدات بالترتيب */
+  function priceNodeOf(card){
+    return card.querySelector('.price') ||
+           card.querySelector('.car-price') ||
+           card.querySelector('[class*="price"]') ||
+           null;
+  }
+  /* حاوية المواصفات داخل الكرت */
+  function specsNodeOf(card){
+    return card.querySelector('.car-specs') ||
+           card.querySelector('.otb-specs') ||
+           card.querySelector('.specs') ||
+           null;
+  }
+
+  /* أعد كتابة عنصر السعر: القديم مشطوب + الجديد (idempotent عبر data-otoff-base) */
+  function applyPriceRewrite(card, hit){
+    try {
+      var pnode = priceNodeOf(card);
+      if (!pnode) return;
+
+      // السعر الأساسي: من السيارة المطابقة إن وُجد، وإلا من نص العنصر
+      var base = (hit.car && num(hit.car.price) != null) ? num(hit.car.price) : null;
+      var stored = pnode.getAttribute('data-otoff-base');
+
+      if (stored != null){
+        base = num(stored);                         // تطبيق سابق → استخدم الأصل المخزَّن
+      } else {
+        if (base == null) base = numFromText(pnode.textContent);
+        if (base == null) return;
+        pnode.setAttribute('data-otoff-base', String(base));
+      }
+
+      var d = discounted(hit.car ? hit.car.id : null, base);
+      if (!d.hasOffer) return;                       // لا خصم سعري → الريبون/المزايا فقط
+
+      if (pnode.getAttribute('data-otoff-priced') === '1') return; // مطبّق
+
+      // ابحث عن عقدة الرقم الأساسية (b) للحفاظ على العملة/«يوميًا»
+      var bEl = pnode.querySelector('b');
+      if (bEl){
+        bEl.innerHTML = '<span class="ot-price-old">' + esc(toAr(d.oldPrice)) + '</span>' +
+                        '<span class="ot-price-new">' + esc(toAr(d.newPrice)) + '</span>';
+      } else {
+        // لا يوجد <b>: أعِد بناء النص مع الإبقاء على أي لاحقة عملة بسيطة
+        pnode.innerHTML = '<span class="ot-price-old">' + esc(toAr(d.oldPrice)) + '</span> ' +
+                          '<span class="ot-price-new">' + esc(toAr(d.newPrice)) + '</span> ' +
+                          '<span class="cur">ريال</span>';
+      }
+      pnode.setAttribute('data-otoff-priced', '1');
+    } catch(e){}
+  }
+
+  /* أضِف شرائح المزايا داخل المواصفات (idempotent عبر data-otoff-perks) */
+  function applyPerkChips(card, hit){
+    try {
+      var perks = (hit.offer && isArr(hit.offer.perks)) ? hit.offer.perks : [];
+      if (!perks.length) return;
+      var sn = specsNodeOf(card);
+      if (!sn) return;
+      if (sn.getAttribute('data-otoff-perks') === '1') return; // مضافة مسبقًا
+
+      for (var i = 0; i < perks.length; i++){
+        var p = String(perks[i] || '');
+        if (!p) continue;
+        var chip = document.createElement('span');
+        chip.className = 'ot-perk';
+        chip.setAttribute('data-otoff-perk', '1');
+        chip.innerHTML = '<span class="ot-perk-ic">✓</span>' + esc(p);
+        sn.appendChild(chip);
+      }
+      sn.setAttribute('data-otoff-perks', '1');
+    } catch(e){}
+  }
+
   function wireCardRibbons(){
     try {
       injectStyle();
@@ -462,6 +599,10 @@
         tmp.innerHTML = badgeHTML(hit.offer);
         var rib = tmp.firstChild;
         if (rib) cont.appendChild(rib);
+
+        // v2: السعر المخفّض + شرائح المزايا (idempotent)
+        applyPriceRewrite(card, hit);
+        applyPerkChips(card, hit);
       }
     } catch(e){}
   }
@@ -503,6 +644,7 @@
     deleteOffer:    deleteOffer,
     activeOffers:   activeOffers,
     offerForCar:    offerForCar,
+    perksForCar:    perksForCar,
     discounted:     discounted,
     iconFor:        iconFor,
     badgeHTML:      badgeHTML,
