@@ -603,9 +603,8 @@
       <div id="o-cars" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:240px;overflow:auto"></div>
       <div class="sub-h">معاينة السعر <span style="font-weight:600;color:#98a0bd;font-size:12px">(تحديث حيّ)</span></div>
       <div id="o-preview" style="border:1.5px dashed var(--line);border-radius:10px;padding:10px;background:#fcfdff;font-size:13px;color:#54607d;min-height:42px"></div>
-      <div class="sub-h">المزايا / المشتملات المجانية <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختياري)</span></div>
-      <div id="o-perks"></div>
-      <button type="button" class="btn btn-ghost" id="o-addPerk" style="margin-top:6px;font-size:13px">+ إضافة ميزة</button>
+      <div class="sub-h">مزايا الإضافات <span style="font-weight:600;color:#98a0bd;font-size:12px">(اختر إضافة وحدّد: مجاني / خصم٪ / خصم مبلغ)</span></div>
+      <div id="o-extras" style="display:grid;gap:8px;max-height:260px;overflow:auto"></div>
     </div>
     <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveOffer">حفظ العرض</button></div>
   </div>
@@ -1303,7 +1302,8 @@
       var carsLbl=names.length?esc(names.slice(0,3).join('، '))+(names.length>3?' +'+toAr(names.length-3):''):'<span style="color:#98a0bd">—</span>';
       var dv=parseFloat(o.discountValue)||0;
       var disc=dv>0?((o.discountType==='amount')?(toAr(dv)+' ريال'):(toAr(dv)+'٪')):'<span style="color:#98a0bd">—</span>';
-      var pk=(o.perks&&o.perks.length)?(' <span class="pill green" title="'+esc(o.perks.join('، '))+'">+'+toAr(o.perks.length)+' مزايا</span>'):'';
+      var exN=(o.extraOffers&&o.extraOffers.length)||0;
+      var pk=exN?(' <span class="pill green" title="'+esc(o.extraOffers.map(function(e){return e.id;}).join('، '))+'">+'+toAr(exN)+' مزايا</span>'):((o.perks&&o.perks.length)?(' <span class="pill green" title="'+esc(o.perks.join('، '))+'">+'+toAr(o.perks.length)+' مزايا</span>'):'');
       var per=(o.startsAt||o.endsAt)?(esc(o.startsAt||'…')+' ← '+esc(o.endsAt||'…')):'<span style="color:#98a0bd">بلا حد</span>';
       return '<tr>'+
         '<td><b style="color:#1b2a7a">'+esc(o.title||'—')+'</b>'+(o.image?' <span title="بصورة">🖼️</span>':'')+pk+'</td>'+
@@ -1344,15 +1344,34 @@
       var on=sel.indexOf(c.id)>=0;
       return '<label class="toggle" style="font-weight:600;font-size:13.5px"><input type="checkbox" class="o-car" value="'+esc(c.id)+'" data-price="'+(parseFloat(c.daily)||0)+'"'+(on?' checked':'')+'> '+esc(c.name||c.id)+' <span style="color:#f5901e;font-weight:700">— '+toAr(c.daily||0)+' ريال/يوم</span></label>';
     }).join('') || '<div class="empty" style="padding:14px">لا توجد سيارات بعد.</div>';
-    renderPerks((o&&o.perks)||[]);
+    renderExtras((o&&o.extraOffers)||[]);
     updateOfferPreview();
     openModal('#offerModal');
   }
-  function renderPerks(arr){
-    var box=$('#o-perks'); if(!box) return;
-    arr=(arr&&arr.length)?arr:[''];
-    box.innerHTML=arr.map(function(p){
-      return '<div class="o-perk-row" style="display:flex;gap:6px;margin-bottom:6px"><input class="o-perk" placeholder="تأمين شامل مجاني" value="'+esc(p||'')+'" style="flex:1"><button type="button" class="btn btn-ghost o-perk-del" style="padding:4px 10px">&times;</button></div>';
+  function availExtras(){
+    var list=null;
+    try{ if(window.OTB&&OTB.extras) list=OTB.extras(); }catch(e){}
+    if(!list||!list.length){ try{ list=load('otb_extras',null); }catch(e){} }
+    if(!list||!list.length) list=[
+      {id:'cdw',name:'تأمين شامل (CDW)',price:35},{id:'driver',name:'سائق إضافي',price:20},
+      {id:'gps',name:'جهاز ملاحة GPS',price:15},{id:'child',name:'كرسي أطفال',price:10},
+      {id:'unlimited',name:'كيلومترات غير محدودة',price:25},{id:'delivery',name:'توصيل السيارة لموقعك',price:60}
+    ];
+    return list;
+  }
+  function renderExtras(arr){
+    var box=$('#o-extras'); if(!box) return;
+    var byId={}; (arr||[]).forEach(function(e){ if(e&&e.id) byId[e.id]=e; });
+    var list=availExtras();
+    if(!list.length){ box.innerHTML='<div class="empty" style="padding:14px">لا توجد إضافات بعد.</div>'; return; }
+    box.innerHTML=list.map(function(x){
+      var sel=byId[x.id], on=!!sel, mode=(sel&&sel.mode)||'free', val=(sel&&sel.value!=null)?sel.value:0;
+      var hideVal=(mode==='free')?'display:none':'';
+      return '<div class="o-extra-row" data-id="'+esc(x.id)+'" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:#fcfdff">'+
+        '<label class="toggle" style="font-weight:600;font-size:13.5px;flex:1;min-width:160px"><input type="checkbox" class="o-extra" value="'+esc(x.id)+'"'+(on?' checked':'')+'> '+esc(x.name||x.id)+' <span style="color:#f5901e;font-weight:700">— '+toAr(x.price||0)+' ريال</span></label>'+
+        '<select class="o-extra-mode" style="font-size:13px"><option value="free"'+(mode==='free'?' selected':'')+'>مجاني</option><option value="percent"'+(mode==='percent'?' selected':'')+'>خصم ٪</option><option value="amount"'+(mode==='amount'?' selected':'')+'>خصم مبلغ</option></select>'+
+        '<input type="number" class="o-extra-val" min="0" step="1" value="'+(parseFloat(val)||0)+'" placeholder="القيمة" style="width:90px;font-size:13px;'+hideVal+'">'+
+      '</div>';
     }).join('');
   }
   function offerPreviewCalc(orig){
@@ -1380,21 +1399,26 @@
   if($('#o-discountType')) $('#o-discountType').addEventListener('change',updateOfferPreview);
   if($('#o-discountValue')) $('#o-discountValue').addEventListener('input',updateOfferPreview);
   if($('#o-cars')) $('#o-cars').addEventListener('change',function(e){ if(e.target&&e.target.classList.contains('o-car')) updateOfferPreview(); });
-  if($('#o-addPerk')) $('#o-addPerk').addEventListener('click',function(){
-    var box=$('#o-perks'); var div=document.createElement('div'); div.className='o-perk-row'; div.style.cssText='display:flex;gap:6px;margin-bottom:6px';
-    div.innerHTML='<input class="o-perk" placeholder="تأمين شامل مجاني" style="flex:1"><button type="button" class="btn btn-ghost o-perk-del" style="padding:4px 10px">&times;</button>';
-    box.appendChild(div);
+  if($('#o-extras')) $('#o-extras').addEventListener('change',function(e){
+    if(e.target&&e.target.classList.contains('o-extra-mode')){
+      var row=e.target.closest('.o-extra-row'); if(!row) return;
+      var vi=row.querySelector('.o-extra-val'); if(vi) vi.style.display=(e.target.value==='free')?'none':'';
+    }
   });
-  if($('#o-perks')) $('#o-perks').addEventListener('click',function(e){ if(e.target&&e.target.classList.contains('o-perk-del')){ var r=e.target.closest('.o-perk-row'); if(r) r.parentNode.removeChild(r); } });
   $('#addOffer').addEventListener('click',function(){ openOffer(null); });
   $('#saveOffer').addEventListener('click',function(){
     var O=OFF(); if(!O){ toast('وحدة العروض غير محمّلة','err'); return; }
     var title=$('#o-title').value.trim(); if(!title){ toast('اكتب عنوان العرض','err'); return; }
     var carIds=$$('#o-cars .o-car').filter(function(i){return i.checked;}).map(function(i){return i.value;});
     var val=parseFloat($('#o-discountValue').value); if(isNaN(val)||val<0) val=0;
-    var perks=$$('#o-perks .o-perk').map(function(i){return (i.value||'').trim();}).filter(function(s){return s;});
+    var extraOffers=$$('#o-extras .o-extra-row').map(function(row){
+      var cb=row.querySelector('.o-extra'); if(!cb||!cb.checked) return null;
+      var mode=(row.querySelector('.o-extra-mode')||{}).value||'free';
+      var v=(mode==='free')?0:(parseFloat((row.querySelector('.o-extra-val')||{}).value)||0);
+      return { id:cb.value, mode:mode, value:v };
+    }).filter(function(x){return x;});
     var o={ id:$('#o-id').value||('offer_'+Date.now()), title:title, carIds:carIds,
-      discountType:$('#o-discountType').value, discountValue:val, perks:perks,
+      discountType:$('#o-discountType').value, discountValue:val, extraOffers:extraOffers,
       icon:$('#o-icon').value, color:($('#o-color')&&$('#o-color').value)||'#e0322b',
       active:$('#o-active').checked, startsAt:$('#o-startsAt').value||'', endsAt:$('#o-endsAt').value||'',
       image:($('#o-image')&&$('#o-image').value)||'' };

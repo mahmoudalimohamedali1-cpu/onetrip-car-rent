@@ -74,6 +74,22 @@
     catch(e){ return false; }
   }
 
+  /* v4: تطبيع مصفوفة extraOffers ⇒ [{id,mode,value}] دفاعيًا */
+  function normExtraOffers(list){
+    if (!isArr(list)) return [];
+    var out = [];
+    for (var i = 0; i < list.length; i++){
+      var x = list[i];
+      if (!x || typeof x !== 'object') continue;
+      var id = x.id != null ? String(x.id) : '';
+      if (!id) continue;
+      var mode = (x.mode === 'percent' || x.mode === 'amount') ? x.mode : 'free';
+      var val = mode === 'free' ? 0 : (num(x.value) != null ? num(x.value) : 0);
+      out.push({ id: id, mode: mode, value: val });
+    }
+    return out;
+  }
+
   function byOrder(a,b){ return ((a && a.order)||0) - ((b && b.order)||0); }
 
   /* كل العروض مرتبة حسب order */
@@ -147,7 +163,9 @@
                                           .filter(function(p){ return p.replace(/\s+/g,'') !== ''; })
                                     : [],
       /* v3: صورة بوستر للعرض (dataURL) — اختياري */
-      image:         o.image != null ? String(o.image) : ''
+      image:         o.image != null ? String(o.image) : '',
+      /* v4: إضافات حقيقية مربوطة بالعرض — [{id,mode,value}] (value يُتجاهل لو free) */
+      extraOffers:   normExtraOffers(o.extraOffers)
     };
     var found = false;
     for (var i = 0; i < arr.length; i++){
@@ -201,11 +219,74 @@
     return null;
   }
 
-  /* v2: مزايا/مشتملات العرض الفعّال لتلك السيارة (أو []) */
-  function perksForCar(carId){
+  /* مزايا نصّية حرة قديمة (legacy perks) للعرض الفعّال — توافق رجعي */
+  function legacyPerksForCar(carId){
     var o = offerForCar(carId);
     if (o && isArr(o.perks)) return o.perks.slice();
     return [];
+  }
+
+  /* ---------- v4: المزايا من نظام الإضافات (extras) ---------- */
+  /* اسم الإضافة من OTB.extra(id) لو متاح، وإلا الـid نفسه */
+  function extraNameById(id){
+    try {
+      if (window.OTB && typeof window.OTB.extra === 'function'){
+        var e = window.OTB.extra(id);
+        if (e && e.name) return String(e.name);
+      }
+    } catch(e){}
+    return String(id);
+  }
+
+  /* تركيب نص الـlabel حسب الوضع */
+  function extraLabel(mode, value, name){
+    if (mode === 'percent') return 'خصم ' + toAr(value) + '٪: ' + name;
+    if (mode === 'amount')  return 'خصم ' + toAr(value) + ' ريال: ' + name;
+    return name + ' مجانًا';
+  }
+
+  /* من أول عرض فعّال للسيارة يحتوي extraId ⇒ {mode,value} أو null */
+  function extraModifierForCar(carId, extraId){
+    if (carId == null || extraId == null) return null;
+    var o = offerForCar(carId);
+    if (!o || !isArr(o.extraOffers)) return null;
+    var target = String(extraId);
+    for (var i = 0; i < o.extraOffers.length; i++){
+      var x = o.extraOffers[i];
+      if (x && String(x.id) === target){
+        var mode = (x.mode === 'percent' || x.mode === 'amount') ? x.mode : 'free';
+        var val = mode === 'free' ? 0 : (num(x.value) != null ? num(x.value) : 0);
+        return { mode: mode, value: val };
+      }
+    }
+    return null;
+  }
+
+  /* للعرض الفعّال على السيارة ⇒ [{id,name,mode,value,label}] */
+  function offerExtrasForCar(carId){
+    var o = offerForCar(carId);
+    if (!o || !isArr(o.extraOffers)) return [];
+    var out = [];
+    for (var i = 0; i < o.extraOffers.length; i++){
+      var x = o.extraOffers[i];
+      if (!x || x.id == null) continue;
+      var id = String(x.id);
+      var mode = (x.mode === 'percent' || x.mode === 'amount') ? x.mode : 'free';
+      var val = mode === 'free' ? 0 : (num(x.value) != null ? num(x.value) : 0);
+      var name = extraNameById(id);
+      out.push({ id: id, name: name, mode: mode, value: val, label: extraLabel(mode, val, name) });
+    }
+    return out;
+  }
+
+  /* v2/v4: قائمة نصوص المزايا (labels) للسيارة = إضافات العرض + المزايا النصّية القديمة */
+  function perksForCar(carId){
+    var out = [];
+    var ex = offerExtrasForCar(carId);
+    for (var i = 0; i < ex.length; i++){ if (ex[i] && ex[i].label) out.push(ex[i].label); }
+    var legacy = legacyPerksForCar(carId);
+    for (var j = 0; j < legacy.length; j++){ var p = String(legacy[j] || ''); if (p) out.push(p); }
+    return out;
   }
 
   /* تحويل عدد لأرقام عربية (٠١٢...) للعرض في الـlabel */
@@ -380,8 +461,8 @@
         var car = carById(cars, cid);
         if (!car) continue;
         var d = discounted(cid, car.price);
-        var perks = (isArr(o.perks) ? o.perks : []);
-        // v2/v3: اعرض الكرت لو فيه خصم سعري أو مزايا أو صورة بوستر (العرض صالح بأيٍّ منها)
+        var perks = perksForCar(cid); // v4: إضافات العرض + المزايا النصّية القديمة (labels)
+        // v2/v3/v4: اعرض الكرت لو فيه خصم سعري أو مزايا أو صورة بوستر (العرض صالح بأيٍّ منها)
         if (!d.hasOffer && !perks.length && !o.image) continue;
         seen[cid] = true;
         out.push({ car: car, disc: d, offer: o });
@@ -398,7 +479,7 @@
     var cardsHTML = '';
     for (var i = 0; i < items.length; i++){
       var it = items[i], c = it.car, d = it.disc;
-      var perks = (it.offer && isArr(it.offer.perks)) ? it.offer.perks : [];
+      var perks = perksForCar(c.id); // v4: labels من إضافات العرض + المزايا القديمة
 
       // شريط السعر: خصم سعري (قديم مشطوب + جديد) أو السعر العادي بلا شطب
       var bandHTML;
@@ -575,7 +656,7 @@
   /* أضِف شرائح المزايا داخل المواصفات (idempotent عبر data-otoff-perks) */
   function applyPerkChips(card, hit){
     try {
-      var perks = (hit.offer && isArr(hit.offer.perks)) ? hit.offer.perks : [];
+      var perks = (hit.car) ? perksForCar(hit.car.id) : []; // v4: إضافات العرض + المزايا القديمة
       if (!perks.length) return;
       var sn = specsNodeOf(card);
       if (!sn) return;
@@ -675,6 +756,8 @@
     activeOffers:   activeOffers,
     offerForCar:    offerForCar,
     perksForCar:    perksForCar,
+    extraModifierForCar: extraModifierForCar,
+    offerExtrasForCar:   offerExtrasForCar,
     discounted:     discounted,
     iconFor:        iconFor,
     badgeHTML:      badgeHTML,

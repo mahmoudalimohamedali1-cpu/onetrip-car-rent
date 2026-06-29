@@ -89,6 +89,10 @@
     var extrasTotal=0, lines=[];
     (o.extras||[]).forEach(function(sel){ var e=extra(sel.id); if(!e) return; var qty=sel.qty||1;
       var amt = e.unit==='day' ? e.price*d*qty : e.price*qty;
+      /* عرض على الإضافة (مجاني/خصم) من سيستم العروض — يُحتسب هنا فيظهر صح بكل الخطوات */
+      try{ var _om = window.OneTrip && OneTrip.Offers && OneTrip.Offers.extraModifierForCar && OneTrip.Offers.extraModifierForCar(o.carId, e.id);
+        if(_om){ if(_om.mode==='free') amt=0; else if(_om.mode==='percent') amt=amt*(1-(_om.value||0)/100); else if(_om.mode==='amount') amt=Math.max(0, amt-(_om.value||0)); }
+      }catch(_e){}
       extrasTotal+=amt; lines.push({id:e.id, name:e.name, qty:qty, amount:amt});
     });
     var subtotal=base+extrasTotal;

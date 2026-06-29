@@ -10,6 +10,7 @@
 <body>
 
 <script src="cars.js?v=7"></script>
+<script src="offers-core.js"></script>
 <script src="booking-core.js?v=7"></script>
 <script>
 (function(){
@@ -69,11 +70,17 @@
   var listEl=document.getElementById('extrasList');
   listEl.innerHTML=OTB.extras().map(function(e){
     var unit = e.unit==='day' ? '/يوم' : '/الحجز';
+    var om=null; try{ om = window.OneTrip&&OneTrip.Offers&&OneTrip.Offers.extraModifierForCar&&OneTrip.Offers.extraModifierForCar(d.carId, e.id); }catch(_e){}
+    var prHTML;
+    if(om && om.mode==='free') prHTML='<s style="opacity:.55">'+OTB.money(e.price)+'</s> <b style="color:#1f8a4c">مجانًا</b>';
+    else if(om && om.mode==='percent') prHTML='<s style="opacity:.55">'+OTB.money(e.price)+'</s> <b style="color:#1f8a4c">'+OTB.money(e.price*(1-(om.value||0)/100))+'</b> <small>'+unit+'</small>';
+    else if(om && om.mode==='amount') prHTML=OTB.money(e.price)+' <small>'+unit+'</small> <span style="color:#1f8a4c;font-size:11px;font-weight:800">(خصم '+OTB.toAr(om.value||0)+' ريال)</span>';
+    else prHTML=OTB.money(e.price)+' <small>'+unit+'</small>';
     return '<div class="otb-extra'+(isSel(e.id)?' on':'')+'" data-id="'+e.id+'" role="button" tabindex="0">'+
         '<span class="ck">'+CHECK+'</span>'+
         '<span class="ico">'+svg(ICONS[e.id]||ICONS.def)+'</span>'+
         '<span class="meta"><b>'+e.name+'</b><p>'+(e.desc||'')+'</p></span>'+
-        '<span class="pr">'+OTB.money(e.price)+' <small>'+unit+'</small></span>'+
+        '<span class="pr">'+prHTML+'</span>'+
       '</div>';
   }).join('');
 
