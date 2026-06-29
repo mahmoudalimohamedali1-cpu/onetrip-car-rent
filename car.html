@@ -95,6 +95,7 @@
             '<span class="otb-spec">'+sp(IC.gear)+esc(c.gear)+'</span>'+
             '<span class="otb-spec">'+sp(IC.door)+OTB.toAr(c.doors)+' أبواب</span>'+
             '<span class="otb-spec">'+sp(IC.ac)+(c.ac?'مكيّف':'بدون تكييف')+'</span>'+
+            (c.specs||[]).map(function(s){return '<span class="otb-spec">'+esc(s)+'</span>';}).join('')+
           '</div>'+
         '</div>'+
 

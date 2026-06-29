@@ -411,6 +411,7 @@
           '<span class="spec">'+specSvg(S.gear)+c.gear+'</span>'+
           '<span class="spec">'+specSvg(S.door)+c.doors+' أبواب</span>'+
           '<span class="spec">'+specSvg(S.ac)+(c.ac?'مكيّف':'بدون')+'</span>'+
+          (c.specs||[]).map(function(s){return '<span class="spec">'+String(s).replace(/[<>&"]/g,'')+'</span>';}).join('')+
         '</div>'+
         '<div class="car-price"><b>'+fmt(price)+'</b><span class="cur">ريال</span><span class="per">/ شهريًا</span></div>'+
         '<div class="car-tax">السعر لا يشمل الضريبة — لمدة '+months+' شهر</div>'+

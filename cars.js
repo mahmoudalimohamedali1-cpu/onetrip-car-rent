@@ -102,7 +102,7 @@
       return {
         id:c.id, name:c.name, category:c.category, image:c.image,
         price:c.daily, year:c.year, seats:c.seats, bags:c.bags,
-        gear:c.gear, doors:c.doors, ac:c.ac, available:c.available, badge:c.bookingBadge
+        gear:c.gear, doors:c.doors, ac:c.ac, specs:(c.specs||[]), available:c.available, badge:c.bookingBadge
       };
     });
   }
@@ -112,7 +112,7 @@
     return sorted().map(function(c){
       return {
         id:c.id, name:c.name, category:c.category, image:c.image,
-        seats:c.seats, bags:c.bags, gear:c.gear, doors:c.doors, ac:c.ac,
+        seats:c.seats, bags:c.bags, gear:c.gear, doors:c.doors, ac:c.ac, specs:(c.specs||[]),
         priceByMonths:c.monthly
       };
     });
