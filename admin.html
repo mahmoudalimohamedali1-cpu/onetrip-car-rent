@@ -682,7 +682,7 @@
       <div class="sub-h">تفاصيل العقد</div>
       <div class="grid2">
         <div class="f"><label>السيارة *</label><select id="ct-car"></select></div>
-        <div class="f"><label>مدة الاشتراك</label><select id="ct-duration"><option value="12">١٢ شهر</option><option value="24">٢٤ شهر</option><option value="36">٣٦ شهر</option></select></div>
+        <div class="f"><label>مدة الاشتراك</label><select id="ct-duration"><option value="1">شهري — شهر</option><option value="3">٣ شهور</option><option value="6">٦ شهور</option><option value="12" selected>سنوي — ١٢ شهر</option><option value="24">سنتان — ٢٤ شهر</option><option value="36">٣ سنوات — ٣٦ شهر</option></select></div>
       </div>
       <div class="f"><label>الإضافات</label><div id="ct-addons" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div></div>
       <div class="grid3">
@@ -1295,6 +1295,7 @@
 
   /* ========== CONTRACTS (عقود الاشتراك الشهري — window.OneTrip.Contracts) ========== */
   function CT(){ return (window.OneTrip&&window.OneTrip.Contracts)||null; }
+  function CDUR(d){ var C=CT(); try{ if(C&&C.durationLabel) return C.durationLabel(d); }catch(e){} return toAr(d||0)+' شهر'; }
   function money(n){ return toAr(Math.round((+n||0)).toLocaleString('en-US'))+' ريال'; }
   function ctStatusPill(s){
     var C=CT(), lbl=(C&&C.statusLabel&&C.statusLabel(s))||s||'—';
@@ -1313,7 +1314,7 @@
         '<td><b style="direction:ltr;display:inline-block">'+esc(c.ref||'')+'</b></td>'+
         '<td><b>'+esc((c.customer&&c.customer.name)||'—')+'</b>'+((c.customer&&c.customer.phone)?'<br><span style="color:#98a0bd;font-size:12.5px;direction:ltr;display:inline-block">'+esc(c.customer.phone)+'</span>':'')+'</td>'+
         '<td>'+esc(c.carName||'—')+'</td>'+
-        '<td>'+toAr(c.duration||0)+' شهر</td>'+
+        '<td>'+esc(CDUR(c.duration))+'</td>'+
         '<td class="price">'+money(c.monthlyPrice)+'</td>'+
         '<td class="price">'+money(c.total)+'</td>'+
         '<td>'+ctStatusPill(st)+'</td>'+
@@ -1402,7 +1403,7 @@
       '<div class="grid2" style="gap:8px;margin-bottom:14px">'+
         row('العميل',cu.name)+row('الجوال',cu.phone)+row('البريد',cu.email)+row('الهوية',cu.idNum)+
         row('الرخصة',cu.license)+row('السيارة',c.carName)+
-        row('المدة',toAr(c.duration)+' شهر')+row('كم/شهر',toAr(c.kmPerMonth))+
+        row('المدة',CDUR(c.duration))+row('كم/شهر',toAr(c.kmPerMonth))+
         row('من',c.startDate)+row('إلى',c.endDate)+
         row('الشهري',money(c.monthlyPrice))+row('الإضافات',addNames.join('، '))+
         row('قبل الضريبة',money(c.subtotal))+row('الضريبة',money(c.vat))+

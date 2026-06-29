@@ -90,7 +90,7 @@
   }
   .duration-tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
   .dur-tab{
-    flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+    flex:1;min-width:118px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
     padding:14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-family:inherit;transition:.15s;
   }
   .dur-tab b{font-size:20px;font-weight:900;color:var(--ink);}
@@ -276,9 +276,12 @@
 <!-- ===== SEARCH / DURATION ===== -->
 <div class="search-card" id="search">
   <div class="duration-tabs" id="durTabs">
-    <button class="dur-tab active" data-months="12" type="button"><b>١٢ شهر</b><small>القسط الأعلى مرونة</small></button>
-    <button class="dur-tab" data-months="24" type="button"><b>٢٤ شهر</b><small>توفير متوسط</small></button>
-    <button class="dur-tab" data-months="36" type="button"><b>٣٦ شهر</b><small>أوفر قسط شهري</small></button>
+    <button class="dur-tab active" data-months="1" type="button"><b>شهري</b><small>شهر واحد</small></button>
+    <button class="dur-tab" data-months="3" type="button"><b>٣ شهور</b><small>قصير الأجل</small></button>
+    <button class="dur-tab" data-months="6" type="button"><b>٦ شهور</b><small>نصف سنوي</small></button>
+    <button class="dur-tab" data-months="12" type="button"><b>سنوي</b><small>١٢ شهر</small></button>
+    <button class="dur-tab" data-months="24" type="button"><b>سنتان</b><small>توفير متوسط</small></button>
+    <button class="dur-tab" data-months="36" type="button"><b>٣ سنوات</b><small>أوفر قسط</small></button>
   </div>
   <div class="search-row">
     <div class="field">
@@ -333,7 +336,7 @@
     <div class="section-head">
       <div class="eyebrow" style="background:#fff5ea;border:1px solid #ffe0bd;"><span>أسطولنا</span></div>
       <h2>اختر سيارتك باشتراك شهري</h2>
-      <p>الأسعار تتغيّر حسب مدة التأجير — جرّب ١٢ / ٢٤ / ٣٦ شهر من الأعلى.</p>
+      <p>الأسعار تتغيّر حسب مدة الاشتراك — من شهري حتى ٣٦ شهر من الأعلى.</p>
     </div>
     <div class="cars" id="carsGrid"></div>
   </section>
@@ -417,8 +420,12 @@
      =========================================================== */
   window.ltCars = OneTrip.ltCars();
 
-  var months = 12;
+  var months = 1;
   function fmt(n){ return n.toLocaleString('en-US'); }
+  function ltPrice(carId, m){
+    try{ if(window.OneTrip&&OneTrip.Contracts&&OneTrip.Contracts.monthlyPrice){ var p=OneTrip.Contracts.monthlyPrice(carId,m); if(p>0) return p; } }catch(e){}
+    return 0;
+  }
   function specSvg(p){ return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
   var S={
     seat:'<path d="M5 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5M4 11h13a2 2 0 0 1 2 2v5h-2M4 11v7M7 18h8"/>',
@@ -430,7 +437,7 @@
   function renderCars(){
     var grid=document.getElementById('carsGrid');
     grid.innerHTML = window.ltCars.map(function(c){
-      var price = c.priceByMonths[months];
+      var price = ltPrice(c.id, months) || c.priceByMonths[months] || 0;
       return '<article class="car" data-id="'+c.id+'">'+
         '<div class="car-top"><span class="car-cat">'+specSvg(S.gear)+c.category+'</span>'+
           '<span class="car-fav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.3-9.5-8.5C.9 9.6 2.5 6 6 6c2 0 3.2 1.2 4 2 0.8-.8 2-2 4-2 3.5 0 5.1 3.6 3.5 6.5C19 16.7 12 21 12 21z"/></svg></span></div>'+

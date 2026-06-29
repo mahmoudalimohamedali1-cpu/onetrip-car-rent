@@ -21,7 +21,11 @@
   var K_EXTRAS    = 'otb_extras';      // مصدر الإضافات الاحتياطي (booking-core seed)
 
   /* ---------- ثوابت (CONTRACTS_CONTRACT.md §2) ---------- */
-  var DURATIONS = [12, 24, 36];
+  /* المدد المتاحة (شهور): شهري / عدة شهور / سنوي / متعدد السنوات */
+  var DURATIONS = [1, 3, 6, 12, 24, 36];
+  /* للمدد القصيرة (غير المسعّرة صراحةً) يُشتق السعر الشهري من السعر السنوي
+     بنسبة أعلى — كل ما قلّ الالتزام زاد السعر الشهري */
+  var SHORT_MULT = { 1: 1.35, 3: 1.25, 6: 1.15 };
   var VAT = (function(){ try { return (window.OTB && window.OTB.VAT) || 0.15; } catch(e){ return 0.15; } })();
   var DEFAULT_KM = 3000;
   var EXTRA_KM = 0.5;
@@ -189,19 +193,34 @@
   }
 
   /* ---------- التسعير ---------- */
+  /* السعر الشهري المرجعي (السنوي = ١٢ شهر) — ومنه تُشتق المدد القصيرة؛
+     آخر حل: السعر اليومي × ٣٠ */
+  function baseMonthly(carId){
+    var c = masterCar(carId);
+    if (c && c.monthly){ var v = num(c.monthly[12]); if (v != null) return v; }
+    var lt = ltCar(carId);
+    if (lt && lt.priceByMonths){ var v2 = num(lt.priceByMonths[12]); if (v2 != null) return v2; }
+    if (c){ var dd = num(c.daily); if (dd != null) return dd * 30; }
+    return 0;
+  }
   function monthlyPrice(carId, duration){
     var dur = num(duration);
     if (dur == null) return 0;
     var c = masterCar(carId);
     if (c && c.monthly){
       var v = num(c.monthly[dur]);
-      if (v != null) return v;
+      if (v != null) return v;                 // سعر صريح (١٢/٢٤/٣٦ أو أي مضبوط)
     }
     var lt = ltCar(carId);
     if (lt && lt.priceByMonths){
       var v2 = num(lt.priceByMonths[dur]);
       if (v2 != null) return v2;
     }
+    if (SHORT_MULT[dur]){                        // مدد قصيرة مشتقّة من السنوي
+      var b = baseMonthly(carId);
+      if (b > 0) return Math.round(b * SHORT_MULT[dur]);
+    }
+    if (dur === 12){ var b12 = baseMonthly(carId); if (b12 > 0) return b12; }
     return 0;
   }
 
@@ -379,7 +398,7 @@
       var dur = num(data.duration);
 
       if (dur == null || DURATIONS.indexOf(dur) === -1){
-        return { error: 'مدة العقد غير صالحة (يجب أن تكون ١٢ أو ٢٤ أو ٣٦ شهرًا).' };
+        return { error: 'مدة العقد غير صالحة (١ أو ٣ أو ٦ أو ١٢ أو ٢٤ أو ٣٦ شهرًا).' };
       }
       var c = masterCar(carId);
       if (!c){ return { error: 'السيارة غير موجودة.' }; }
@@ -522,6 +541,20 @@
     return map[s] || str(s);
   }
 
+  /* تسمية المدة: شهري / عدة شهور / سنوي / متعدد السنوات */
+  function durationLabel(d){
+    var map = {
+      1:  'شهري — شهر',
+      3:  '٣ شهور',
+      6:  '٦ شهور',
+      12: 'سنوي — ١٢ شهر',
+      24: 'سنتان — ٢٤ شهر',
+      36: '٣ سنوات — ٣٦ شهر'
+    };
+    var n = num(d);
+    return map[n] || (str(d) + ' شهر');
+  }
+
   /* ---------- التصدير ---------- */
   window.OneTrip = window.OneTrip || {};
   window.OneTrip.Contracts = {
@@ -546,6 +579,7 @@
     carBusy:            carBusy,
     activeForCar:       activeForCar,
     statusLabel:        statusLabel,
+    durationLabel:      durationLabel,
     /* تفاعلية */
     on:                 on,
     off:                off,
