@@ -76,6 +76,8 @@
     var bk=bookings();
     for(var i=0;i<bk.length;i++){ var b=bk[i];
       if(b.status!=='cancelled' && b.carId===carId && overlaps(pickupAt,returnAt,b.pickupAt,b.returnAt)) return false; }
+    /* سيارة على عقد اشتراك شهري نشط لا تُتاح لحجز يومي متداخل (محروس) */
+    try{ if(window.OneTrip&&OneTrip.Contracts&&OneTrip.Contracts.carBusy&&OneTrip.Contracts.carBusy(carId,pickupAt,returnAt)) return false; }catch(e){}
     return true;
   }
   function availableCars(pickupAt, returnAt){

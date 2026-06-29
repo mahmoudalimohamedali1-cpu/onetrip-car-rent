@@ -205,6 +205,7 @@
     <button class="nav-i" data-sec="chat"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-3a8 8 0 0 1 16 0v3"/><path d="M21 16v2a3 3 0 0 1-3 3h-3"/><rect x="1" y="14" width="4" height="6" rx="1.5"/><rect x="19" y="14" width="4" height="6" rx="1.5"/></svg> المحادثات <span class="ct" id="ctChat">0</span></button>
     <button class="nav-i" data-sec="whatsapp"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.3A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 8.5c0 4 3 7 7 7"/></svg> واتساب بيزنس</button>
     <button class="nav-i" data-sec="bookings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h.01M12 14h.01M16 14h.01"/></svg> الحجوزات <span class="ct" id="ctBook">0</span></button>
+    <button class="nav-i" data-sec="contracts"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg> عقود الاشتراك <span class="ct" id="ctContracts">0</span></button>
     <button class="nav-i" data-sec="addons"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v9L12 22l-8-6.5v-9L12 2Z"/><path d="M12 22V12M20 6.5 12 12 4 6.5"/></svg> الإضافات <span class="ct" id="ctAddons">0</span></button>
     <button class="nav-i" data-sec="promos"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 3 8v8l6 6h8l6-6V8l-6-6H9Z"/><path d="M8.5 8.5h.01M15.5 15.5h.01M15 9l-6 6"/></svg> أكواد الخصم <span class="ct" id="ctPromos">0</span></button>
     <button class="nav-i" data-sec="emails"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> الإيميلات <span class="ct" id="ctEmails">0</span></button>
@@ -313,6 +314,17 @@
       <div class="panel">
         <div class="panel-h"><div><h2>الحجوزات</h2><span class="sub">الحجوزات المؤكّدة عبر مسار الحجز على الموقع</span></div></div>
         <div style="overflow:auto" id="bookTable"></div>
+      </div>
+    </section>
+
+    <!-- CONTRACTS (عقود الاشتراك الشهري) -->
+    <section class="sect" id="sec-contracts">
+      <div class="panel">
+        <div class="panel-h">
+          <div><h2>عقود الاشتراك الشهري</h2><span class="sub">إدارة اشتراكات العملاء طويلة الأجل</span></div>
+          <button class="btn btn-org" id="addContract"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> عقد جديد</button>
+        </div>
+        <div style="overflow:auto" id="contractsTable"></div>
       </div>
     </section>
 
@@ -651,6 +663,54 @@
   </div>
 </div>
 
+<!-- ===== CONTRACT EDIT MODAL ===== -->
+<div class="modal" id="contractModal">
+  <div class="modal-card" style="max-width:760px">
+    <div class="modal-h"><h3 id="contractModalTitle">عقد اشتراك جديد</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="ct-id">
+      <div class="sub-h" style="border-top:none;padding-top:0">بيانات العميل</div>
+      <div class="grid2">
+        <div class="f"><label>اسم العميل *</label><input id="ct-name" placeholder="أحمد علي"></div>
+        <div class="f"><label>الجوال</label><input id="ct-phone" dir="ltr" placeholder="05xxxxxxxx"></div>
+      </div>
+      <div class="grid3">
+        <div class="f"><label>البريد الإلكتروني</label><input id="ct-email" dir="ltr" placeholder="name@mail.com"></div>
+        <div class="f"><label>رقم الهوية</label><input id="ct-idnum" dir="ltr"></div>
+        <div class="f"><label>رقم الرخصة</label><input id="ct-license" dir="ltr"></div>
+      </div>
+      <div class="sub-h">تفاصيل العقد</div>
+      <div class="grid2">
+        <div class="f"><label>السيارة *</label><select id="ct-car"></select></div>
+        <div class="f"><label>مدة الاشتراك</label><select id="ct-duration"><option value="12">١٢ شهر</option><option value="24">٢٤ شهر</option><option value="36">٣٦ شهر</option></select></div>
+      </div>
+      <div class="f"><label>الإضافات</label><div id="ct-addons" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div></div>
+      <div class="grid3">
+        <div class="f"><label>كم/شهر</label><input id="ct-km" type="number" value="3000"></div>
+        <div class="f"><label>تاريخ البداية</label><input id="ct-start" type="date"></div>
+        <div class="f"><label>تاريخ النهاية</label><input id="ct-end" type="date" readonly style="background:#f1f3fb"></div>
+      </div>
+      <div class="grid3">
+        <div class="f"><label>التأمين المسترد (ريال)</label><input id="ct-deposit" type="number" value="1000"></div>
+        <div class="f"><label>الدفعة المقدّمة (ريال)</label><input id="ct-down" type="number" value="0"></div>
+        <div class="f"><label>الحالة</label><select id="ct-status"><option value="pending">قيد الانتظار</option><option value="active">نشط</option><option value="completed">منتهٍ</option><option value="suspended">معلّق</option><option value="cancelled">ملغى</option></select></div>
+      </div>
+      <div class="f"><label>ملاحظات</label><textarea id="ct-notes" rows="2" placeholder="ملاحظات داخلية"></textarea></div>
+      <div id="ct-summary" style="background:#f4f6fd;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-weight:700;font-size:14px;color:var(--ink);line-height:1.9"></div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إلغاء</button><button class="btn btn-pri" id="saveContract">حفظ العقد</button></div>
+  </div>
+</div>
+
+<!-- ===== CONTRACT VIEW / PRINT MODAL ===== -->
+<div class="modal" id="contractViewModal">
+  <div class="modal-card" style="max-width:760px">
+    <div class="modal-h"><h3>عقد اشتراك شهري</h3><button class="x" data-close>&times;</button></div>
+    <div class="modal-b" id="contractViewBody"></div>
+    <div class="modal-f"><button class="btn btn-ghost" data-close>إغلاق</button><button class="btn btn-pri" id="printContract"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg> طباعة</button></div>
+  </div>
+</div>
+
 <!-- ===== PROMO MODAL ===== -->
 <div class="modal" id="promoModal">
   <div class="modal-card" style="max-width:520px">
@@ -713,6 +773,7 @@
 <script src="req-core.js"></script>
 <script src="supabase-sync.js"></script>
 <script src="booking-core.js?v=7"></script>
+<script src="contracts-core.js"></script>
 <script src="news-core.js"></script>
 <script>
 /* news section: keep the sidebar count badge in sync with the embedded editor */
@@ -775,7 +836,7 @@
   /* ---------- users / permissions (نظام صلاحيات الموظفين — localStorage تجريبي) ---------- */
   var UK='ot_users';
   /* الأقسام اللي ينفع تتمنح للموظف (الأدمن عنده كله) */
-  var GRANT=[['chat','المحادثات'],['leads','الطلبات'],['bookings','الحجوزات'],['cars','السيارات'],['cats','الفئات'],['branches','الفروع'],['promos','أكواد الخصم'],['addons','الإضافات'],['intro','واجهة الرئيسية'],['whatsapp','واتساب بيزنس']];
+  var GRANT=[['chat','المحادثات'],['leads','الطلبات'],['bookings','الحجوزات'],['contracts','عقود الاشتراك'],['cars','السيارات'],['cats','الفئات'],['branches','الفروع'],['promos','أكواد الخصم'],['addons','الإضافات'],['intro','واجهة الرئيسية'],['whatsapp','واتساب بيزنس']];
   function seedUsers(){ if(localStorage.getItem(UK)==null) save(UK,[{id:'u_admin',name:'المدير',username:'admin',pass:'onetrip',role:'admin',sections:[]}]); }
   function users(){ return load(UK,[]); }
   function curUser(){
@@ -1009,7 +1070,7 @@
   $('#resetBtn').addEventListener('click',function(){ if(confirm('استرجاع كل البيانات للوضع الافتراضي؟ (هيمسح تعديلاتك على هذا المتصفح)')){ [K.cars,K.cats,K.br,K.leads,K.intro].forEach(function(k){localStorage.removeItem(k);}); seed(); renderAll(); toast('تم الاسترجاع','ok'); } });
 
   /* ---------- nav ---------- */
-  var titles={dash:'لوحة التحكم',cars:'السيارات',offers:'العروض',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',addons:'الإضافات',promos:'أكواد الخصم',emails:'الإيميلات',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',surveys:'التقييمات',users:'الموظفين',customers:'العملاء',reqs:'متطلبات الحجز',docs:'مراجعة المستندات'};
+  var titles={dash:'لوحة التحكم',cars:'السيارات',offers:'العروض',cats:'الفئات',branches:'الفروع',leads:'الطلبات',bookings:'الحجوزات',contracts:'عقود الاشتراك الشهري',addons:'الإضافات',promos:'أكواد الخصم',emails:'الإيميلات',intro:'واجهة الرئيسية',chat:'المحادثات',whatsapp:'واتساب بيزنس',surveys:'التقييمات',users:'الموظفين',customers:'العملاء',reqs:'متطلبات الحجز',docs:'مراجعة المستندات'};
   $$('.nav-i').forEach(function(b){ b.addEventListener('click',function(){
     $$('.nav-i').forEach(function(x){x.classList.remove('active');}); b.classList.add('active');
     var s=b.getAttribute('data-sec'); $$('.sect').forEach(function(x){x.classList.remove('on');}); $('#sec-'+s).classList.add('on');
@@ -1017,6 +1078,7 @@
     if(s==='chat'){ renderInbox(); loadChatSettings(); clearNotify(); }
     if(s==='whatsapp') renderWa();
     if(s==='offers') renderOffers();
+    if(s==='contracts') renderContracts();
     if(s==='surveys') renderSurveys();
     if(s==='users') renderUsers();
     if(s==='customers') renderCustomers();
@@ -1027,7 +1089,7 @@
   /* ---------- renderers ---------- */
   /* عزل الأعطال: لو رندرر واحد رمى استثناء، ما يوقّفش باقي اللوحة (وخصوصًا قسم المحادثات) */
   function safeRender(fn){ try{ fn(); }catch(e){ if(window.console&&console.warn) console.warn('renderAll: تخطّي رندرر فشل —', e&&e.message); } }
-  function renderAll(){ [renderCounts,renderDash,renderCars,renderOffers,renderCats,renderBranches,renderLeads,renderBookings,renderAddons,renderPromos,renderEmails,renderIntro,renderChatBadge,renderSurveys,renderUsers,renderCustomers,renderReqs,renderDocs].forEach(safeRender); }
+  function renderAll(){ [renderCounts,renderDash,renderCars,renderOffers,renderCats,renderBranches,renderLeads,renderBookings,renderContracts,renderAddons,renderPromos,renderEmails,renderIntro,renderChatBadge,renderSurveys,renderUsers,renderCustomers,renderReqs,renderDocs].forEach(safeRender); }
   function renderCounts(){
     $('#ctCars').textContent=toAr(DB.cars.all().length);
     $('#ctCats').textContent=toAr(DB.cats.all().length);
@@ -1037,6 +1099,7 @@
     var hasOTB=!!window.OTB;
     var confirmed=hasOTB?OTB.bookings().filter(function(b){return b.status==='confirmed';}).length:0;
     $('#ctBook').textContent=toAr(confirmed);
+    if($('#ctContracts')){ var C=CT(); $('#ctContracts').textContent=toAr(C?C.all().length:0); }
     $('#ctAddons').textContent=toAr(addonStore().length);
     $('#ctPromos').textContent=toAr(promoStore().length);
     if($('#ctEmails')) $('#ctEmails').textContent=toAr((window.OTB&&OTB.emails)?OTB.emails().length:0);
@@ -1228,6 +1291,157 @@
     var item={id:id,name:name,type:$('#a-type').value,price:pr,unit:$('#a-unit').value,desc:$('#a-desc').value.trim()};
     if(i>=0)arr[i]=item; else arr.push(item);
     addonSave(arr); closeModal(); renderAll(); toast('تم حفظ العنصر ✓','ok');
+  });
+
+  /* ========== CONTRACTS (عقود الاشتراك الشهري — window.OneTrip.Contracts) ========== */
+  function CT(){ return (window.OneTrip&&window.OneTrip.Contracts)||null; }
+  function money(n){ return toAr(Math.round((+n||0)).toLocaleString('en-US'))+' ريال'; }
+  function ctStatusPill(s){
+    var C=CT(), lbl=(C&&C.statusLabel&&C.statusLabel(s))||s||'—';
+    var cls=s==='active'?'green':(s==='pending'?'orange':(s==='cancelled'?'gray':(s==='suspended'?'gray':'blue')));
+    return '<span class="pill '+cls+'">'+esc(lbl)+'</span>';
+  }
+  function renderContracts(){
+    var box=$('#contractsTable'); if(!box) return;
+    var C=CT();
+    if(!C){ box.innerHTML='<div class="empty">وحدة العقود غير محمّلة (contracts-core.js).</div>'; return; }
+    var list=C.all();
+    if(!list.length){ box.innerHTML='<div class="empty">مفيش عقود — اضغط «عقد جديد».</div>'; return; }
+    var rows=list.map(function(c){
+      var st=(C.effectiveStatus?C.effectiveStatus(c):c.status);
+      return '<tr>'+
+        '<td><b style="direction:ltr;display:inline-block">'+esc(c.ref||'')+'</b></td>'+
+        '<td><b>'+esc((c.customer&&c.customer.name)||'—')+'</b>'+((c.customer&&c.customer.phone)?'<br><span style="color:#98a0bd;font-size:12.5px;direction:ltr;display:inline-block">'+esc(c.customer.phone)+'</span>':'')+'</td>'+
+        '<td>'+esc(c.carName||'—')+'</td>'+
+        '<td>'+toAr(c.duration||0)+' شهر</td>'+
+        '<td class="price">'+money(c.monthlyPrice)+'</td>'+
+        '<td class="price">'+money(c.total)+'</td>'+
+        '<td>'+ctStatusPill(st)+'</td>'+
+        '<td><div class="rowacts">'+
+          '<button class="iact" data-ctv="'+esc(c.id)+'" title="عرض"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
+          '<button class="iact" data-cte="'+esc(c.id)+'" title="تعديل"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+          '<button class="iact del" data-ctd="'+esc(c.id)+'" title="حذف"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>'+
+        '</div></td>'+
+      '</tr>';
+    }).join('');
+    box.innerHTML='<table><thead><tr><th>المرجع</th><th>العميل</th><th>السيارة</th><th>المدة</th><th>الشهري</th><th>الإجمالي (شامل الضريبة)</th><th>الحالة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $$('#contractsTable [data-ctv]').forEach(function(b){b.addEventListener('click',function(){viewContract(b.getAttribute('data-ctv'));});});
+    $$('#contractsTable [data-cte]').forEach(function(b){b.addEventListener('click',function(){openContract(b.getAttribute('data-cte'));});});
+    $$('#contractsTable [data-ctd]').forEach(function(b){b.addEventListener('click',function(){ if(confirm('حذف العقد؟')){ CT().deleteContract(b.getAttribute('data-ctd')); renderAll(); toast('تم الحذف','ok'); } });});
+  }
+
+  /* الإضافات المتاحة للعقود (نفس مصدر قسم الإضافات) */
+  function ctExtras(){ try{ return (window.OTB&&OTB.extras&&OTB.extras())||load('otb_extras',[])||[]; }catch(e){ return []; } }
+
+  function ctFillCarOptions(sel){
+    var C=CT(); if(!C) return;
+    var cars=(C.carsWithMonthly&&C.carsWithMonthly())||[];
+    $('#ct-car').innerHTML=cars.map(function(c){ return '<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>'; }).join('');
+    if(sel) $('#ct-car').value=sel;
+  }
+  function ctFillAddons(checked){
+    checked=checked||[];
+    var ex=ctExtras();
+    $('#ct-addons').innerHTML = ex.length? ex.map(function(e){
+      var ck=checked.indexOf(e.id)>=0?'checked':'';
+      return '<label class="toggle" style="font-size:13px;height:42px"><input type="checkbox" value="'+esc(e.id)+'" '+ck+'> '+esc(e.name)+'</label>';
+    }).join('') : '<span style="color:#98a0bd;font-weight:600;font-size:13px">لا توجد إضافات</span>';
+    $$('#ct-addons input').forEach(function(c){ c.addEventListener('change',ctUpdatePreview); });
+  }
+  function ctSelAddons(){ return $$('#ct-addons input:checked').map(function(c){return c.value;}); }
+
+  function ctUpdatePreview(){
+    var C=CT(); if(!C) return;
+    var carId=$('#ct-car').value, duration=parseInt($('#ct-duration').value,10)||12, km=parseInt($('#ct-km').value,10)||0;
+    var q=C.quote({carId:carId,duration:duration,kmPerMonth:km,addons:ctSelAddons()})||{};
+    /* end date */
+    var sd=$('#ct-start').value;
+    $('#ct-end').value = (sd&&C.endDate)?C.endDate(sd,duration):'';
+    $('#ct-summary').innerHTML=
+      'الشهري للسيارة: <b class="price">'+money(q.monthlyPrice||0)+'</b><br>'+
+      'إضافات شهرية: <b class="price">'+money(q.addonsMonthly||0)+'</b><br>'+
+      'الإجمالي قبل الضريبة: <b class="price">'+money(q.subtotal||0)+'</b><br>'+
+      'الضريبة (١٥٪): <b class="price">'+money(q.vat||0)+'</b><br>'+
+      'الإجمالي الكلي: <b class="price" style="font-size:16px">'+money(q.total||0)+'</b>';
+  }
+
+  function openContract(id){
+    var C=CT(); if(!C){ toast('وحدة العقود غير محمّلة','err'); return; }
+    var c=id?C.get(id):null;
+    $('#contractModalTitle').textContent=c?'تعديل عقد اشتراك':'عقد اشتراك جديد';
+    $('#ct-id').value=c?c.id:'';
+    var cu=(c&&c.customer)||{};
+    $('#ct-name').value=cu.name||''; $('#ct-phone').value=cu.phone||''; $('#ct-email').value=cu.email||'';
+    $('#ct-idnum').value=cu.idNum||''; $('#ct-license').value=cu.license||'';
+    ctFillCarOptions(c?c.carId:'');
+    $('#ct-duration').value=String(c?(c.duration||12):12);
+    ctFillAddons(c?(c.addons||[]):[]);
+    $('#ct-km').value=c?(c.kmPerMonth||3000):3000;
+    $('#ct-start').value=(c&&c.startDate)?c.startDate:(new Date().toISOString().slice(0,10));
+    $('#ct-deposit').value=c?(c.deposit!=null?c.deposit:1000):1000;
+    $('#ct-down').value=c?(c.downPayment||0):0;
+    $('#ct-status').value=c?(c.status||'pending'):'pending';
+    $('#ct-notes').value=c?(c.notes||''):'';
+    ctUpdatePreview();
+    openModal('#contractModal');
+  }
+
+  function viewContract(id){
+    var C=CT(); if(!C){ toast('وحدة العقود غير محمّلة','err'); return; }
+    var c=C.get(id); if(!c){ toast('العقد غير موجود','err'); return; }
+    var cu=c.customer||{};
+    function row(l,v){ return '<div class="bub card cd-row" style="max-width:none;display:flex"><span>'+l+'</span><b>'+esc(v||'—')+'</b></div>'; }
+    var sched=(c.schedule||[]).map(function(p){
+      var st=p.status==='paid'?'<span class="pill green">مدفوعة</span>':(p.status==='late'?'<span class="pill orange">متأخرة</span>':'<span class="pill gray">مستحقة</span>');
+      return '<tr><td>'+toAr(p.n)+'</td><td>'+esc(p.dueDate||'')+'</td><td class="price">'+money(p.amount)+'</td><td>'+st+'</td></tr>';
+    }).join('');
+    var addNames=(c.addons||[]).map(function(aid){ var e=ctExtras().filter(function(x){return x.id===aid;})[0]; return e?e.name:aid; });
+    $('#contractViewBody').innerHTML=
+      '<div style="text-align:center;margin-bottom:14px"><h2 style="margin:0;color:var(--blue)">عقد اشتراك شهري</h2>'+
+        '<div style="color:var(--muted);font-weight:700;direction:ltr">'+esc(c.ref||'')+'</div></div>'+
+      '<div class="grid2" style="gap:8px;margin-bottom:14px">'+
+        row('العميل',cu.name)+row('الجوال',cu.phone)+row('البريد',cu.email)+row('الهوية',cu.idNum)+
+        row('الرخصة',cu.license)+row('السيارة',c.carName)+
+        row('المدة',toAr(c.duration)+' شهر')+row('كم/شهر',toAr(c.kmPerMonth))+
+        row('من',c.startDate)+row('إلى',c.endDate)+
+        row('الشهري',money(c.monthlyPrice))+row('الإضافات',addNames.join('، '))+
+        row('قبل الضريبة',money(c.subtotal))+row('الضريبة',money(c.vat))+
+        row('التأمين المسترد',money(c.deposit))+row('الدفعة المقدّمة',money(c.downPayment))+
+        row('الإجمالي الكلي',money(c.total))+row('الحالة',(C.statusLabel&&C.statusLabel(c.status))||c.status)+
+      '</div>'+
+      '<div class="sub-h">جدول الدفعات</div>'+
+      '<div style="overflow:auto"><table><thead><tr><th>#</th><th>الاستحقاق</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>'+(sched||'<tr><td colspan="4" class="empty">لا يوجد جدول</td></tr>')+'</tbody></table></div>'+
+      (c.notes?('<div class="sub-h">ملاحظات</div><div style="font-weight:600;color:var(--muted)">'+esc(c.notes)+'</div>'):'')+
+      '<div class="sub-h">الشروط</div>'+
+      '<div style="font-weight:600;color:var(--muted);font-size:13px;line-height:1.9">— يلتزم العميل بسداد الدفعات الشهرية في مواعيدها.<br>— المسافة المشمولة '+toAr(c.kmPerMonth)+' كم/شهر، وما زاد يُحتسب '+toAr(c.extraKmPrice||0.5)+' ريال/كم.<br>— التأمين مسترد عند انتهاء العقد بحالة سليمة.<br>— تخضع جميع المبالغ لضريبة القيمة المضافة ١٥٪.</div>';
+    openModal('#contractViewModal');
+  }
+  $('#printContract') && $('#printContract').addEventListener('click',function(){ window.print(); });
+
+  /* live preview triggers */
+  ['#ct-car','#ct-duration','#ct-km','#ct-start'].forEach(function(s){ var el=$(s); if(el) el.addEventListener('change',ctUpdatePreview); });
+  $('#addContract') && $('#addContract').addEventListener('click',function(){ openContract(null); });
+  $('#saveContract') && $('#saveContract').addEventListener('click',function(){
+    var C=CT(); if(!C){ toast('وحدة العقود غير محمّلة','err'); return; }
+    var name=$('#ct-name').value.trim(); if(!name){ toast('اكتب اسم العميل','err'); return; }
+    var carId=$('#ct-car').value; if(!carId){ toast('اختر السيارة','err'); return; }
+    var rec={
+      id: $('#ct-id').value||undefined,
+      carId: carId,
+      duration: parseInt($('#ct-duration').value,10)||12,
+      customer:{ name:name, phone:$('#ct-phone').value.trim(), email:$('#ct-email').value.trim(), idNum:$('#ct-idnum').value.trim(), license:$('#ct-license').value.trim() },
+      kmPerMonth: parseInt($('#ct-km').value,10)||0,
+      addons: ctSelAddons(),
+      startDate: $('#ct-start').value,
+      deposit: parseFloat($('#ct-deposit').value)||0,
+      downPayment: parseFloat($('#ct-down').value)||0,
+      status: $('#ct-status').value,
+      source: 'admin',
+      notes: $('#ct-notes').value.trim()
+    };
+    var res=C.saveContract(rec);
+    if(res&&res.error){ toast(res.error,'err'); return; }
+    renderAll(); closeModal(); toast('تم حفظ العقد ✓','ok');
   });
 
   /* ========== PROMO CODES (localStorage otb_promos) ========== */
