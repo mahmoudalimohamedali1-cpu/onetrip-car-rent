@@ -512,6 +512,10 @@
         <div class="f"><label>مكيّف</label><label class="toggle"><input type="checkbox" id="c-ac" checked> يوجد تكييف</label></div>
       </div>
 
+      <div class="sub-h">مواصفات إضافية <span style="font-weight:600;color:#98a0bd;font-size:12px">(تظهر تحت السيارة في الأسطول — مثال: فتحة سقف، بلوتوث، شاشة لمس)</span></div>
+      <div id="c-specs"></div>
+      <button type="button" class="btn btn-ghost" id="c-addSpec" style="margin-top:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة مواصفة</button>
+
       <div class="sub-h">الأسعار</div>
       <div class="grid3">
         <div class="f"><label>السعر اليومي (ريال)</label><input id="c-daily" type="number" value="150"></div>
@@ -1220,8 +1224,18 @@
     g('#c-order').value=c?c.order:(DB.cars.all().length+1);
     g('#c-onHomepage').checked=c?!!c.onHomepage:false; g('#c-featured').checked=c?!!c.featured:false;
     g('#c-bookingBadge').value=(c&&c.bookingBadge)||''; g('#c-showcaseBadge').value=(c&&c.showcaseBadge)||'';
+    renderSpecRows((c&&c.specs)||[]);
     openModal('#carModal');
   }
+  /* ---------- مواصفات إضافية للسيارة (صفوف ديناميكية) ---------- */
+  function specRow(val){
+    return '<div class="spec-row" style="display:flex;gap:8px;margin-bottom:8px;align-items:center">'+
+      '<input class="c-spec" value="'+esc(val||'')+'" placeholder="مثال: فتحة سقف / بلوتوث / مثبّت سرعة" style="flex:1;height:46px;border:1.5px solid var(--line);border-radius:11px;padding:0 13px;font-family:inherit;font-weight:600;background:#fcfdff;outline:none">'+
+      '<button type="button" class="btn btn-ghost c-spec-del" title="حذف" style="padding:0 12px;height:46px">✕</button></div>';
+  }
+  function renderSpecRows(list){ var box=$('#c-specs'); if(box) box.innerHTML=(list&&list.length?list:['']).map(function(v){return specRow(v);}).join(''); }
+  if($('#c-addSpec')) $('#c-addSpec').addEventListener('click',function(){ var box=$('#c-specs'); if(box) box.insertAdjacentHTML('beforeend', specRow('')); });
+  if($('#c-specs')) $('#c-specs').addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('.c-spec-del'); if(b&&b.parentNode){ b.parentNode.parentNode.removeChild(b.parentNode); } });
   function setPrev(src){ var p=$('#c-prev'); if(src){p.src=src;p.style.visibility='visible';}else{p.removeAttribute('src');p.style.visibility='hidden';} }
   $('#c-image').addEventListener('input',function(){setPrev(this.value);});
   $('#c-file').addEventListener('change',function(){ var f=this.files[0]; if(!f)return; var r=new FileReader(); r.onload=function(){ $('#c-image').value=r.result; setPrev(r.result); }; r.readAsDataURL(f); });
@@ -1237,6 +1251,7 @@
       bookingBadge:$('#c-bookingBadge').value.trim()||null,
       onHomepage:$('#c-onHomepage').checked, order:num('#c-order')||0, showcase:sc, featured:$('#c-featured').checked,
       showcaseBadge:$('#c-showcaseBadge').value.trim()||null,
+      specs:$$('#c-specs .c-spec').map(function(i){return i.value.trim();}).filter(Boolean),
       monthly:{12:num('#c-m12'),24:num('#c-m24'),36:num('#c-m36')} };
     DB.cars.put(car); closeModal(); renderAll(); toast('تم حفظ السيارة ✓','ok');
   });

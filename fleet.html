@@ -311,6 +311,7 @@
             + '<span class="spec">'+sp(S.gear)+c.gear+'</span>'
             + '<span class="spec">'+sp(S.door)+toAr(c.doors)+' أبواب</span>'
             + '<span class="spec">'+sp(S.ac)+(c.ac?'مكيّف':'بدون')+'</span>'
+            + (c.specs||[]).map(function(s){return '<span class="spec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'+String(s).replace(/[<>&"]/g,'')+'</span>';}).join('')
           + '</div>'
           + '<div class="car-foot">'
             + '<div class="price"><b>'+toAr(c.price)+'</b> <span class="cur">ريال</span><span class="per">/ يوميًا — لا يشمل الضريبة</span></div>'
