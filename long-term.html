@@ -90,7 +90,7 @@
   }
   .duration-tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
   .dur-tab{
-    flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+    flex:1;min-width:118px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
     padding:14px;border-radius:14px;border:2px solid var(--line);background:#fff;font-family:inherit;transition:.15s;
   }
   .dur-tab b{font-size:20px;font-weight:900;color:var(--ink);}
@@ -197,6 +197,36 @@
     .benefits,.steps,.cars,.footer-inner{grid-template-columns:1fr;}
     .corp{padding:34px 24px;}
   }
+
+  /* ---------- subscription request modal ---------- */
+  .sub-ov{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(13,18,58,.55);backdrop-filter:blur(3px);}
+  .sub-ov.open{display:flex;}
+  .sub-modal{background:#fff;border-radius:22px;width:100%;max-width:480px;max-height:92vh;overflow:auto;box-shadow:0 40px 90px rgba(20,28,80,.4);border:1px solid var(--line);}
+  .sub-head{position:relative;padding:24px 26px 18px;background:linear-gradient(135deg,var(--blue),var(--indigo));color:#fff;border-radius:22px 22px 0 0;}
+  .sub-head h3{margin:0;font-size:22px;font-weight:900;}
+  .sub-head .sub-dur{margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);font-weight:600;}
+  .sub-x{position:absolute;top:16px;left:18px;width:36px;height:36px;border-radius:10px;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:.15s;}
+  .sub-x:hover{background:rgba(255,255,255,.28);}
+  .sub-body{padding:22px 26px 26px;}
+  .sub-summary{background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:18px;}
+  .sub-summary .row{display:flex;justify-content:space-between;align-items:baseline;font-size:14.5px;color:var(--muted);font-weight:600;padding:4px 0;}
+  .sub-summary .row b{color:var(--ink);font-weight:800;font-size:16px;}
+  .sub-summary .row.total b{color:var(--blue);font-size:20px;font-weight:900;}
+  .sub-summary .row.total{border-top:1px dashed var(--line);margin-top:6px;padding-top:10px;}
+  .sub-fld{margin-bottom:14px;}
+  .sub-fld label{display:block;font-weight:800;font-size:14px;margin-bottom:7px;color:var(--ink);}
+  .sub-fld label .req{color:var(--orange);}
+  .sub-fld input{width:100%;height:50px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);outline:none;transition:.15s;}
+  .sub-fld input:focus{border-color:var(--blue);}
+  .sub-err{display:none;background:#fdecea;border:1px solid #f5c2bd;color:#b3261e;font-weight:700;font-size:14px;border-radius:11px;padding:11px 14px;margin-bottom:14px;}
+  .sub-err.show{display:block;}
+  .sub-modal .btn-blue{width:100%;justify-content:center;height:54px;font-size:16px;}
+  .sub-ok{text-align:center;padding:30px 26px 28px;}
+  .sub-ok .ic{width:72px;height:72px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1b2a7a,#2300d9);color:#fff;}
+  .sub-ok h3{margin:0 0 10px;font-size:22px;font-weight:900;color:var(--blue);}
+  .sub-ok p{margin:0 0 6px;color:var(--muted);font-size:15px;line-height:1.7;}
+  .sub-ok .ref{font-weight:900;color:var(--orange);font-size:18px;}
+  .sub-ok .btn-blue{margin-top:22px;}
 </style>
 </head>
 <body>
@@ -246,9 +276,12 @@
 <!-- ===== SEARCH / DURATION ===== -->
 <div class="search-card" id="search">
   <div class="duration-tabs" id="durTabs">
-    <button class="dur-tab active" data-months="12" type="button"><b>١٢ شهر</b><small>القسط الأعلى مرونة</small></button>
-    <button class="dur-tab" data-months="24" type="button"><b>٢٤ شهر</b><small>توفير متوسط</small></button>
-    <button class="dur-tab" data-months="36" type="button"><b>٣٦ شهر</b><small>أوفر قسط شهري</small></button>
+    <button class="dur-tab active" data-months="1" type="button"><b>شهري</b><small>شهر واحد</small></button>
+    <button class="dur-tab" data-months="3" type="button"><b>٣ شهور</b><small>قصير الأجل</small></button>
+    <button class="dur-tab" data-months="6" type="button"><b>٦ شهور</b><small>نصف سنوي</small></button>
+    <button class="dur-tab" data-months="12" type="button"><b>سنوي</b><small>١٢ شهر</small></button>
+    <button class="dur-tab" data-months="24" type="button"><b>سنتان</b><small>توفير متوسط</small></button>
+    <button class="dur-tab" data-months="36" type="button"><b>٣ سنوات</b><small>أوفر قسط</small></button>
   </div>
   <div class="search-row">
     <div class="field">
@@ -303,7 +336,7 @@
     <div class="section-head">
       <div class="eyebrow" style="background:#fff5ea;border:1px solid #ffe0bd;"><span>أسطولنا</span></div>
       <h2>اختر سيارتك باشتراك شهري</h2>
-      <p>الأسعار تتغيّر حسب مدة التأجير — جرّب ١٢ / ٢٤ / ٣٦ شهر من الأعلى.</p>
+      <p>الأسعار تتغيّر حسب مدة الاشتراك — من شهري حتى ٣٦ شهر من الأعلى.</p>
     </div>
     <div class="cars" id="carsGrid"></div>
   </section>
@@ -355,6 +388,7 @@
 </footer>
 
 <script src="cars.js?v=7"></script>
+<script src="contracts-core.js"></script>
 <script>
 (function(){
   'use strict';
@@ -386,8 +420,12 @@
      =========================================================== */
   window.ltCars = OneTrip.ltCars();
 
-  var months = 12;
+  var months = 1;
   function fmt(n){ return n.toLocaleString('en-US'); }
+  function ltPrice(carId, m){
+    try{ if(window.OneTrip&&OneTrip.Contracts&&OneTrip.Contracts.monthlyPrice){ var p=OneTrip.Contracts.monthlyPrice(carId,m); if(p>0) return p; } }catch(e){}
+    return 0;
+  }
   function specSvg(p){ return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
   var S={
     seat:'<path d="M5 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5M4 11h13a2 2 0 0 1 2 2v5h-2M4 11v7M7 18h8"/>',
@@ -399,7 +437,7 @@
   function renderCars(){
     var grid=document.getElementById('carsGrid');
     grid.innerHTML = window.ltCars.map(function(c){
-      var price = c.priceByMonths[months];
+      var price = ltPrice(c.id, months) || c.priceByMonths[months] || 0;
       return '<article class="car" data-id="'+c.id+'">'+
         '<div class="car-top"><span class="car-cat">'+specSvg(S.gear)+c.category+'</span>'+
           '<span class="car-fav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.3-9.5-8.5C.9 9.6 2.5 6 6 6c2 0 3.2 1.2 4 2 0.8-.8 2-2 4-2 3.5 0 5.1 3.6 3.5 6.5C19 16.7 12 21 12 21z"/></svg></span></div>'+
@@ -415,7 +453,7 @@
         '</div>'+
         '<div class="car-price"><b>'+fmt(price)+'</b><span class="cur">ريال</span><span class="per">/ شهريًا</span></div>'+
         '<div class="car-tax">السعر لا يشمل الضريبة — لمدة '+months+' شهر</div>'+
-        '<button class="btn-blue" type="button" onclick="console.log(\'احجز\','+JSON.stringify(c.id)+','+months+')">احجز الآن'+
+        '<button class="btn-blue" type="button" onclick="openSubModal('+JSON.stringify(c.id)+','+months+')">احجز الآن'+
           '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'+
         '</button>'+
       '</article>';
@@ -434,6 +472,91 @@
   });
 
   renderCars();
+
+  /* ===========================================================
+     SUBSCRIPTION REQUEST MODAL (CONTRACTS_CONTRACT §4)
+     =========================================================== */
+  function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g,function(m){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[m];}); }
+  function todayISO(){
+    var d=new Date(), p=function(n){return (n<10?'0':'')+n;};
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  }
+
+  var ov=document.createElement('div');
+  ov.className='sub-ov'; ov.id='subOv';
+  ov.innerHTML='<div class="sub-modal" role="dialog" aria-modal="true"><div id="subInner"></div></div>';
+  document.body.appendChild(ov);
+  var inner=ov.querySelector('#subInner');
+  var cur={carId:null, months:12};
+
+  function closeSubModal(){ ov.classList.remove('open'); }
+  function showErr(msg){ var e=inner.querySelector('#subErr'); if(e){ e.textContent=msg; e.classList.add('show'); } }
+
+  function renderForm(){
+    var C=window.OneTrip&&OneTrip.Contracts;
+    if(!C){
+      inner.innerHTML='<div class="sub-head"><button class="sub-x" type="button" aria-label="إغلاق" onclick="closeSubModal()">×</button><h3>طلب اشتراك شهري</h3></div>'+
+        '<div class="sub-body"><div class="sub-err show">عذرًا، خدمة الاشتراكات غير متاحة حاليًا. برجاء المحاولة لاحقًا أو التواصل معنا.</div>'+
+        '<button class="btn-blue" type="button" onclick="closeSubModal()">إغلاق</button></div>';
+      return;
+    }
+    var q={}; try{ q=C.quote({carId:cur.carId, duration:cur.months})||{}; }catch(e){ q={}; }
+    var monthly=q.monthlyPrice||0, total=q.total||0, vat=q.vat||0;
+    var name=q.carName||(window.ltCars.filter(function(c){return c.id===cur.carId;})[0]||{}).name||'';
+    inner.innerHTML=
+      '<div class="sub-head"><button class="sub-x" type="button" aria-label="إغلاق" onclick="closeSubModal()">×</button>'+
+        '<h3>طلب اشتراك: '+esc(name)+'</h3><p class="sub-dur">مدة الاشتراك: '+cur.months+' شهر</p></div>'+
+      '<div class="sub-body">'+
+        '<div class="sub-summary">'+
+          '<div class="row"><span>القسط الشهري</span><b>'+fmt(monthly)+' ريال</b></div>'+
+          '<div class="row"><span>ضريبة القيمة المضافة (١٥٪)</span><b>'+fmt(Math.round(vat))+' ريال</b></div>'+
+          '<div class="row total"><span>الإجمالي شامل الضريبة</span><b>'+fmt(Math.round(total))+' ريال</b></div>'+
+        '</div>'+
+        '<div class="sub-err" id="subErr"></div>'+
+        '<div class="sub-fld"><label>الاسم <span class="req">*</span></label><input id="subName" type="text" placeholder="الاسم بالكامل"></div>'+
+        '<div class="sub-fld"><label>رقم الجوال <span class="req">*</span></label><input id="subPhone" type="tel" placeholder="05xxxxxxxx"></div>'+
+        '<div class="sub-fld"><label>البريد الإلكتروني (اختياري)</label><input id="subEmail" type="email" placeholder="name@email.com"></div>'+
+        '<div class="sub-fld"><label>رقم الهوية / الإقامة (اختياري)</label><input id="subId" type="text" placeholder="١٠ أرقام"></div>'+
+        '<button class="btn-blue" type="button" id="subConfirm">تأكيد الطلب'+
+          '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#eef1ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'+
+        '</button>'+
+      '</div>';
+    inner.querySelector('#subConfirm').addEventListener('click', confirmSub);
+  }
+
+  function confirmSub(){
+    var C=window.OneTrip&&OneTrip.Contracts; if(!C) return;
+    var name=(inner.querySelector('#subName').value||'').trim();
+    var phone=(inner.querySelector('#subPhone').value||'').trim();
+    var email=(inner.querySelector('#subEmail').value||'').trim();
+    var idNum=(inner.querySelector('#subId').value||'').trim();
+    if(!name || !phone){ showErr('برجاء إدخال الاسم ورقم الجوال.'); return; }
+    var res;
+    try{
+      res=C.createSubscription({carId:cur.carId, duration:cur.months, customer:{name:name,phone:phone,email:email,idNum:idNum},
+        startDate:todayISO(), source:'website', status:'pending'});
+    }catch(e){ res={error:'تعذّر إرسال الطلب. حاول مرة أخرى.'}; }
+    if(!res || res.error){ showErr((res&&res.error)||'تعذّر إرسال الطلب. حاول مرة أخرى.'); return; }
+    inner.innerHTML=
+      '<div class="sub-head"><button class="sub-x" type="button" aria-label="إغلاق" onclick="closeSubModal()">×</button><h3>تم استلام طلبك</h3></div>'+
+      '<div class="sub-ok">'+
+        '<div class="ic"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>'+
+        '<h3>شكرًا لك!</h3>'+
+        '<p>رقم طلبك: <span class="ref">'+esc(res.ref)+'</span></p>'+
+        '<p>هنتواصل معك لتفعيل العقد.</p>'+
+        '<button class="btn-blue" type="button" onclick="closeSubModal()">إغلاق</button>'+
+      '</div>';
+  }
+
+  window.openSubModal=function(carId, months){
+    cur.carId=carId; cur.months=months||12;
+    renderForm();
+    ov.classList.add('open');
+  };
+  window.closeSubModal=closeSubModal;
+
+  ov.addEventListener('click', function(e){ if(e.target===ov) closeSubModal(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && ov.classList.contains('open')) closeSubModal(); });
 })();
 </script>
 <script src="anim.js"></script>
